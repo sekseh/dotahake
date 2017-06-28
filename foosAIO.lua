@@ -1,7 +1,8 @@
 -- foosAIO.lua
--- Version: beta.0.74.3
+-- Version: beta.0.74.4
 -- Author: foo0oo
--- Release Date: 2017/5/03
+-- Release Date: 2017/05/03
+-- Last Update: 2017/06/28
 
 local fooAllInOne = {}
 -- Menu Items
@@ -1314,9 +1315,11 @@ function fooAllInOne.OnParticleCreate(particle)
 	end
 
 	if particle.name == "teleport_start" then
-		if particle.unit ~= Heroes.GetLocal() then
-			fooAllInOne.TPParticleIndex = particle.index
-			fooAllInOne.TPParticleTime = GameRules.GetGameTime()
+		if particle.entityForModifiers ~= Heroes.GetLocal() then
+			if not Entity.IsSameTeam(Heroes.GetLocal(), particle.entityForModifiers) then
+				fooAllInOne.TPParticleIndex = particle.index
+				fooAllInOne.TPParticleTime = GameRules.GetGameTime()
+			end
 		end
 	end
 
@@ -1692,6 +1695,12 @@ function fooAllInOne.GetMoveSpeed(enemy)
     	if NPC.HasModifier(enemy, "modifier_invoker_ice_wall_slow_debuff") then 
 		return 100 
 	end
+
+	if NPC.HasModifier(enemy, "modifier_invoker_cold_snap_freeze") or NPC.HasModifier(enemy, "modifier_invoker_cold_snap") then
+		return (base_speed + bonus_speed) * 0.5
+	end
+
+	
 
     	return base_speed + bonus_speed
 end
@@ -5677,7 +5686,7 @@ function fooAllInOne.InvokerComboCSSpiritSunstrike(myHero, myMana, enemy, coldSn
 	if not Ability.IsReady(coldSnap) and not Ability.IsReady(forgeSpirit) then
 		if fooAllInOne.SleepReady(0.05) and sunStrike and Ability.IsCastable(sunStrike, myMana) and fooAllInOne.InvokerIsAbilityInvoked(myHero, sunStrike) then
 			if not Entity.IsTurning(enemy) then
-				Ability.CastPosition(sunStrike, fooAllInOne.castPrediction(myHero, enemy, Ability.GetCastPoint(NPC.GetAbility(myHero, "invoker_sun_strike")) + 1.0 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)))
+				Ability.CastPosition(sunStrike, fooAllInOne.castPrediction(myHero, enemy, Ability.GetCastPoint(NPC.GetAbility(myHero, "invoker_sun_strike")) + 1.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)))
 				fooAllInOne.lastTick = os.clock()
 				return
 			end
@@ -7051,8 +7060,6 @@ function fooAllInOne.InvokerSkillProcessingSunstrike(myHero, myMana, enemy)
 		position = (Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(300 - (curTime - fooAllInOne.InvokerLastCastedSkillTime)*150))
 	elseif NPC.HasModifier(enemy, "modifier_invoker_tornado") then
 		position = Entity.GetAbsOrigin(enemy)
-	elseif NPC.HasModifier(enemy, "modifier_invoker_cold_snap_freeze") then
-		position = fooAllInOne.castPrediction(myHero, enemy, Ability.GetCastPoint(NPC.GetAbility(myHero, "invoker_sun_strike")) + 1.0 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
 	else
 		position = fooAllInOne.castPrediction(myHero, enemy, Ability.GetCastPoint(NPC.GetAbility(myHero, "invoker_sun_strike")) + 1.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
 	end
