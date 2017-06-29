@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.74.9
+-- Version: beta.0.75.2
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/06/29
@@ -126,10 +126,12 @@ fooAllInOne.optionHeroInvokerIcewallKey = Menu.AddKeyOption({ "Utility","foos Al
 fooAllInOne.optionHeroInvokerCancelEnable = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "4. Cancel Channelling abilities" }, "Auto cancel", "will auto use snap or tornado to cancel enemy channelling spells or TPing, will invoke snap or tornado if not invoked")
 fooAllInOne.optionHeroInvokerInstanceHelper = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "5. Instance helper" }, "auto instance switch", "QQQ if hp missing, WWW if running, EEE if attacking")
 fooAllInOne.optionHeroInvokerInstanceDelay = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "5. Instance helper" }, "delay between instance switch", "", 1, 12, 1)
---fooAllInOne.optionHeroInvokerCombo1Skill1 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "Custom Combo", "Combo 1" }, "Skill 1", "select skill", 0, 9, 1)
---fooAllInOne.optionHeroInvokerCombo1Skill2 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "Custom Combo", "Combo 1" }, "Skill 2", "select skill", 0, 9, 1)
---fooAllInOne.optionHeroInvokerCombo1Skill3 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "Custom Combo", "Combo 1" }, "Skill 3", "select skill", 0, 9, 1)
---fooAllInOne.optionHeroInvokerCombo1Skill4 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "Custom Combo", "Combo 1" }, "Skill 4", "select skill (only with agha)", 0, 9, 1)
+fooAllInOne.optionHeroInvokerCombo1Skill1 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "6. Custom Combo", "Combo 1" }, "Skill 1", "select skill", 0, 9, 1)
+fooAllInOne.optionHeroInvokerCombo1Skill2 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "6. Custom Combo", "Combo 1" }, "Skill 2", "select skill", 0, 9, 1)
+fooAllInOne.optionHeroInvokerCombo1Skill3 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "6. Custom Combo", "Combo 1" }, "Skill 3", "select skill", 0, 9, 1)
+fooAllInOne.optionHeroInvokerCombo1Skill4 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "6. Custom Combo", "Combo 1" }, "Skill 4", "select skill", 0, 9, 1)
+fooAllInOne.optionHeroInvokerCombo1Skill5 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "6. Custom Combo", "Combo 1" }, "Skill 5", "select skill", 0, 9, 1)
+fooAllInOne.optionHeroInvokerCombo1Skill6 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "6. Custom Combo", "Combo 1" }, "Skill 6", "select skill", 0, 9, 1)
 --fooAllInOne.optionHeroInvokerCombo2Skill1 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "Custom Combo", "Combo 2" }, "Skill 1", "select skill", 0, 9, 1)
 --fooAllInOne.optionHeroInvokerCombo2Skill2 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "Custom Combo", "Combo 2" }, "Skill 2", "select skill", 0, 9, 1)
 --fooAllInOne.optionHeroInvokerCombo2Skill3 = Menu.AddOption({ "Utility","foos AllInOne", "5. Hero Scripts", "Invoker", "Custom Combo", "Combo 2" }, "Skill 3", "select skill", 0, 9, 1)
@@ -224,51 +226,71 @@ Menu.SetValueName(fooAllInOne.optionHeroInvokerInstanceDelay, 10, '2.50')
 Menu.SetValueName(fooAllInOne.optionHeroInvokerInstanceDelay, 11, '2.75')
 Menu.SetValueName(fooAllInOne.optionHeroInvokerInstanceDelay, 12, '3.00')
 
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 0, 'none')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 1, 'tornado')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 2, 'emp')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 3, 'chaos_meteor')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 4, 'deafening_blast')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 5, 'sun_strike')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 6, 'ice_wall')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 7, 'cold_snap')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 8, 'forge_spirit')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 9, 'alacrity')
 
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 0, 'none')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 1, 'tornado')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 2, 'emp')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 3, 'chaos_meteor')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 4, 'deafening_blast')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 5, 'sun_strike')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 6, 'ice_wall')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 7, 'cold_snap')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 8, 'forge_spirit')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 9, 'alacrity')
 
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 0, 'none')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 1, 'tornado')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 2, 'emp')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 3, 'chaos_meteor')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 4, 'deafening_blast')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 5, 'sun_strike')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 6, 'ice_wall')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 7, 'cold_snap')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 8, 'forge_spirit')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill1, 9, 'alacrity')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 0, 'none')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 1, 'tornado')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 2, 'emp')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 3, 'chaos_meteor')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 4, 'deafening_blast')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 5, 'sun_strike')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 6, 'ice_wall')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 7, 'cold_snap')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 8, 'forge_spirit')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 9, 'alacrity')
 
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 0, 'none')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 1, 'tornado')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 2, 'emp')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 3, 'chaos_meteor')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 4, 'deafening_blast')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 5, 'sun_strike')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 6, 'ice_wall')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 7, 'cold_snap')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 8, 'forge_spirit')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill2, 9, 'alacrity')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 0, 'none')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 1, 'tornado')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 2, 'emp')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 3, 'chaos_meteor')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 4, 'deafening_blast')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 5, 'sun_strike')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 6, 'ice_wall')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 7, 'cold_snap')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 8, 'forge_spirit')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 9, 'alacrity')
 
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 0, 'none')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 1, 'tornado')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 2, 'emp')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 3, 'chaos_meteor')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 4, 'deafening_blast')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 5, 'sun_strike')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 6, 'ice_wall')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 7, 'cold_snap')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 8, 'forge_spirit')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill3, 9, 'alacrity')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 0, 'none')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 1, 'tornado')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 2, 'emp')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 3, 'chaos_meteor')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 4, 'deafening_blast')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 5, 'sun_strike')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 6, 'ice_wall')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 7, 'cold_snap')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 8, 'forge_spirit')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill5, 9, 'alacrity')
 
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 0, 'none')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 1, 'tornado')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 2, 'emp')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 3, 'chaos_meteor')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 4, 'deafening_blast')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 5, 'sun_strike')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 6, 'ice_wall')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 7, 'cold_snap')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 8, 'forge_spirit')
---Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill4, 9, 'alacrity')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 0, 'none')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 1, 'tornado')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 2, 'emp')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 3, 'chaos_meteor')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 4, 'deafening_blast')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 5, 'sun_strike')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 6, 'ice_wall')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 7, 'cold_snap')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 8, 'forge_spirit')
+Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo1Skill6, 9, 'alacrity')
 
 --Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo2Skill1, 0, 'none')
 --Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo2Skill1, 1, 'tornado')
@@ -313,8 +335,6 @@ Menu.SetValueName(fooAllInOne.optionHeroInvokerInstanceDelay, 12, '3.00')
 --Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo2Skill4, 7, 'cold_snap')
 --Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo2Skill4, 8, 'forge_spirit')
 --Menu.SetValueName(fooAllInOne.optionHeroInvokerCombo2Skill4, 9, 'alacrity')
-
-
 
 	-- global Variables
 fooAllInOne.lastCastTime = 0
@@ -362,6 +382,7 @@ fooAllInOne.InvokerComboSelector = 0
 fooAllInOne.InvokerLastCastedSkill = nil
 fooAllInOne.InvokerLastCastedSkillTime = 0
 fooAllInOne.InvokerLastChangedInstance = 0
+fooAllInOne.InvokerCaptureManualInstances = 0
 fooAllInOne.AttackProjectileCreate = 0
 fooAllInOne.AttackAnimationCreate = 0
 fooAllInOne.AttackParticleCreate = 0
@@ -1432,6 +1453,19 @@ function fooAllInOne.OnPrepareUnitOrders(orders)
 	if Menu.IsEnabled(fooAllInOne.optionHeroInvokerInstanceHelper) then
 		if NPC.GetUnitName(myHero) == "npc_dota_hero_invoker" then
 			fooAllInOne.invokerProcessInstances(myHero, orders.order)
+		end
+	end
+
+	
+	
+	if NPC.GetUnitName(myHero) == "npc_dota_hero_invoker" then
+		local quas = NPC.GetAbility(myHero, "invoker_quas")
+		local wex = NPC.GetAbility(myHero, "invoker_wex")
+		local exort = NPC.GetAbility(myHero, "invoker_exort")
+		if orders.order == Enum.UnitOrder.DOTA_UNIT_ORDER_CAST_NO_TARGET then
+			if orders.ability == quas or orders.ability == wex or orders.ability == exort then
+				fooAllInOne.InvokerCaptureManualInstances = os.clock()
+			end
 		end
 	end
 
@@ -5734,6 +5768,18 @@ function fooAllInOne.InvokerCombo(myHero, enemy)
 	local blink = NPC.GetItem(myHero, "item_blink", true)
 	local euls = NPC.GetItem(myHero, "item_cyclone", true)
 
+	local invokeTranslator = {
+		"invoker_tornado",
+		"invoker_emp",
+		"invoker_chaos_meteor", 
+		"invoker_deafening_blast",
+		"invoker_sun_strike",
+		"invoker_ice_wall",
+		"invoker_cold_snap",
+		"invoker_forge_spirit",
+		"invoker_alacrity"
+			}
+
 	if Menu.IsKeyDown(fooAllInOne.optionHeroInvokerAltKey) and Menu.IsKeyDown(fooAllInOne.optionComboKey) then
 		if fooAllInOne.InvokerComboSelector == 1 then
 			fooAllInOne.PreInvokeSkills = {{coldSnap, forgeSpirit}}
@@ -5755,6 +5801,8 @@ function fooAllInOne.InvokerCombo(myHero, enemy)
 			fooAllInOne.PreInvokeSkills = {{emp, tornado}}
 		elseif fooAllInOne.InvokerComboSelector == 10 then
 			fooAllInOne.PreInvokeSkills = {{deafeningBlast, chaosMeteor}}
+		elseif fooAllInOne.InvokerComboSelector == 12 then
+			fooAllInOne.PreInvokeSkills = {{NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2)]), NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1)])}}
 		end
 	end
 	
@@ -5762,7 +5810,7 @@ function fooAllInOne.InvokerCombo(myHero, enemy)
 		fooAllInOne.InvokerPreInvoke(myHero, myMana, invoke)
 	end
 	if Menu.IsKeyDown(fooAllInOne.optionHeroInvokerIcewallKey) then
-		fooAllInOne.InvokerFastIceWall(myHero, myMana, invoke)
+		fooAllInOne.InvokerFastIceWall(myHero, myMana, invoke, enemy)
 	end
 
 	if Menu.IsEnabled(fooAllInOne.optionHeroInvokerCancelEnable) then
@@ -5795,11 +5843,41 @@ function fooAllInOne.InvokerCombo(myHero, enemy)
 				fooAllInOne.InvokerComboRefresherAghaBlastMeteorSunstrike(myHero, myMana, enemy, deafeningBlast, chaosMeteor, sunStrike, blink, aghanims, refresher, invoke)
 			elseif fooAllInOne.InvokerComboSelector == 11 then
 				fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invoke)
+			elseif fooAllInOne.InvokerComboSelector == 12 then
+				fooAllInOne.InvokerComboCustomMode(myHero, myMana, enemy, blink, invoke)
 			end
 		end
 	end
 
 end
+
+function fooAllInOne.InvokerIceWallHelper(myHero, enemy, iceWall, myMana)
+	
+	if not myHero then return end
+	if not enemy then return end
+	if NPC.IsStunned(myHero) or NPC.IsSilenced(myHero) then return end
+	if not iceWall then return end
+	if not Ability.IsReady(iceWall) or not Ability.IsCastable(iceWall, myMana) or not fooAllInOne.InvokerIsAbilityInvoked(myHero, iceWall) then return end
+	if not NPC.IsEntityInRange(myHero, enemy, 600) then return end
+
+	local betaRad = math.acos(200 / (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D())
+	local beta = betaRad * 180 / math.pi
+	local delta = math.acos((Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Dot(Entity.GetRotation(myHero):GetForward()) / (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D() * (Entity.GetRotation(myHero):GetForward()):Length2D()) * 180 / math.pi
+
+	if NPC.IsEntityInRange(myHero, enemy, 150) then
+		Ability.CastNoTarget(iceWall)
+		return
+	else
+		if math.abs(delta - beta) > 2 then
+			Player.PrepareUnitOrders(Players.GetLocal(), Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION, target, Entity.GetAbsOrigin(myHero) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(5):Rotated(Angle(0, beta, 0)), ability, Enum.PlayerOrderIssuer.DOTA_ORDER_ISSUER_PASSED_UNIT_ONLY, myHero, queue, showEffects)
+			return
+		else
+			Ability.CastNoTarget(iceWall)
+			return
+		end
+	end
+
+end		
 
 function fooAllInOne.InvokerComboCSAlacritySpirit(myHero, myMana, enemy, coldSnap, alacrity, forgeSpirit, blink, invoke)
 
@@ -7265,7 +7343,7 @@ function fooAllInOne.InvokerSkillProcessingSunstrike(myHero, myMana, enemy)
 			end
 		else
 			if not NPC.HasModifier(enemy, "modifier_invoker_tornado") then
-				if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) > 0 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) < ((Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D() / 1000 + fooAllInOne.invokerTornadoLiftDuration[Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 0))] + 0.5) then
+				if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) < ((Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D() / 1000 + fooAllInOne.invokerTornadoLiftDuration[Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 0))] + 0.5) then
 					delay = curTime - Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) + tornadoTiming - 1.7
 				else
 					delay = fooAllInOne.InvokerLastCastedSkillTime + 0.05
@@ -7293,6 +7371,232 @@ function fooAllInOne.InvokerSkillProcessingSunstrike(myHero, myMana, enemy)
 
 end
 
+function fooAllInOne.InvokerSkillProcessingIcewall(myHero, myMana, enemy)
+
+	if not enemy then return end
+
+	local iceWall = NPC.GetAbility(myHero, "invoker_ice_wall")
+		if not iceWall then return end
+
+	local tornadoTravelTime = (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D() / 1000
+	local tornadoLiftDuration = fooAllInOne.invokerTornadoLiftDuration[Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 0))]
+	local tornadoTiming = tornadoTravelTime + tornadoLiftDuration
+
+	local curTime = GameRules.GetGameTime()
+
+	local delay
+	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) < ((Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D() / 1000 + fooAllInOne.invokerTornadoLiftDuration[Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 0))] + 0.1) then
+		delay = curTime - Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_tornado")) + tornadoTiming - 0.5
+	else
+		delay = fooAllInOne.InvokerLastCastedSkillTime + 0.05
+	end
+
+	return { delay, nil }
+
+end
+
+function fooAllInOne.InvokerComboCustomMode(myHero, myMana, enemy, blink, invoke)
+
+	if not myHero then return end
+	if not enemy then return end
+
+	local skillTranslator = {
+		"invoker_tornado",
+		"invoker_emp",
+		"invoker_chaos_meteor", 
+		"invoker_deafening_blast",
+		"invoker_sun_strike",
+		"invoker_ice_wall",
+		"invoker_cold_snap",
+		"invoker_forge_spirit",
+		"invoker_alacrity"
+			}
+		
+	local skillOrder = {}
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1) > 0 then
+		table.insert(skillOrder, skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1)])
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2) > 0 then
+		table.insert(skillOrder, skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2)])
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill3) > 0 then
+		table.insert(skillOrder, skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill3)])
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill4) > 0 then
+		table.insert(skillOrder, skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill4)])
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill5) > 0 then
+		table.insert(skillOrder, skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill5)])
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill6) > 0 then
+		table.insert(skillOrder, skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill6)])
+	end
+
+	local skillProcessing = { 
+		["invoker_tornado"] = { "position", fooAllInOne.InvokerSkillProcessingTornado(myHero, myMana, enemy) }, 
+		["invoker_emp"] = { "position", fooAllInOne.InvokerSkillProcessingEMP(myHero, myMana, enemy) },
+		["invoker_chaos_meteor"] = { "position", fooAllInOne.InvokerSkillProcessingMeteor(myHero, myMana, enemy) },
+		["invoker_deafening_blast"] = { "position", fooAllInOne.InvokerSkillProcessingBlast(myHero, myMana, enemy) },
+		["invoker_sun_strike"] = { "position", fooAllInOne.InvokerSkillProcessingSunstrike(myHero, myMana, enemy) },
+		["invoker_ice_wall"] = { "no target", fooAllInOne.InvokerSkillProcessingIcewall(myHero, myMana, enemy) },
+		["invoker_cold_snap"] = { "target", enemy },
+		["invoker_forge_spirit"] = { "no target", nil },
+		["invoker_alacrity"] = { "target", myHero }
+				}
+
+	local readyTable = {}
+	for i = 1, #skillOrder do
+		if Ability.IsReady(NPC.GetAbility(myHero, skillOrder[i])) then
+			table.insert(readyTable, NPC.GetAbility(myHero, skillOrder[i]))
+		end
+	end
+
+	local skill
+		if #readyTable > 0 then
+			skill = readyTable[1]
+		else
+			skill = nil
+		end
+	
+	local invokeSkill
+		if not Ability.IsReady(NPC.GetAbilityByIndex(myHero, 4)) and Ability.IsReady(NPC.GetAbilityByIndex(myHero, 3)) then
+			if #readyTable > 1 then
+				invokeSkill = readyTable[2]
+			else
+				invokeSkill = nil
+			end
+		elseif not Ability.IsReady(NPC.GetAbilityByIndex(myHero, 4)) and not Ability.IsReady(NPC.GetAbilityByIndex(myHero, 3)) then
+			if #readyTable > 0 then
+				invokeSkill = readyTable[1]
+			else
+				invokeSkill = nil
+			end
+		end
+
+	if invokeSkill then
+		if not fooAllInOne.InvokerIsAbilityInvoked(myHero, invokeSkill) then
+			if GameRules.GetGameTime() - fooAllInOne.lastCastTime3 > 0.05 and invoke and Ability.IsCastable(invoke, myMana) then
+				fooAllInOne.invokerInvokeAbility(myHero, invokeSkill)
+				fooAllInOne.lastCastTime3 = GameRules.GetGameTime()
+				return
+			end
+		end
+	end
+
+	local processingTempTable = {}
+		if skill then
+			if Ability.GetName(skill) == "invoker_tornado" or Ability.GetName(skill) == "invoker_emp" or Ability.GetName(skill) == "invoker_chaos_meteor" or Ability.GetName(skill) == "invoker_deafening_blast" or Ability.GetName(skill) == "invoker_sun_strike" or Ability.GetName(skill) == "invoker_ice_wall" then
+				table.insert(processingTempTable, skillProcessing[Ability.GetName(skill)][2])
+			else
+				processingTempTable = {}
+			end
+		end
+
+	local targetingStyle
+		if skill then
+			targetingStyle = skillProcessing[Ability.GetName(skill)][1]
+		end
+
+	local targetingDelay
+		if skill then
+			if fooAllInOne.InvokerLastCastedSkill == nil then
+				targetingDelay = fooAllInOne.InvokerLastCastedSkillTime + 0.05
+			elseif Ability.GetName(skill) == "invoker_tornado" or Ability.GetName(skill) == "invoker_emp" or Ability.GetName(skill) == "invoker_chaos_meteor" or Ability.GetName(skill) == "invoker_deafening_blast" or Ability.GetName(skill) == "invoker_sun_strike" or Ability.GetName(skill) == "invoker_ice_wall" then
+				targetingDelay = processingTempTable[1][1]
+			else
+				targetingDelay = fooAllInOne.InvokerLastCastedSkillTime + 0.05
+			end
+		end
+
+	local targetingTarget	
+		if skill then
+			if Ability.GetName(skill) == "invoker_tornado" or Ability.GetName(skill) == "invoker_emp" or Ability.GetName(skill) == "invoker_chaos_meteor" or Ability.GetName(skill) == "invoker_deafening_blast" or Ability.GetName(skill) == "invoker_sun_strike" then
+				targetingTarget = processingTempTable[1][2]
+			else
+				targetingTarget = skillProcessing[Ability.GetName(skill)][2]
+			end
+		end
+
+	if skill then
+		if Ability.GetName(skill) == "invoker_tornado" then
+			fooAllInOne.noItemCastFor(((Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D() / 1000) + 0.5)
+		else
+			fooAllInOne.itemUsage(myHero, enemy)
+		end
+	end
+
+	if not NPC.HasModifier(enemy, "modifier_invoker_tornado") and NPC.IsPositionInRange(enemy, Input.GetWorldCursorPos(), 300, 0) then
+		fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+	end
+
+
+	if skill and NPC.IsPositionInRange(enemy, Input.GetWorldCursorPos(), 300, 0) then
+		if not NPC.IsEntityInRange(myHero, enemy, NPC.GetAttackRange(myHero)+200) then
+			if blink and Ability.IsReady(blink) then
+				if NPC.IsEntityInRange(myHero, enemy, 1150 + NPC.GetAttackRange(myHero)) then
+					Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(NPC.GetAttackRange(myHero)-100))
+					return
+				else
+					fooAllInOne.GenericAttackIssuer("Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, Entity.GetAbsOrigin(enemy), myHero)
+					return
+				end
+			end
+			if not blink or (blink and not Ability.IsReady(blink)) and not NPC.HasModifier(enemy, "modifier_invoker_tornado") then
+					fooAllInOne.GenericAttackIssuer("Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil, myHero)
+					return
+				end
+		else
+			if fooAllInOne.InvokerIsAbilityInvoked(myHero, skill) then
+				if GameRules.GetGameTime() > targetingDelay then
+					if Ability.IsCastable(skill, myMana) then
+						if skillProcessing[Ability.GetName(skill)][1] == "position" then
+							Ability.CastPosition(skill, targetingTarget)
+							fooAllInOne.InvokerLastCastedSkillTime = GameRules.GetGameTime()
+							fooAllInOne.InvokerLastCastedSkill = skill
+							return
+						end
+						if skillProcessing[Ability.GetName(skill)][1] == "target" then
+							if not NPC.HasModifier(enemy, "modifier_invoker_tornado") then
+								Ability.CastTarget(skill, targetingTarget)
+								fooAllInOne.InvokerLastCastedSkillTime = GameRules.GetGameTime()
+								fooAllInOne.InvokerLastCastedSkill = skill
+								return
+							end
+						end
+						if skillProcessing[Ability.GetName(skill)][1] == "no target" then
+							if Ability.GetName(skill) == "invoker_ice_wall" then
+								if not NPC.IsEntityInRange(myHero, enemy, 600) then
+									fooAllInOne.GenericAttackIssuer("Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(550), myHero)
+									return
+								else
+									fooAllInOne.InvokerIceWallHelper(myHero, enemy, skill, myMana)
+									fooAllInOne.InvokerLastCastedSkillTime = GameRules.GetGameTime() + 0.1
+									fooAllInOne.InvokerLastCastedSkill = skill
+									return
+								end
+							else
+								Ability.CastNoTarget(skill)
+								fooAllInOne.InvokerLastCastedSkillTime = GameRules.GetGameTime()
+								fooAllInOne.InvokerLastCastedSkill = skill
+								return
+							end			
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if Menu.IsEnabled(fooAllInOne.optionHeroInvokerSwitch) then
+		if next(readyTable) == nil then
+			fooAllInOne.InvokerComboSelector = 11
+		end
+	end
+	fooAllInOne.invokerProcessInstancesWhileComboing(myHero)
+
+		
+end
+
 function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invoke)
 
 	if not myHero then return end
@@ -7316,7 +7620,7 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 		["invoker_chaos_meteor"] = { "position", fooAllInOne.InvokerSkillProcessingMeteor(myHero, myMana, enemy) },
 		["invoker_deafening_blast"] = { "position", fooAllInOne.InvokerSkillProcessingBlast(myHero, myMana, enemy) },
 		["invoker_sun_strike"] = { "position", fooAllInOne.InvokerSkillProcessingSunstrike(myHero, myMana, enemy) },
-		["invoker_ice_wall"] = { "no target", nil },
+		["invoker_ice_wall"] = { "no target", fooAllInOne.InvokerSkillProcessingIcewall(myHero, myMana, enemy) },
 		["invoker_cold_snap"] = { "target", enemy },
 		["invoker_forge_spirit"] = { "no target", nil },
 		["invoker_alacrity"] = { "target", myHero }
@@ -7336,7 +7640,7 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 		if Ability.IsReady(NPC.GetAbilityByIndex(myHero, 3)) then
 			skill = NPC.GetAbilityByIndex(myHero, 3)
 		else
-			if NPC.IsEntityInRange(myHero, enemy, 250) then
+			if NPC.IsEntityInRange(myHero, enemy, 800) then
 				skill = NPC.GetAbilityByIndex(myHero, 4)
 			else
 				if next(readyTable) ~= nil then
@@ -7352,7 +7656,7 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 		if Ability.IsReady(NPC.GetAbilityByIndex(myHero, 4)) then
 			skill = NPC.GetAbilityByIndex(myHero, 4)
 		else
-			if NPC.IsEntityInRange(myHero, enemy, 250) then
+			if NPC.IsEntityInRange(myHero, enemy, 800) then
 				skill = NPC.GetAbilityByIndex(myHero, 3)
 			else
 				if next(readyTable) ~= nil then
@@ -7435,7 +7739,7 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 						skill = readyTable[1]
 					end
 				elseif Ability.GetName(readyTable[1]) == "invoker_ice_wall" then
-					if NPC.IsEntityInRange(myHero, enemy, 250) then
+					if NPC.IsEntityInRange(myHero, enemy, 800) then
 						skill = readyTable[1]
 					else
 						if #readyTable > 1 then
@@ -7452,7 +7756,7 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 	end
 
 	if skill then
-		if (not Ability.IsReady(NPC.GetAbilityByIndex(myHero, 4)) or Ability.GetName(NPC.GetAbilityByIndex(myHero, 4)) == "invoker_ghost_walk" or Ability.GetName(NPC.GetAbilityByIndex(myHero, 4)) == "invoker_ice_wall") and not fooAllInOne.InvokerIsAbilityInvoked(myHero, skill) then
+		if (not Ability.IsReady(NPC.GetAbilityByIndex(myHero, 4)) or Ability.GetName(NPC.GetAbilityByIndex(myHero, 4)) == "invoker_ghost_walk") and not fooAllInOne.InvokerIsAbilityInvoked(myHero, skill) then
 			if GameRules.GetGameTime() - fooAllInOne.lastCastTime3 > 0.05 and invoke and Ability.IsCastable(invoke, myMana) then
 				fooAllInOne.invokerInvokeAbility(myHero, skill)
 				fooAllInOne.InvokerLastChangedInstance = os.clock()
@@ -7464,7 +7768,7 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 
 	local processingTempTable = {}
 		if skill then
-			if Ability.GetName(skill) == "invoker_tornado" or Ability.GetName(skill) == "invoker_emp" or Ability.GetName(skill) == "invoker_chaos_meteor" or Ability.GetName(skill) == "invoker_deafening_blast" or Ability.GetName(skill) == "invoker_sun_strike" then
+			if Ability.GetName(skill) == "invoker_tornado" or Ability.GetName(skill) == "invoker_emp" or Ability.GetName(skill) == "invoker_chaos_meteor" or Ability.GetName(skill) == "invoker_deafening_blast" or Ability.GetName(skill) == "invoker_sun_strike" or Ability.GetName(skill) == "invoker_ice_wall" then
 				table.insert(processingTempTable, skillProcessing[Ability.GetName(skill)][2])
 			else
 				processingTempTable = {}
@@ -7480,7 +7784,7 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 		if skill then
 			if fooAllInOne.InvokerLastCastedSkill == nil then
 				targetingDelay = fooAllInOne.InvokerLastCastedSkillTime + 0.05
-			elseif Ability.GetName(skill) == "invoker_tornado" or Ability.GetName(skill) == "invoker_emp" or Ability.GetName(skill) == "invoker_chaos_meteor" or Ability.GetName(skill) == "invoker_deafening_blast" or Ability.GetName(skill) == "invoker_sun_strike" then
+			elseif Ability.GetName(skill) == "invoker_tornado" or Ability.GetName(skill) == "invoker_emp" or Ability.GetName(skill) == "invoker_chaos_meteor" or Ability.GetName(skill) == "invoker_deafening_blast" or Ability.GetName(skill) == "invoker_sun_strike" or Ability.GetName(skill) == "invoker_ice_wall" then
 				targetingDelay = processingTempTable[1][1]
 			else
 				targetingDelay = fooAllInOne.InvokerLastCastedSkillTime + 0.05
@@ -7504,14 +7808,14 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 		end
 	end
 
-	if not NPC.HasModifier(enemy, "modifier_invoker_tornado") then
+	if not NPC.HasModifier(enemy, "modifier_invoker_tornado")and NPC.IsPositionInRange(enemy, Input.GetWorldCursorPos(), 300, 0) then
 		fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 	end
 
-	if skill then
+	if skill and NPC.IsPositionInRange(enemy, Input.GetWorldCursorPos(), 300, 0) then
 		if not NPC.IsEntityInRange(myHero, enemy, NPC.GetAttackRange(myHero)+200) then
 			if blink and Ability.IsReady(blink) then
-				if NPC.IsEntityInRange(myHero, enemy, 1150 + NPC.GetAttackRange(myHero)) and NPC.IsPositionInRange(enemy, Input.GetWorldCursorPos(), 300, 0) then
+				if NPC.IsEntityInRange(myHero, enemy, 1150 + NPC.GetAttackRange(myHero)) then
 					Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(NPC.GetAttackRange(myHero)-100))
 					return
 				else
@@ -7542,10 +7846,22 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 							end
 						end
 						if skillProcessing[Ability.GetName(skill)][1] == "no target" then
-							Ability.CastNoTarget(skill)
-							fooAllInOne.InvokerLastCastedSkillTime = GameRules.GetGameTime()
-							fooAllInOne.InvokerLastCastedSkill = skill
-							return			
+							if Ability.GetName(skill) == "invoker_ice_wall" then
+								if not NPC.IsEntityInRange(myHero, enemy, 600) then
+									fooAllInOne.GenericAttackIssuer("Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(550), myHero)
+									return
+								else
+									fooAllInOne.InvokerIceWallHelper(myHero, enemy, skill, myMana)
+									fooAllInOne.InvokerLastCastedSkillTime = GameRules.GetGameTime() + 0.25
+									fooAllInOne.InvokerLastCastedSkill = skill
+									return
+								end
+							else
+								Ability.CastNoTarget(skill)
+								fooAllInOne.InvokerLastCastedSkillTime = GameRules.GetGameTime()
+								fooAllInOne.InvokerLastCastedSkill = skill
+								return
+							end		
 						end
 					end
 				end
@@ -7555,10 +7871,15 @@ function fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invok
 	fooAllInOne.invokerProcessInstancesWhileComboing(myHero)
 end
 
-function fooAllInOne.InvokerFastIceWall(myHero, myMana, invoke)
+function fooAllInOne.InvokerFastIceWall(myHero, myMana, invoke, enemy)
 
 	if not Menu.IsEnabled(fooAllInOne.optionHeroInvokerIcewallEnable) then return end
 	if not myHero then return end
+	if enemy then
+		if not NPC.IsEntityInRange(myHero, enemy, 600) then
+			enemy = nil
+		end
+	end
 
 	if NPC.IsSilenced(myHero) or NPC.IsStunned(myHero) then return end
 	
@@ -7570,14 +7891,24 @@ function fooAllInOne.InvokerFastIceWall(myHero, myMana, invoke)
 
 	if not fooAllInOne.InvokerIsAbilityInvoked(myHero, iceWall) then
 		if invoke and Ability.IsCastable(invoke, myMana-175) then
-			fooAllInOne.invokerInvokeAbility(myHero, iceWall)
-			Ability.CastNoTarget(iceWall, true)
-			return
+			if enemy then
+				fooAllInOne.invokerInvokeAbility(myHero, iceWall)
+				fooAllInOne.InvokerIceWallHelper(myHero, enemy, iceWall, myMana)
+				return
+			else
+				fooAllInOne.invokerInvokeAbility(myHero, iceWall)
+				Ability.CastNoTarget(iceWall, true)
+				return
+			end
 		end
 	else
 		if Ability.IsCastable(iceWall, myMana) then
-			Ability.CastNoTarget(iceWall)
-			return
+			if enemy then
+				fooAllInOne.InvokerIceWallHelper(myHero, enemy, iceWall, myMana)
+			else
+				Ability.CastNoTarget(iceWall)
+				return
+			end
 		end
 	end
 
@@ -7923,13 +8254,16 @@ function fooAllInOne.invokerProcessInstances(myHero, order)
 
 	if not myHero then return end
 	if not order then return end
+	if os.clock() - fooAllInOne.InvokerCaptureManualInstances < 2.5 then return end
 	if next(fooAllInOne.PreInvokeSkills) ~= nil then return end
 
 	if Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 0)) < 1 or Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 2)) < 1 or Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 2)) < 1 then
 		return
 	end
 
-	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) < 0.25 then return end
+	if NPC.HasModifier(myHero, "modifier_invoker_ghost_walk_self") then return end
+	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) < 1 then return end
+	
 	if NPC.HasModifier(myHero, "modifier_teleporting") then return end
 	if NPC.IsChannellingAbility(myHero) then return end
 	if NPC.IsSilenced(myHero) or NPC.IsStunned(myHero) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVISIBLE) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then return end
@@ -8025,10 +8359,12 @@ function fooAllInOne.InvokerDraw(myHero)
 	 -- black background
 	Renderer.SetDrawColor(0, 0, 0, 150)
 	Renderer.DrawFilledRect(startX, startY, (38 * maxSkills) + 4, (40 * numberCombos) + 12)
+	Renderer.DrawFilledRect(startX, startY+40*12+12, (38 * maxSkills) + 4, (40 + 2))
 
 	-- black border
 	Renderer.SetDrawColor(0, 0, 0, 255)
 	Renderer.DrawOutlineRect(startX, startY, (38 * maxSkills) + 4, (40 * numberCombos) + 12)
+	Renderer.DrawOutlineRect(startX, startY+40*12+12, (38 * maxSkills) + 4, (40 + 2))
 
 	local hoveringOverCombo1 = Input.IsCursorInRect(startX+1, startY+1+40*0 + 0, (38 * maxSkills)+2 , 40)
 	local hoveringOverCombo2 = Input.IsCursorInRect(startX+1, startY+1+40*1 + 1, (38 * maxSkills)+2 , 40)
@@ -8041,6 +8377,7 @@ function fooAllInOne.InvokerDraw(myHero)
 	local hoveringOverCombo9 = Input.IsCursorInRect(startX+1, startY+1+40*8 + 8, (38 * maxSkills)+2 , 40)
 	local hoveringOverCombo10 = Input.IsCursorInRect(startX+1, startY+1+40*9 + 9, (38 * maxSkills)+2 , 40)
 	local hoveringOverCombo11 = Input.IsCursorInRect(startX+1, startY+1+40*10 + 10, (38 * maxSkills)+2 , 40)
+	local hoveringOverCombo12 = Input.IsCursorInRect(startX+1, startY+1+40*12 + 12, (38 * maxSkills)+2 , 40)
 
 	local sunStrike = NPC.GetAbility(myHero, "invoker_sun_strike")
 	local emp = NPC.GetAbility(myHero, "invoker_emp")
@@ -8053,6 +8390,18 @@ function fooAllInOne.InvokerDraw(myHero)
 	local iceWall = NPC.GetAbility(myHero, "invoker_ice_wall")
 	local euls = NPC.GetItem(myHero, "item_cyclone", true)
 	local refresher = NPC.GetItem(myHero, "item_refresher", true)
+
+	local invokeTranslator = {
+		"invoker_tornado",
+		"invoker_emp",
+		"invoker_chaos_meteor", 
+		"invoker_deafening_blast",
+		"invoker_sun_strike",
+		"invoker_ice_wall",
+		"invoker_cold_snap",
+		"invoker_forge_spirit",
+		"invoker_alacrity"
+			}
 
 	if hoveringOverCombo1 and Input.IsKeyDownOnce(Enum.ButtonCode.MOUSE_LEFT) then
 		if Menu.IsEnabled(fooAllInOne.optionHeroInvokerAutoInvoke) then
@@ -8210,6 +8559,25 @@ function fooAllInOne.InvokerDraw(myHero)
 		else
 			fooAllInOne.InvokerComboSelector = 0
 		end
+	elseif hoveringOverCombo12 and Input.IsKeyDownOnce(Enum.ButtonCode.MOUSE_LEFT) then
+		if Menu.IsEnabled(fooAllInOne.optionHeroInvokerAutoInvoke) then
+			if fooAllInOne.InvokerComboSelector ~= 12 then
+				if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1) > 0 and Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2) > 0 then
+					fooAllInOne.PreInvokeSkills = {{NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2)]), NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1)])}}
+					fooAllInOne.InvokerComboSelector = 12
+				else
+					fooAllInOne.InvokerComboSelector = 0
+				end	
+			else
+				fooAllInOne.InvokerComboSelector = 0
+			end
+		else
+			if fooAllInOne.InvokerComboSelector ~= 12 then
+				fooAllInOne.InvokerComboSelector = 12
+			else
+				fooAllInOne.InvokerComboSelector = 0
+			end
+		end
 	end
 
 	-- border
@@ -8256,6 +8624,10 @@ function fooAllInOne.InvokerDraw(myHero)
 	if fooAllInOne.InvokerComboSelector == 11 then
 		Renderer.SetDrawColor(0, 255, 0, 255)
 		Renderer.DrawOutlineRect(startX+1, startY+1+40*10 + 10, (38 * maxSkills)+2 , 40)
+	end
+	if fooAllInOne.InvokerComboSelector == 12 then
+		Renderer.SetDrawColor(0, 255, 0, 255)
+		Renderer.DrawOutlineRect(startX+1, startY+1+40*12 + 12, (38 * maxSkills)+2 , 40)
 	end
 
 	local imageHandleSnap = fooAllInOne.InvokerCachedIconsSnap
@@ -8683,6 +9055,51 @@ function fooAllInOne.InvokerDraw(myHero)
 
 	Renderer.DrawText(fooAllInOne.font, startX+2+19*6, startY+12+40*10+5, "dynamic", 1)
 
+
+	-- custom mode
+	local skillTranslator = {
+		imageHandleTornado,
+		imageHandleEmp,
+		imageHandleMeteor, 
+		imageHandleBlast,
+		imageHandleSunStrike,
+		imageHandleIcewall,
+		imageHandleSnap,
+		imageHandleSpirit,
+		imageHandleAlacrity
+			}
+
+	if fooAllInOne.InvokerComboSelector == 12 then
+		if fooAllInOne.InvokerInvokedChecker(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2)], invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1)]) and Ability.IsReady(NPC.GetAbility(myHero, "invoker_invoke")) then
+			Renderer.SetDrawColor(0, 205, 0, 255)
+		else
+			Renderer.SetDrawColor(255, 255, 0, 255)
+		end
+	else	
+		Renderer.SetDrawColor(255, 255, 255, 150)
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1) > 0 then
+		Renderer.DrawImage(skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1)], startX+2+38*0, startY+14+40*12, 38, 38)
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2) > 0 then
+		Renderer.DrawImage(skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2)], startX+2+38*1, startY+14+40*12, 38, 38)
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill3) > 0 then
+		Renderer.DrawImage(skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill3)], startX+2+38*2, startY+14+40*12, 38, 38)
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill4) > 0 then
+		Renderer.DrawImage(skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill4)], startX+2+38*3, startY+14+40*12, 38, 38)
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill5) > 0 then
+		Renderer.DrawImage(skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill5)], startX+2+38*4, startY+14+40*12, 38, 38)
+	end
+	if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill6) > 0 then
+		Renderer.DrawImage(skillTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill6)], startX+2+38*5, startY+14+40*12, 38, 38)
+	end
+	Renderer.SetDrawColor(255, 50, 0, 150)
+	Renderer.DrawText(fooAllInOne.font, startX+2+38*1, startY+25+40*11, "custom combo", 1)
+	
+	-- longest CDs
 	if Menu.GetValue(fooAllInOne.optionHeroInvokerPanelCD) == 1 then
 		Renderer.SetDrawColor(255, 0, 0, 150)
 		if fooAllInOne.GetLongestCooldown(myHero, coldSnap, forgeSpirit, alacrity) > 0 then
@@ -8714,6 +9131,11 @@ function fooAllInOne.InvokerDraw(myHero)
 		end
 		if fooAllInOne.GetLongestCooldown(myHero, sunStrike, chaosMeteor, deafeningBlast, refresher) > 0 then
 			Renderer.DrawText(fooAllInOne.font, startX+1-35, startY+11+40*9+6, fooAllInOne.GetLongestCooldown(myHero, sunStrike, chaosMeteor, deafeningBlast, refresher), 1)
+		end
+		if Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1) > 0 and Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2) > 0 and Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill3) > 0 then
+			if fooAllInOne.GetLongestCooldown(myHero, NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1)]), NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2)]), NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill3)])) > 0 then
+				Renderer.DrawText(fooAllInOne.font, startX+1-35, startY+14+40*12+6, fooAllInOne.GetLongestCooldown(myHero, NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill1)]), NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill2)]), NPC.GetAbility(myHero, invokeTranslator[Menu.GetValue(fooAllInOne.optionHeroInvokerCombo1Skill3)])), 1)
+			end
 		end
 	end
 
