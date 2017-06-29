@@ -1,8 +1,8 @@
 -- foosAIO.lua
--- Version: beta.0.74.7
+-- Version: beta.0.74.9
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2017/06/28
+-- Last Update: 2017/06/29
 
 local fooAllInOne = {}
 -- Menu Items
@@ -1716,8 +1716,6 @@ function fooAllInOne.GetMoveSpeed(enemy)
 	if NPC.HasModifier(enemy, "modifier_invoker_cold_snap_freeze") or NPC.HasModifier(enemy, "modifier_invoker_cold_snap") then
 		return (base_speed + bonus_speed) * 0.5
 	end
-
-	
 
     	return base_speed + bonus_speed
 end
@@ -7594,8 +7592,11 @@ function fooAllInOne.InvokerCancelChannelingAbilities(myHero, myMana, enemy, inv
 	
 	if not myHero then return end
 
-	if NPC.IsSilenced(myHero) or NPC.IsStunned(myHero) then return end
-	
+	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) < 0.25 then return end
+	if NPC.HasModifier(myHero, "modifier_teleporting") then return end
+	if NPC.IsChannellingAbility(myHero) then return end
+	if NPC.IsSilenced(myHero) or NPC.IsStunned(myHero) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVISIBLE) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then return end	
+
 	if Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 0)) < 1 or Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 1)) < 1 or Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 2)) < 1 then return end
 
 	if not coldSnap or not tornado then return end
@@ -7928,6 +7929,8 @@ function fooAllInOne.invokerProcessInstances(myHero, order)
 		return
 	end
 
+	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) < 0.25 then return end
+	if NPC.HasModifier(myHero, "modifier_teleporting") then return end
 	if NPC.IsChannellingAbility(myHero) then return end
 	if NPC.IsSilenced(myHero) or NPC.IsStunned(myHero) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVISIBLE) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then return end
 
@@ -8887,9 +8890,19 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 	end
 end
 
-function fooAllInOne.AutoSunstrikeKillSteal(myHero)	
+function fooAllInOne.AutoSunstrikeKillSteal(myHero)
 
-	if (os.clock() - fooAllInOne.lastTick) < fooAllInOne.delay then return end
+	if not myHero then return end
+
+	if Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 2)) < 1 then return end
+	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) < 0.25 then return end
+	if NPC.HasModifier(myHero, "modifier_teleporting") then return end
+	if NPC.IsChannellingAbility(myHero) then return end
+	if NPC.IsSilenced(myHero) or NPC.IsStunned(myHero) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVISIBLE) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then return end
+
+	if Input.IsKeyDownOnce(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
+	if Input.IsKeyDown(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
+
 	local myMana = NPC.GetMana(myHero)
 
 	local exort = NPC.GetAbility(myHero, "invoker_exort")
@@ -8901,56 +8914,46 @@ function fooAllInOne.AutoSunstrikeKillSteal(myHero)
 			sunStrikeDMG = 37.5 + (62.5 * (Ability.GetLevel(exort) + 1))
 		end
 	
-	local sunStrikeInSlot = false
-		if Ability.GetName(NPC.GetAbilityByIndex(myHero, 3)) == "invoker_sun_strike" then
-			sunStrikeInSlot = true
-		elseif Ability.GetName(NPC.GetAbilityByIndex(myHero, 4)) == "invoker_sun_strike" then
-			sunStrikeInSlot = true
-		end
+	if not sunStrike then return end
+	if not Ability.IsReady(sunStrike) then return end
 
 	for _, stealEnemyEntity in ipairs(NPC.GetHeroesInRadius(myHero, 99999, Enum.TeamType.TEAM_ENEMY)) do
 		if not stealEnemyEntity then return end
 
 	sunStrikeEnemy = fooAllInOne.targetChecker(stealEnemyEntity)
 		if not sunStrikeEnemy then return end
-		if NPC.IsChannellingAbility(myHero) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVISIBLE) then return end	
+		if not Entity.IsAlive(sunStrikeEnemy) then return end
 	
 	local bestTarget
 	local maxAgi = 0
 
 	if Entity.GetHealth(sunStrikeEnemy) <= sunStrikeDMG and Hero.GetAgilityTotal(sunStrikeEnemy) > maxAgi then
-	          bestTarget = sunStrikeEnemy
-	        maxAgi = Hero.GetAgilityTotal(sunStrikeEnemy)
+		bestTarget = sunStrikeEnemy
+		maxAgi = Hero.GetAgilityTotal(sunStrikeEnemy)
 	end
 
-	if Entity.GetHealth(sunStrikeEnemy) > sunStrikeDMG then
+	if Entity.GetHealth(sunStrikeEnemy) > sunStrikeDMG or Entity.GetHealth(sunStrikeEnemy) < 1  then
 		bestTarget = nil
 		maxAgi = 0
 	end
 
 		if bestTarget and sunStrike then
-			if NPC.IsRunning(bestTarget) then
+			if NPC.IsRunning(bestTarget) and Entity.IsAlive(bestTarget) then
 				if fooAllInOne.isEnemyTurning(bestTarget) == false then
 					if Ability.IsReady(sunStrike) and Ability.IsCastable(sunStrike, myMana) then
-						if not sunStrikeInSlot then
+						if not fooAllInOne.InvokerIsAbilityInvoked(myHero, sunStrike) then
 							if Menu.IsEnabled(fooAllInOne.optionKillStealAutoInvoke) then
 								if invoke and Ability.IsCastable(invoke, myMana) then
-									Ability.CastNoTarget(exort)
-									Ability.CastNoTarget(exort)
-									Ability.CastNoTarget(exort)
-									Ability.CastNoTarget(invoke)
-									fooAllInOne.makeDelay(0.05)
+									fooAllInOne.invokerInvokeAbility(myHero, sunStrike)
+									Ability.CastPosition(sunStrike, fooAllInOne.castPrediction(myHero, bestTarget, Ability.GetCastPoint(NPC.GetAbility(myHero, "invoker_sun_strike")) + 1.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)), true)
 									return
 								end
+							else
+								return
 							end
 						else
-							local enemyRotation = Entity.GetRotation(bestTarget):GetVectors()
-								enemyRotation:SetZ(0)
-    							local enemyOrigin = NPC.GetAbsOrigin(bestTarget)
-								enemyOrigin:SetZ(0)
-							if enemyRotation and enemyOrigin then
-								Ability.CastPosition(sunStrike, enemyOrigin:__add(enemyRotation:Normalized():Scaled(fooAllInOne.GetMoveSpeed(bestTarget) * (1.8 + 0.05 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)))))
-							end
+							Ability.CastPosition(sunStrike, fooAllInOne.castPrediction(myHero, bestTarget, Ability.GetCastPoint(NPC.GetAbility(myHero, "invoker_sun_strike")) + 1.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)))
+							return
 						end
 					end
 				end
