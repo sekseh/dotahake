@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.81.5
+-- Version: beta.0.81.7
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/07/07
@@ -10094,7 +10094,7 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 							end
 							if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) then
 								if NPC.GetAbility(myHero, skillName) and Ability.IsCastable(NPC.GetAbility(myHero, skillName), myMana) then
-									if targetMode == "target" and not NPC.IsLinkensProtected(enemy) then
+									if targetMode == "target" and not NPC.IsLinkensProtected(stealEnemy) then
 										Ability.CastTarget(NPC.GetAbility(myHero, skillName), stealEnemy)
 										return
 									end
