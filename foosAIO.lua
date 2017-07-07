@@ -6332,8 +6332,8 @@ function fooAllInOne.InvokerCombo(myHero, enemy)
 		fooAllInOne.EnemyHPTracker(myHero)
 	end
 
-	if enemy then
-		if Menu.IsKeyDown(fooAllInOne.optionComboKey) and not Menu.IsKeyDown(fooAllInOne.optionHeroInvokerAltKey) and Entity.GetHealth(enemy) > 0 and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and not Menu.IsKeyDown(fooAllInOne.optionHeroInvokerAltKey) then
+		if invokerTarget and Entity.GetHealth(invokerTarget) > 0 and not NPC.HasState(invokerTarget, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
 			if fooAllInOne.InvokerComboSelector == 0 then
 				return
 			elseif fooAllInOne.InvokerComboSelector == 1 then
