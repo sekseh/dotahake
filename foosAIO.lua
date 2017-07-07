@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.81.4
+-- Version: beta.0.81.5
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/07/07
@@ -1589,9 +1589,9 @@ function fooAllInOne.OnPrepareUnitOrders(orders)
     
 	if Menu.IsEnabled(fooAllInOne.optionHeroInvokerInstanceHelper) then
 		if NPC.GetUnitName(myHero) == "npc_dota_hero_invoker" then
-			if not Input.IsKeyDown(Menu.GetKey(fooAllInOne.optionHeroInvokerGhostKey)) then
+			if not Menu.IsKeyDown(fooAllInOne.optionHeroInvokerGhostKey) then
 				fooAllInOne.invokerProcessInstances(myHero, orders.order)
-			elseif not Input.IsKeyDownOnce(Menu.GetKey(fooAllInOne.optionHeroInvokerGhostKey)) then
+			elseif not Menu.IsKeyDownOnce(fooAllInOne.optionHeroInvokerGhostKey) then
 				fooAllInOne.invokerProcessInstances(myHero, orders.order)
 			end
 		end
@@ -6234,7 +6234,7 @@ function fooAllInOne.InvokerCombo(myHero, enemy)
 		return
 	end
 
-	if Input.IsKeyDown(Menu.GetKey(fooAllInOne.optionComboKey)) then
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) then
 		if fooAllInOne.InvokerLockedTarget == nil then
 			fooAllInOne.InvokerLockedTarget = enemy
 		end
@@ -8554,8 +8554,8 @@ end
 
 function fooAllInOne.InvokerCancelChannelingAbilities(myHero, myMana, enemy, invoke, coldSnap, tornado)
 
-	if Input.IsKeyDownOnce(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
-	if Input.IsKeyDown(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
+	if Menu.IsKeyDownOnce(fooAllInOne.optionComboKey) then return end
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) then return end
 
 	if os.clock() - fooAllInOne.invokerChannellingKillstealTimer <= 3 then return end
 
@@ -8931,8 +8931,8 @@ function fooAllInOne.invokerProcessInstances(myHero, order)
 
 	if os.clock() - fooAllInOne.InvokerLastChangedInstance < Menu.GetValue(fooAllInOne.optionHeroInvokerInstanceDelay) * 0.25 then return end
 
-	if Input.IsKeyDownOnce(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
-	if Input.IsKeyDown(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
+	if Menu.IsKeyDownOnce(fooAllInOne.optionComboKey) then return end
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) then return end
 
 	local instanceTable = {}
 	local modifiers = NPC.GetModifiers(myHero)
@@ -8975,8 +8975,8 @@ function fooAllInOne.invokerChangeInstances(myHero, instance)
 	if not myHero then return end
 	if not instance then return end
 
-	if Input.IsKeyDownOnce(Menu.GetKey(fooAllInOne.optionHeroInvokerGhostKey)) then return end
-	if Input.IsKeyDown(Menu.GetKey(fooAllInOne.optionHeroInvokerGhostKey)) then return end
+	if Menu.IsKeyDownOnce(fooAllInOne.optionHeroInvokerGhostKey) then return end
+	if Menu.IsKeyDown(fooAllInOne.optionHeroInvokerGhostKey) then return end
 	
 	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) < 1 then return end
 	if NPC.HasModifier(myHero, "modifier_invoker_ghost_walk_self") then return end
@@ -10245,8 +10245,8 @@ function fooAllInOne.AutoSunstrikeKillStealNew(myHero)
 	if NPC.IsChannellingAbility(myHero) then return end
 	if NPC.IsSilenced(myHero) or NPC.IsStunned(myHero) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVISIBLE) or NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then return end
 
-	if Input.IsKeyDownOnce(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
-	if Input.IsKeyDown(Menu.GetKey(fooAllInOne.optionComboKey)) then return end
+	if Menu.IsKeyDownOnce(fooAllInOne.optionComboKey) then return end
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) then return end
 
 	local myMana = NPC.GetMana(myHero)
 
