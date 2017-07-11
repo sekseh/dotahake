@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.84.2c
+-- Version: beta.0.84.2d
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/07/11
@@ -3872,6 +3872,42 @@ function fooAllInOne.shouldCastBKB(myHero)
 	if not myHero then return end
 	if NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then return false end
 
+	local dangerousRangeTable = {
+		alchemist_unstable_concoction_throw = 775,
+		beastmaster_primal_roar = 600,
+		centaur_hoof_stomp = 315,
+		chaos_knight_chaos_bolt = 500,
+		crystal_maiden_frostbite = 525,
+		dragon_knight_dragon_tail = 400,
+		drow_ranger_wave_of_silence = 900,
+		earth_spirit_boulder_smash = 300,
+		earthshaker_fissure = 1400,
+		ember_spirit_searing_chains = 400,
+		invoker_tornado = 1000,
+		jakiro_ice_path = 1200,
+		lion_impale = 500,
+		lion_voodoo = 500,
+		naga_siren_ensnare = 650,
+		nyx_assassin_impale = 700,
+		puck_dream_coil = 750,
+		rubick_telekinesis = 625,
+		sandking_burrowstrike = 650,
+		shadow_shaman_shackles = 400,
+		shadow_shaman_voodoo = 500,
+		skeleton_king_hellfire_blast = 525,
+		slardar_slithereen_crush = 400,
+		storm_spirit_electric_vortex = 400,
+		sven_storm_bolt = 600,
+		tidehunter_ravage = 1025,
+		tiny_avalanche = 600,
+		vengefulspirit_magic_missile = 500,
+		warlock_rain_of_chaos = 1200,
+		windrunner_shackleshot = 800,
+		slark_pounce = 700,
+		ogre_magi_fireblast = 475,
+		meepo_poof = 400
+			}
+
 	local enemyTable = {}
 	local enemiesAround = Entity.GetHeroesInRadius(myHero, Menu.GetValue(fooAllInOne.optionDefensiveItemsBKBRadius), Enum.TeamType.TEAM_ENEMY)
 		for _, enemy in ipairs(enemiesAround) do
@@ -3899,8 +3935,10 @@ function fooAllInOne.shouldCastBKB(myHero)
 			if NPC.HasAbility(enemy, ability) then
 				if NPC.GetAbility(enemy, ability) ~= nil and Ability.IsReady(NPC.GetAbility(enemy, ability)) then
 					if Ability.GetLevel(NPC.GetAbility(enemy, ability)) > 0 and Ability.GetCooldownTimeLeft(NPC.GetAbility(enemy, ability)) < 1 and not Ability.IsHidden(NPC.GetAbility(enemy, ability)) then
-						searchAbility = ability
-						break
+						if dangerousRangeTable[ability] > (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Length2D() then
+							searchAbility = ability
+							break
+						end
 					end
 				end
 			end
