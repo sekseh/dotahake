@@ -1,8 +1,8 @@
 -- foosAIO.lua
--- Version: beta.0.84.2d
+-- Version: beta.0.84.4a
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2017/07/11
+-- Last Update: 2017/07/12
 
 local fooAllInOne = {}
 -- Menu Items
@@ -1304,11 +1304,11 @@ function fooAllInOne.ResetGlobalVariables()
 
 end
 
-function fooAllInOne.OnGameStart()
+--function fooAllInOne.OnGameStart()
 	
-	fooAllInOne.ResetGlobalVariables()
+--	fooAllInOne.ResetGlobalVariables()
 
-end
+--end
 
 function fooAllInOne.OnGameEnd()
 	
@@ -1481,7 +1481,7 @@ function fooAllInOne.OnUpdate()
 --	local abilityNames = Ability.GetName(abilities)
 --	Log.Write(abilityNames)
 --	end
-	
+
 end
 
 function fooAllInOne.OnParticleCreate(particle)
@@ -1498,7 +1498,7 @@ function fooAllInOne.OnParticleCreate(particle)
 	end
 
 	if particle.name == "teleport_start" then
-		if particle.entityForModifiers ~= Heroes.GetLocal() then
+		if particle.entityForModifiers ~= nil and particle.entityForModifiers ~= Heroes.GetLocal() then
 			if not Entity.IsSameTeam(Heroes.GetLocal(), particle.entityForModifiers) then
 				fooAllInOne.TPParticleIndex = particle.index
 				fooAllInOne.TPParticleTime = GameRules.GetGameTime()
@@ -1508,7 +1508,7 @@ function fooAllInOne.OnParticleCreate(particle)
 	end
 
 	if particle.name == "furion_sprout" then
-		if Entity.IsSameTeam(Heroes.GetLocal(), particle.entityForModifiers) then
+		if particle.entityForModifiers ~= nil and Entity.IsSameTeam(Heroes.GetLocal(), particle.entityForModifiers) then
 			fooAllInOne.InvokerKSparticleProcess[1][1] = particle.index
 			fooAllInOne.InvokerKSparticleProcess[1][2] = particle.name
 			fooAllInOne.InvokerKSparticleProcess[1][3] = GameRules.GetGameTime()
@@ -1517,7 +1517,7 @@ function fooAllInOne.OnParticleCreate(particle)
 	end
 
 	if particle.name == "rattletrap_cog_deploy" then
-		if Entity.IsSameTeam(Heroes.GetLocal(), particle.entity) then
+		if particle.entity ~= nil and Entity.IsSameTeam(Heroes.GetLocal(), particle.entity) then
 			fooAllInOne.InvokerKSparticleProcess[1][1] = particle.index
 			fooAllInOne.InvokerKSparticleProcess[1][2] = particle.name
 			fooAllInOne.InvokerKSparticleProcess[1][3] = GameRules.GetGameTime()
@@ -1527,16 +1527,12 @@ function fooAllInOne.OnParticleCreate(particle)
 	end
 
 	if particle.name == "disruptor_glimpse_targetend" then
-		if not Entity.IsSameTeam(Heroes.GetLocal(), particle.entityForModifiers) then
-			fooAllInOne.GlimpseParticleIndex = particle.index
-			fooAllInOne.GlimpseParticleTime = GameRules.GetGameTime()
-		end
+		fooAllInOne.GlimpseParticleIndex = particle.index
+		fooAllInOne.GlimpseParticleTime = GameRules.GetGameTime()
 	end
 
 	if particle.name == "disruptor_glimpse_targetstart" then
-		if not Entity.IsSameTeam(Heroes.GetLocal(), particle.entityForModifiers) then
-			fooAllInOne.GlimpseParticleIndexStart = particle.index
-		end
+		fooAllInOne.GlimpseParticleIndexStart = particle.index
 	end
 	
 end
@@ -1547,7 +1543,7 @@ function fooAllInOne.OnParticleUpdate(particle)
 	if not Heroes.GetLocal() then return end
 	if not particle.position then return end
 	if particle.position:__tostring() == Vector(1.0, 1.0, 1.0):__tostring() then return end
-	if particle.controlPoint > 0 then return end
+	if particle.position:__tostring() == Vector(0.0, 0.0, 0.0):__tostring() then return end
 
 	if particle.index  == fooAllInOne.TPParticleIndex then
 		fooAllInOne.TPParticlePosition = particle.position
@@ -1572,11 +1568,14 @@ function fooAllInOne.OnParticleUpdateEntity(particle)
 	if not particle then return end
 	if not Heroes.GetLocal() then return end
 	if not particle.position then return end
+	if particle.controlPoint > 0 then return end
 
 	if particle.index  == fooAllInOne.GlimpseParticleIndexStart then
-		if particle.position:__tostring() ~= Vector(0.0, 0.0, 0.0):__tostring() then
-			fooAllInOne.GlimpseParticlePositionStart = particle.position
-			fooAllInOne.GlimpseParticleUnit = particle.entity
+		if particle.entity ~= nil and not Entity.IsSameTeam(Heroes.GetLocal(), particle.entity) then
+			if particle.position:__tostring() ~= Vector(0.0, 0.0, 0.0):__tostring() then
+				fooAllInOne.GlimpseParticlePositionStart = particle.position
+				fooAllInOne.GlimpseParticleUnit = particle.entity
+			end
 		end
 	end
 
@@ -1625,6 +1624,8 @@ function fooAllInOne.OnParticleDestroy(particle)
 
 	if particle.index  == fooAllInOne.TPParticleIndex then
 		fooAllInOne.TPParticlePosition = Vector()
+		fooAllInOne.TPParticleTime = 0
+		fooAllInOne.TPParticleUnit = nil
 	end
 
 end
@@ -1663,7 +1664,7 @@ function fooAllInOne.OnDraw()
 
 	if NPC.GetUnitName(myHero) == "npc_dota_hero_phantom_assassin" then
 		fooAllInOne.DrawPADaggerSwitch()
-	end
+	end	
 
 end
 
@@ -2321,7 +2322,11 @@ function fooAllInOne.GenericMainAttack(myHero, attackType, target, position)
 
 	if Menu.IsEnabled(fooAllInOne.optionOrbwalkEnable) then
 		if target ~= nil then
-			fooAllInOne.OrbWalker(myHero, target)
+			if NPC.HasModifier(myHero, "modifier_windrunner_focusfire") then
+				fooAllInOne.GenericAttackIssuer(attackType, target, position, myHero)
+			else
+				fooAllInOne.OrbWalker(myHero, target)
+			end
 		else
 			fooAllInOne.GenericAttackIssuer(attackType, target, position, myHero)
 		end
@@ -2929,6 +2934,217 @@ function fooAllInOne.EnemyHPTracker(myHero)
 			fooAllInOne.enemyHeroTable[hero] = { heroHP, heroHPreg, timeStamp }
 		end
 	end
+
+end
+
+function fooAllInOne.getEnemyBeShackledWithNPC(myHero, enemy)
+
+	if not myHero then return end
+	if not enemy then return end
+
+	local myMana = NPC.GetMana(myHero)
+	local shackleShot = NPC.GetAbility(myHero, "windrunner_shackleshot")
+		if not shackleShot then return end
+		if not Ability.IsCastable(shackleShot, myMana) then return end
+
+	local shackleSearchRange = 575
+	local shackleCastRange = 785
+
+	local directLineVector = Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
+
+	local npcs = Entity.GetUnitsInRadius(enemy, shackleSearchRange, Enum.TeamType.TEAM_FRIEND)
+		if next(npcs) == nil then return end
+
+		local shackleNPC
+		local minAngle = 180
+
+		for _, targetNPC in ipairs(npcs) do
+			if targetNPC then
+				local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D()
+				local myDisToNPC = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(targetNPC)):Length2D()
+				local enemyDisToNPC = (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)):Length2D()
+				if myDisToEnemy < myDisToNPC then
+					if myDisToEnemy < shackleCastRange then
+						local vectorEnemyToNPC = Entity.GetAbsOrigin(targetNPC) - Entity.GetAbsOrigin(enemy)
+						local vectormyHerotoEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)
+						local searchAngleRad = math.acos(vectormyHerotoEnemy:Dot2D(vectorEnemyToNPC) / (vectormyHerotoEnemy:Length2D() * vectorEnemyToNPC:Length2D()))
+						local searchAngle = (180 / math.pi) * searchAngleRad
+						if searchAngle < minAngle then
+							shackleNPC = enemy
+							minAngle = searchAngle
+						end
+					end
+				else
+					if myDisToNPC < shackleCastRange then
+						local vectorNPCToEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)
+						local vectormyHerotoNPC = Entity.GetAbsOrigin(targetNPC) - Entity.GetAbsOrigin(myHero)
+						local searchAngleRad = math.acos(vectormyHerotoNPC:Dot2D(vectorNPCToEnemy) / (vectormyHerotoNPC:Length2D() * vectorNPCToEnemy:Length2D()))
+						local searchAngle = (180 / math.pi) * searchAngleRad
+						if searchAngle < minAngle then
+							shackleNPC = targetNPC
+							minAngle = searchAngle
+						end
+					end
+				end
+			end
+		end
+
+		if shackleNPC and minAngle < 23 then
+			return shackleNPC
+		end
+	
+	return
+
+end
+
+function fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, dist)
+
+	if not myHero then return Vector() end
+	if not enemy then return Vector() end
+	if not dist then return Vector() end
+
+	local myMana = NPC.GetMana(myHero)
+	local shackleShot = NPC.GetAbility(myHero, "windrunner_shackleshot")
+		if not shackleShot then return Vector() end
+		if not Ability.IsCastable(shackleShot, myMana) then return Vector() end
+
+	local shackleSearchRange = 575
+	local shackleCastRange = 785
+
+	local directLineVector = Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
+
+	local shacklePos = Vector()
+	local minDis = 99999
+
+	if not fooAllInOne.canEnemyBeShackledWithTree(myHero, enemy) and fooAllInOne.getEnemyBeShackledWithNPC(myHero, enemy) == nil then
+		if fooAllInOne.getEnemyShackleTrees(myHero, enemy) ~= nil then
+			for _, targetTree in ipairs(fooAllInOne.getEnemyShackleTrees(myHero, enemy)) do
+				if targetTree then
+					local vectorTreeToEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetTree)
+					local searchVec = Entity.GetAbsOrigin(targetTree) + vectorTreeToEnemy:Normalized():Scaled(vectorTreeToEnemy:Length2D() + 500)
+					local myDisToSearchPos = (searchVec - Entity.GetAbsOrigin(myHero)):Length2D()
+					if #Trees.InRadius(searchVec, 300, true) < 1 and #Heroes.InRadius(searchVec, 300, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY) < 1 then
+						if myDisToSearchPos < minDis then
+							shacklePos = searchVec
+							minDis = myDisToSearchPos
+						end
+					end
+				end
+			end
+		else
+			local npcs = Entity.GetUnitsInRadius(enemy, shackleSearchRange, Enum.TeamType.TEAM_FRIEND)
+			for _, targetNPC in ipairs(npcs) do
+				if targetNPC then
+					local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D()
+					local myDisToNPC = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(targetNPC)):Length2D()
+					local enemyDisToNPC = (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)):Length2D()
+					if myDisToEnemy < myDisToNPC then
+						local vectorNPCtoEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)
+						local searchVec = Entity.GetAbsOrigin(targetNPC) + vectorNPCtoEnemy:Normalized():Scaled(vectorNPCtoEnemy:Length2D() + 500)
+						local myDisToSearchPos = (searchVec - Entity.GetAbsOrigin(myHero)):Length2D()
+						if #Trees.InRadius(searchVec, 300, true) < 1 and #Heroes.InRadius(searchVec, 300, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY) < 1 then
+							if myDisToSearchPos < minDis then
+								shacklePos = searchVec
+								minDis = myDisToSearchPos
+							end
+						end
+					else
+						local vectorEnemyToNPC = Entity.GetAbsOrigin(targetNPC) - Entity.GetAbsOrigin(enemy)
+						local searchVec = Entity.GetAbsOrigin(enemy) + vectorEnemyToNPC:Normalized():Scaled(vectorEnemyToNPC:Length2D() + 200)
+						local myDisToSearchPos = (searchVec - Entity.GetAbsOrigin(myHero)):Length2D()
+						if #Trees.InRadius(searchVec, 300, true) < 1 and #Heroes.InRadius(searchVec, 300, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY) < 1 then
+							if myDisToSearchPos < minDis then
+								shacklePos = searchVec
+								minDis = myDisToSearchPos
+							end
+						end
+					end
+				end
+			end
+		end			
+	end
+	
+	if shacklePos ~= Vector() and minDis < dist then
+		return shacklePos
+	end
+
+	return Vector()
+
+end
+
+function fooAllInOne.getEnemyShackleTrees(myHero, enemy)
+
+	if not myHero then return end
+	if not enemy then return end
+
+	local shackleSearchRange = 575
+
+	local trees = Trees.InRadius(Entity.GetAbsOrigin(enemy), shackleSearchRange, true)
+		if next(trees) == nil then return end
+
+	local returnTrees = {}
+	for _, targetTree in ipairs(trees) do		
+		if targetTree then
+			table.insert(returnTrees, targetTree)
+		end
+	end
+
+	if next(returnTrees) ~= nil then
+		return returnTrees
+	end
+	return
+
+end
+			
+			
+
+function fooAllInOne.canEnemyBeShackledWithTree(myHero, enemy)
+
+	if not myHero then return end
+	if not enemy then return end
+
+	local myMana = NPC.GetMana(myHero)
+	local shackleShot = NPC.GetAbility(myHero, "windrunner_shackleshot")
+		if not shackleShot then return false end
+		if not Ability.IsCastable(shackleShot, myMana) then return false end
+
+	local shackleSearchRange = 575
+	local shackleCastRange = 785
+
+	local directLineVector = Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
+
+	local trees = Trees.InRadius(directLineVector, shackleSearchRange, true)
+		if next(trees) == nil then return false end
+
+		local shackleTree
+		local minAngle = 180
+		
+		for _, targetTree in ipairs(trees) do		
+			if targetTree then
+				local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D()
+				local enemyDisToTree = (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetTree)):Length2D()
+				if myDisToEnemy < shackleCastRange then
+					if enemyDisToTree < shackleSearchRange then
+						if targetTree ~= nil then
+							local vectorEnemyToTree = Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(enemy)
+							local vectormyHerotoEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)
+							local searchAngleRad = math.acos(vectormyHerotoEnemy:Dot2D(vectorEnemyToTree) / (vectormyHerotoEnemy:Length2D() * vectorEnemyToTree:Length2D()))
+							local searchAngle = (180 / math.pi) * searchAngleRad
+							if searchAngle < minAngle then
+								shackleTree = targetTree
+								minAngle = searchAngle
+							end
+						end
+					end
+				end
+			end
+		end
+
+		if shackleTree and minAngle < 23 then
+			return true
+		end
+	
+	return false
 
 end
 
@@ -4485,35 +4701,38 @@ end
 function fooAllInOne.WindRunnerCombo(myHero, enemy)
 
 	if not Menu.IsEnabled(fooAllInOne.optionHeroWindrunner) then return end
-	if not NPC.IsEntityInRange(myHero, enemy, 1500)	then return end
-	if (os.clock() - fooAllInOne.lastTick) < fooAllInOne.delay then return end
+	if not NPC.IsEntityInRange(myHero, enemy, 1800)	then return end
 
 	local shackleShot = NPC.GetAbilityByIndex(myHero, 0)
-	local powerShot = NPC.GetAbilityByIndex(myHero, 1)
 	local windRun = NPC.GetAbilityByIndex(myHero, 2)
 	local focusFire = NPC.GetAbilityByIndex(myHero, 3)
 	local myMana = NPC.GetMana(myHero)
 	
 	local branch = NPC.GetItem(myHero, "item_branches", true)
 	local blink = NPC.GetItem(myHero, "item_blink", true)
-	
-	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and NPC.IsEntityInRange(myHero, enemy, 750) then
-		if branch then
-			if blink then	
-				if shackleShot and Ability.IsCastable(shackleShot, myMana) then
-					Ability.CastTarget(shackleShot, enemy)
-			--		return
-				end
-				if blink and Ability.IsReady(blink) and not Ability.IsReady(shackleShot) then
-					Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Rotated(Angle(0,45,0)):Normalized():Scaled(200))
-					Ability.CastPosition(branch, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(150))
-			--		return
+
+	fooAllInOne.itemUsage(myHero, enemy)
+
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+		if fooAllInOne.canEnemyBeShackledWithTree(myHero, enemy) == true then
+			if shackleShot and Ability.IsCastable(shackleShot, myMana) then
+				Ability.CastTarget(shackleShot, enemy)
+				return
+			end
+		elseif fooAllInOne.getEnemyBeShackledWithNPC(myHero, enemy) ~= nil then
+			if shackleShot and Ability.IsCastable(shackleShot, myMana) then
+				Ability.CastTarget(shackleShot, fooAllInOne.getEnemyBeShackledWithNPC(myHero, enemy))
+				return
+			end
+		else
+			if fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, 1150):__tostring() ~= Vector():__tostring() then
+				if blink and Ability.IsReady(blink) then
+					Ability.CastPosition(blink, fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, 1150))
+					return
 				end
 			end
-		else 
-			fooAllInOne.itemUsage(myHero, enemy)
-			fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 		end
+	fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 	end
 
 	if NPC.IsEntityInRange(myHero, enemy, NPC.GetAttackRange(myHero)) and Entity.GetHealth(enemy) > 0 then
@@ -4524,7 +4743,6 @@ function fooAllInOne.WindRunnerCombo(myHero, enemy)
 			local shackleTime = Modifier.GetCreationTime(shackleMod) + Modifier.GetDuration(shackleMod)
 
 			if NPC.HasModifier(enemy, "modifier_windrunner_shackle_shot") and Modifier.GetDuration(shackleMod) >= 1.5 then
-				fooAllInOne.itemUsage(myHero, enemy, true)
 				if focusFire and Ability.IsCastable(focusFire, myMana) then
 					Ability.CastTarget(focusFire, enemy)
 					return
@@ -4536,6 +4754,26 @@ function fooAllInOne.WindRunnerCombo(myHero, enemy)
 			end
 		end
 	end
+
+--	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and NPC.IsEntityInRange(myHero, enemy, 750) then
+--		if branch then
+--			if blink then	
+--				if shackleShot and Ability.IsCastable(shackleShot, myMana) then
+--					Ability.CastTarget(shackleShot, enemy)
+--			--		return
+--				end
+--				if blink and Ability.IsReady(blink) and not Ability.IsReady(shackleShot) then
+--					Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Rotated(Angle(0,45,0)):Normalized():Scaled(200))
+--					Ability.CastPosition(branch, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(150))
+--			--		return
+--				end
+--			end
+--		else 
+--			fooAllInOne.itemUsage(myHero, enemy)
+--			fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+--		end
+--	end
+	
 end
 
 function fooAllInOne.TimberCombo(myHero, enemy)
@@ -9101,7 +9339,7 @@ function fooAllInOne.InvokerCancelChannelingAbilities(myHero, myMana, enemy, inv
 	if Menu.IsKeyDownOnce(fooAllInOne.optionComboKey) then return end
 	if Menu.IsKeyDown(fooAllInOne.optionComboKey) then return end
 
-	if os.clock() - fooAllInOne.invokerChannellingKillstealTimer <= 3 then return end
+	if os.clock() - fooAllInOne.invokerChannellingKillstealTimer <= 2 then return end
 
 	if not myHero then return end
 
@@ -9444,7 +9682,7 @@ function fooAllInOne.InvokerCancelChannelingAbilities(myHero, myMana, enemy, inv
 	end
 
 	if fooAllInOne.TPParticleUnit ~= nil and NPC.IsDormant(fooAllInOne.TPParticleUnit) then
-		if fooAllInOne.TPParticleTime > 0 and fooAllInOne.TPParticlePosition ~= Vector() then
+		if fooAllInOne.TPParticleTime > 0 and fooAllInOne.TPParticlePosition:__tostring() ~= Vector(0.0, 0.0, 0.0):__tostring() and not fooAllInOne.invokerSunstrikeKSParticleProcess(myHero) then
 			if GameRules.GetGameTime() + ((Entity.GetAbsOrigin(myHero) - fooAllInOne.TPParticlePosition):Length2D() / 1000) < fooAllInOne.TPParticleTime + 2.5 then
 				if NPC.IsPositionInRange(myHero, fooAllInOne.TPParticlePosition, (400 + Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 1)) * 400), 0) then
 					if tornado and Ability.IsReady(tornado) then
@@ -9914,15 +10152,20 @@ end
 function fooAllInOne.invokerSunstrikeKSParticleProcess(myHero)
 
 	if not myHero then return false end
+	if fooAllInOne.TPParticlePosition:__tostring() == Vector(0.0, 0.0, 0.0):__tostring() then return false end
+	if NPC.GetMana(myHero) < 175 then return false end	
+
 	local sunStrike = NPC.GetAbility(myHero, "invoker_sun_strike")
 	if not sunStrike or (sunStrike and not Ability.IsReady(sunStrike)) then return false end
+	if not fooAllInOne.InvokerIsAbilityInvoked(myHero, sunStrike) and not Ability.IsReady(NPC.GetAbility(myHero, "invoker_invoke")) then return false end
+	
 	local aghanims = NPC.GetItem(myHero, "item_ultimate_scepter", true)
 	local sunStrikeDMG = 37.5 + (62.5 * Ability.GetLevel(NPC.GetAbility(myHero, "invoker_exort")))
 		if aghanims or NPC.HasModifier(myHero, "modifier_item_ultimate_scepter_consumed") then
 			sunStrikeDMG = 37.5 + (62.5 * (Ability.GetLevel(NPC.GetAbility(myHero, "invoker_exort")) + 1))
 		end
 
-	if fooAllInOne.TPParticleTime > 0 and fooAllInOne.TPParticlePosition ~= Vector() and fooAllInOne.TPParticleUnit ~= nil then
+	if fooAllInOne.TPParticleTime > 0 and fooAllInOne.TPParticleUnit ~= nil then
 		for hero, data in pairs(fooAllInOne.enemyHeroTable) do
 			local heroHP = data[1]
 			local heroHPreg = data[2]
@@ -10894,6 +11137,7 @@ end
 -- killsteal functions
 function fooAllInOne.AutoNukeKillSteal(myHero)
 
+	if not myHero then return end
 	local myMana = NPC.GetMana(myHero)
 
 	for _, stealEnemyEntity in ipairs(NPC.GetHeroesInRadius(myHero, 1200, Enum.TeamType.TEAM_ENEMY)) do
@@ -10912,11 +11156,11 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 		
 			
 			if NPC.GetUnitName(myHero) == heroName then
-				if skillType == "nuke" and not Ability.IsUltimate(NPC.GetAbility(myHero, skillName)) then
+				if skillType == "nuke" and NPC.GetAbility(myHero, skillName) ~= nil and not Ability.IsUltimate(NPC.GetAbility(myHero, skillName)) then
 					if Entity.GetHealth(stealEnemy) > 0 then
-						if NPC.IsEntityInRange(myHero, stealEnemy, Ability.GetCastRange(NPC.GetAbility(myHero, skillName))) then
+						if NPC.IsEntityInRange(myHero, stealEnemy, Ability.GetCastRange(NPC.GetAbility(myHero, skillName))) or skillName == "rattletrap_rocket_flare" then
 							local skillDamage = Ability.GetDamage(NPC.GetAbility(myHero, skillName), 0)
-							if  skillDamage < 1 then
+							if skillDamage < 1 then
 								if skillName == "skywrath_mage_arcane_bolt" then
 									skillDamage = Ability.GetLevelSpecialValueFor(NPC.GetAbility(myHero, skillName), specialAttribute) + (1.6 * Hero.GetIntellectTotal(myHero))
 								else
@@ -11060,7 +11304,7 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 						end
 					end
 				end
-				if skillType == "pure" and not Ability.IsUltimate(NPC.GetAbility(myHero, skillName)) then
+				if skillType == "pure" and NPC.GetAbility(myHero, skillName) ~= nil and not Ability.IsUltimate(NPC.GetAbility(myHero, skillName)) then
 					if Entity.GetHealth(stealEnemy) > 0 then
 						if NPC.IsEntityInRange(myHero, stealEnemy, Ability.GetCastRange(NPC.GetAbility(myHero, skillName))) then
 							local skillDamage = Ability.GetDamage(NPC.GetAbility(myHero, skillName), 0)
@@ -11098,7 +11342,7 @@ end
 function fooAllInOne.AutoSunstrikeKillStealNew(myHero)
 
 	if not myHero then return end
-	if os.clock() - fooAllInOne.invokerChannellingKillstealTimer <= 3 then return end
+	if os.clock() - fooAllInOne.invokerChannellingKillstealTimer <= 2 then return end
 
 	if Ability.GetLevel(NPC.GetAbilityByIndex(myHero, 2)) < 1 then return end
 	if Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) > -1 and Ability.SecondsSinceLastUse(NPC.GetAbility(myHero, "invoker_ghost_walk")) < 0.25 then return end
@@ -11241,6 +11485,7 @@ function fooAllInOne.AutoSunstrikeKillStealNew(myHero)
 									fooAllInOne.invokerInvokeAbility(myHero, sunStrike)
 									Ability.CastPosition(sunStrike, fooAllInOne.GlimpseParticlePosition, true)
 									fooAllInOne.invokerChannellingKillstealTimer = os.clock()
+									fooAllInOne.GlimpseParticleUnit = nil
 									return
 								end
 							else
@@ -11249,6 +11494,7 @@ function fooAllInOne.AutoSunstrikeKillStealNew(myHero)
 						else
 							Ability.CastPosition(sunStrike, fooAllInOne.GlimpseParticlePosition)
 							fooAllInOne.invokerChannellingKillstealTimer = os.clock()
+							fooAllInOne.GlimpseParticleUnit = nil
 							return
 						end
 					end
