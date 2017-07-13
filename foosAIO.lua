@@ -1,8 +1,8 @@
 -- foosAIO.lua
--- Version: beta.0.84.4a
+-- Version: beta.0.84.9f
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2017/07/12
+-- Last Update: 2017/07/13
 
 local fooAllInOne = {}
 -- Menu Items
@@ -73,13 +73,14 @@ fooAllInOne.optionDefensiveItems = Menu.AddOption({ "Utility","foos AllInOne", "
 fooAllInOne.optionDefensiveItemsGlimmer = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "3. Glimmer Cape", "will be cast on self/ally if in danger or channelling ability or tping outside of base")
 fooAllInOne.optionDefensiveItemslotusOrb = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "4. Lotus Orb", "on self/ally when in danger")
 fooAllInOne.optionDefensiveItemsCrimson = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "5. Crimson Guard", "self/ally when in danger")
-fooAllInOne.optionDefensiveItemsCrest = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "6. Solar Crest", "on self/ally when in danger")
+fooAllInOne.optionDefensiveItemsCrest = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "6. Solar Crest", "on ally when in danger")
 fooAllInOne.optionDefensiveItemsPipe = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "7. Pipe", "self/ally when in danger")
 fooAllInOne.optionDefensiveItemsBKB = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items", "2. BKB" }, "0. Enabled", "will trigger BKB if one of the abilities below is around and ready and if there are at least #min. enemies around (set option)")
 fooAllInOne.optionDefensiveItemsBKBEnemies = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items", "2. BKB" }, "1. Min. enemies around", "", 1, 5, 1)
 fooAllInOne.optionDefensiveItemsBKBRadius = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items", "2. BKB" }, "2. Search radius", "radius to search for enemies and abilities", 500, 1000, 100)
 fooAllInOne.optionDefensiveItemsSatanic = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "8. Satanic", "logic tbd")
-fooAllInOne.optionDefensiveItemsThreshold = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "1. HP Threshold", "below this treshold, npc is always treated as in danger (regardless of stun, root, ...) (in life %)", 10, 50, 10)
+fooAllInOne.optionDefensiveItemsThreshold = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "1. HP Threshold", "below this treshold, npc is always treated as in danger (regardless of stun, root, ...) (in life %)", 10, 50, 5)
+fooAllInOne.optionDefensiveItemsMedallion = Menu.AddOption({ "Utility","foos AllInOne", "5. Auto Use Defensive Items" }, "9. Medallion of Courage", "on self/ally when in danger")
 
 	-- Hero Menu
 fooAllInOne.optionHeroAxe = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Axe" }, "Axe Combo", "basic axe script, will focus nearest hero to cursor")
@@ -90,8 +91,17 @@ fooAllInOne.optionHeroAxeForceBlinkRange = Menu.AddOption({ "Utility","foos AllI
 fooAllInOne.optionHeroClock = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Clockwerk", "full combo with hookshot prediction (will not check for collision with npcs)")
 fooAllInOne.optionHeroSky = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Skywrath", "full combo")
 fooAllInOne.optionHeroTiny = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Tiny", "full combo")
-fooAllInOne.optionHeroWindrunner = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Windrunner", "if branch in inventory, full combo with tree plant ;); else: if target shakled, then combo")
-fooAllInOne.optionHeroTimber = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Timber", "meh, cant target trees.. timberchain to cursor, if enemys are hit, full combo with chakram prediction")
+fooAllInOne.optionHeroWindrunner = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Windrunner" }, "0. Enable", "basic windrunner combo")
+fooAllInOne.optionHeroWindrunnerPredict = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Windrunner" }, "1. Use prediction for shackleshot", "if activated, script will use predicted position instead of the current position for calculating shackleshot and blink position")
+fooAllInOne.optionHeroWindrunnerUlt = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Windrunner" }, "2. Auto use ultimate", "if shackleshot was successful, hero will auto activate ult on shackle target")
+fooAllInOne.optionHeroWindrunnerWind = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Windrunner" }, "3. Auto use windrun", "will trigger windrun, if enough enemies around (radius 600) (set enemy count here)", 0, 5, 1)
+fooAllInOne.optionHeroTimber = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "0. Enable", "meh, cant target trees.. timberchain to cursor, if enemys are hit, full combo with chakram prediction")
+fooAllInOne.optionHeroTimberPredict = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "1. Use prediction for timberchain", "")
+fooAllInOne.optionHeroTimberWhirling = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "2. Auto use whirling death", "")
+fooAllInOne.optionHeroTimberUlt = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "3. Use chakram", "will use chakram in combo")
+fooAllInOne.optionHeroTimberBlink = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "4. Use blink", "will use blink in combo to find best chain position")
+fooAllInOne.optionHeroTimberPanicKey = Menu.AddKeyOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "5. Panic Key", Enum.ButtonCode.KEY_P)
+fooAllInOne.optionHeroTimberPanicDir = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "6. panic direction", "will find furthest tree away", 0, 2, 1)
 fooAllInOne.optionHeroEmber = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ember" }, "Ember Combo", "hold combo key -> full combo with remnant, release key after ~ 1 sec -> fist+chains")
 fooAllInOne.optionHeroEmberUlt = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ember" }, "Ember Ult Usage in Combo", "", 0, 1, 1)
 fooAllInOne.optionHeroUrsa = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Ursa", "full combo, trigger enrage if 2 or more heroes in range")
@@ -239,6 +249,10 @@ Menu.SetValueName(fooAllInOne.optionUtilityMidasXP, 1, 'range creep')
 
 Menu.SetValueName(fooAllInOne.optionHeroEmberUlt, 0, 'use all charges')
 Menu.SetValueName(fooAllInOne.optionHeroEmberUlt, 1, 'use one charge')
+Menu.SetValueName(fooAllInOne.optionHeroWindrunnerWind, 0, 'Off')
+Menu.SetValueName(fooAllInOne.optionHeroTimberPanicDir, 0, 'fountain')
+Menu.SetValueName(fooAllInOne.optionHeroTimberPanicDir, 1, 'furthest away')
+Menu.SetValueName(fooAllInOne.optionHeroTimberPanicDir, 2, 'cursor')
 Menu.SetValueName(fooAllInOne.optionHeroArcWardenPushTPStyle, 0, 'auto select lane')
 Menu.SetValueName(fooAllInOne.optionHeroArcWardenPushTPStyle, 1, 'cursor')
 Menu.SetValueName(fooAllInOne.optionHeroArcWardenPushTPSelect, 0, 'furthest pushed')
@@ -2337,7 +2351,7 @@ function fooAllInOne.GenericMainAttack(myHero, attackType, target, position)
 end
 
 function fooAllInOne.GenericAttackIssuer(attackType, target, position, npc)
-	
+
 	if not npc then return end
 	if not target and not position then return end
 	if os.clock() - fooAllInOne.lastAttackTime2 < 0.5 then return end
@@ -2950,23 +2964,29 @@ function fooAllInOne.getEnemyBeShackledWithNPC(myHero, enemy)
 	local shackleSearchRange = 575
 	local shackleCastRange = 785
 
-	local directLineVector = Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroWindrunnerPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.15 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
+	local directLineVector = enemyPos + (enemyPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
 
 	local npcs = Entity.GetUnitsInRadius(enemy, shackleSearchRange, Enum.TeamType.TEAM_FRIEND)
 		if next(npcs) == nil then return end
 
 		local shackleNPC
 		local minAngle = 180
+		local minRange = 99999
 
 		for _, targetNPC in ipairs(npcs) do
 			if targetNPC then
-				local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D()
+				local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - enemyPos):Length2D()
 				local myDisToNPC = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(targetNPC)):Length2D()
-				local enemyDisToNPC = (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)):Length2D()
+				local enemyDisToNPC = (enemyPos - Entity.GetAbsOrigin(targetNPC)):Length2D()
 				if myDisToEnemy < myDisToNPC then
 					if myDisToEnemy < shackleCastRange then
-						local vectorEnemyToNPC = Entity.GetAbsOrigin(targetNPC) - Entity.GetAbsOrigin(enemy)
-						local vectormyHerotoEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)
+						local vectorEnemyToNPC = Entity.GetAbsOrigin(targetNPC) - enemyPos
+						local vectormyHerotoEnemy = enemyPos - Entity.GetAbsOrigin(myHero)
 						local searchAngleRad = math.acos(vectormyHerotoEnemy:Dot2D(vectorEnemyToNPC) / (vectormyHerotoEnemy:Length2D() * vectorEnemyToNPC:Length2D()))
 						local searchAngle = (180 / math.pi) * searchAngleRad
 						if searchAngle < minAngle then
@@ -2976,13 +2996,14 @@ function fooAllInOne.getEnemyBeShackledWithNPC(myHero, enemy)
 					end
 				else
 					if myDisToNPC < shackleCastRange then
-						local vectorNPCToEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)
+						local vectorNPCToEnemy = enemyPos - Entity.GetAbsOrigin(targetNPC)
 						local vectormyHerotoNPC = Entity.GetAbsOrigin(targetNPC) - Entity.GetAbsOrigin(myHero)
 						local searchAngleRad = math.acos(vectormyHerotoNPC:Dot2D(vectorNPCToEnemy) / (vectormyHerotoNPC:Length2D() * vectorNPCToEnemy:Length2D()))
 						local searchAngle = (180 / math.pi) * searchAngleRad
-						if searchAngle < minAngle then
+						if searchAngle < minAngle and vectorNPCToEnemy:Length2D() < minRange then
 							shackleNPC = targetNPC
 							minAngle = searchAngle
+							minRange = vectorNPCToEnemy:Length2D()
 						end
 					end
 				end
@@ -3011,16 +3032,22 @@ function fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, dist)
 	local shackleSearchRange = 575
 	local shackleCastRange = 785
 
-	local directLineVector = Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroWindrunnerPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.15 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
+	local directLineVector = enemyPos + (enemyPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
 
 	local shacklePos = Vector()
 	local minDis = 99999
+	local minCreepDis = 99999
 
 	if not fooAllInOne.canEnemyBeShackledWithTree(myHero, enemy) and fooAllInOne.getEnemyBeShackledWithNPC(myHero, enemy) == nil then
-		if fooAllInOne.getEnemyShackleTrees(myHero, enemy) ~= nil then
+		if next(fooAllInOne.getEnemyShackleTrees(myHero, enemy)) ~= nil then
 			for _, targetTree in ipairs(fooAllInOne.getEnemyShackleTrees(myHero, enemy)) do
 				if targetTree then
-					local vectorTreeToEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetTree)
+					local vectorTreeToEnemy = enemyPos - Entity.GetAbsOrigin(targetTree)
 					local searchVec = Entity.GetAbsOrigin(targetTree) + vectorTreeToEnemy:Normalized():Scaled(vectorTreeToEnemy:Length2D() + 500)
 					local myDisToSearchPos = (searchVec - Entity.GetAbsOrigin(myHero)):Length2D()
 					if #Trees.InRadius(searchVec, 300, true) < 1 and #Heroes.InRadius(searchVec, 300, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY) < 1 then
@@ -3035,11 +3062,11 @@ function fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, dist)
 			local npcs = Entity.GetUnitsInRadius(enemy, shackleSearchRange, Enum.TeamType.TEAM_FRIEND)
 			for _, targetNPC in ipairs(npcs) do
 				if targetNPC then
-					local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D()
+					local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - enemyPos):Length2D()
 					local myDisToNPC = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(targetNPC)):Length2D()
-					local enemyDisToNPC = (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)):Length2D()
+					local enemyDisToNPC = (enemyPos - Entity.GetAbsOrigin(targetNPC)):Length2D()
 					if myDisToEnemy < myDisToNPC then
-						local vectorNPCtoEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetNPC)
+						local vectorNPCtoEnemy = enemyPos - Entity.GetAbsOrigin(targetNPC)
 						local searchVec = Entity.GetAbsOrigin(targetNPC) + vectorNPCtoEnemy:Normalized():Scaled(vectorNPCtoEnemy:Length2D() + 500)
 						local myDisToSearchPos = (searchVec - Entity.GetAbsOrigin(myHero)):Length2D()
 						if #Trees.InRadius(searchVec, 300, true) < 1 and #Heroes.InRadius(searchVec, 300, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY) < 1 then
@@ -3049,13 +3076,14 @@ function fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, dist)
 							end
 						end
 					else
-						local vectorEnemyToNPC = Entity.GetAbsOrigin(targetNPC) - Entity.GetAbsOrigin(enemy)
-						local searchVec = Entity.GetAbsOrigin(enemy) + vectorEnemyToNPC:Normalized():Scaled(vectorEnemyToNPC:Length2D() + 200)
+						local vectorEnemyToNPC = Entity.GetAbsOrigin(targetNPC) - enemyPos
+						local searchVec = enemyPos + vectorEnemyToNPC:Normalized():Scaled(vectorEnemyToNPC:Length2D() + 200)
 						local myDisToSearchPos = (searchVec - Entity.GetAbsOrigin(myHero)):Length2D()
 						if #Trees.InRadius(searchVec, 300, true) < 1 and #Heroes.InRadius(searchVec, 300, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY) < 1 then
-							if myDisToSearchPos < minDis then
+							if myDisToSearchPos < minDis and vectorEnemyToNPC:Length2D() < minCreepDis then
 								shacklePos = searchVec
 								minDis = myDisToSearchPos
+								minCreepDis = vectorEnemyToNPC:Length2D()
 							end
 						end
 					end
@@ -3064,7 +3092,7 @@ function fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, dist)
 		end			
 	end
 	
-	if shacklePos ~= Vector() and minDis < dist then
+	if shacklePos:__tostring() ~= Vector():__tostring() and minDis < dist then
 		return shacklePos
 	end
 
@@ -3074,13 +3102,18 @@ end
 
 function fooAllInOne.getEnemyShackleTrees(myHero, enemy)
 
-	if not myHero then return end
-	if not enemy then return end
+	if not myHero then return {} end
+	if not enemy then return {} end
 
 	local shackleSearchRange = 575
 
-	local trees = Trees.InRadius(Entity.GetAbsOrigin(enemy), shackleSearchRange, true)
-		if next(trees) == nil then return end
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroWindrunnerPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.15 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
+	local trees = Trees.InRadius(enemyPos, shackleSearchRange, true)
+		if next(trees) == nil then return {} end
 
 	local returnTrees = {}
 	for _, targetTree in ipairs(trees) do		
@@ -3092,7 +3125,7 @@ function fooAllInOne.getEnemyShackleTrees(myHero, enemy)
 	if next(returnTrees) ~= nil then
 		return returnTrees
 	end
-	return
+	return {}
 
 end
 			
@@ -3111,7 +3144,12 @@ function fooAllInOne.canEnemyBeShackledWithTree(myHero, enemy)
 	local shackleSearchRange = 575
 	local shackleCastRange = 785
 
-	local directLineVector = Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroWindrunnerPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.15 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
+	local directLineVector = enemyPos + (enemyPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(shackleSearchRange)
 
 	local trees = Trees.InRadius(directLineVector, shackleSearchRange, true)
 		if next(trees) == nil then return false end
@@ -3121,13 +3159,13 @@ function fooAllInOne.canEnemyBeShackledWithTree(myHero, enemy)
 		
 		for _, targetTree in ipairs(trees) do		
 			if targetTree then
-				local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D()
-				local enemyDisToTree = (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(targetTree)):Length2D()
+				local myDisToEnemy = (Entity.GetAbsOrigin(myHero) - enemyPos):Length2D()
+				local enemyDisToTree = (enemyPos - Entity.GetAbsOrigin(targetTree)):Length2D()
 				if myDisToEnemy < shackleCastRange then
 					if enemyDisToTree < shackleSearchRange then
 						if targetTree ~= nil then
-							local vectorEnemyToTree = Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(enemy)
-							local vectormyHerotoEnemy = Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)
+							local vectorEnemyToTree = Entity.GetAbsOrigin(targetTree) - enemyPos
+							local vectormyHerotoEnemy = enemyPos - Entity.GetAbsOrigin(myHero)
 							local searchAngleRad = math.acos(vectormyHerotoEnemy:Dot2D(vectorEnemyToTree) / (vectormyHerotoEnemy:Length2D() * vectorEnemyToTree:Length2D()))
 							local searchAngle = (180 / math.pi) * searchAngleRad
 							if searchAngle < minAngle then
@@ -3145,6 +3183,262 @@ function fooAllInOne.canEnemyBeShackledWithTree(myHero, enemy)
 		end
 	
 	return false
+
+end
+
+function fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy)
+
+	if not myHero then return end
+	if not enemy then return end
+
+	local myMana = NPC.GetMana(myHero)
+
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return end
+		if not Ability.IsCastable(timberChain, myMana) then return end
+
+	local chainCastRange = Ability.GetCastRange(timberChain)
+	
+
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroTimberPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
+	local remainingDis = chainCastRange - (enemyPos - Entity.GetAbsOrigin(myHero)):Length2D()
+	local directLineVector = enemyPos + (enemyPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(remainingDis)
+
+	local trees = Trees.InRadius(directLineVector, remainingDis, true)
+		if next(trees) == nil then return end
+
+		local chainTree
+		local minDis = 99999
+		
+		for _, targetTree in ipairs(trees) do		
+			if targetTree then
+				local myDisToTree = (Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(myHero)):Length2D()
+				if myDisToTree < chainCastRange then
+					local vectormyHeroToTree = Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(myHero)
+					if fooAllInOne.TimberAmIhittingWithChain(myHero, enemy, Entity.GetAbsOrigin(targetTree)) == true and myDisToTree < minDis then
+						chainTree = targetTree
+						minDis = myDisToTree
+					end
+				end
+			end
+		end
+
+
+		if chainTree then
+			return chainTree
+		end
+	
+	return 
+
+end
+
+function fooAllInOne.TimberAmIhittingWithChain(myHero, enemy, pos)
+
+	if not myHero then return false end
+	if not enemy then return false end
+	if not pos then return false end
+
+	local myPos = Entity.GetAbsOrigin(myHero)
+	local chainDistance = (pos - myPos):Length2D()
+	local chainVector = myPos - pos
+
+	local checkNum = tonumber(math.floor(chainDistance/150) + 1)
+	for i = checkNum, 1, -1 do 
+        	chainVector:Normalize()
+        	chainVector:Scale(150 * (i-1))
+        	local checkPos = pos + chainVector
+		if NPC.IsPositionInRange(enemy, checkPos + (Entity.GetAbsOrigin(enemy) - fooAllInOne.castPrediction(myHero, enemy, 0.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))), 180, 0) then 
+            		return true
+		end
+	end
+
+	return false
+
+end
+
+function fooAllInOne.TimberGetEnemyChainTrees(myHero, enemy)
+
+	if not myHero then return {} end
+	if not enemy then return {} end
+
+	local myMana = NPC.GetMana(myHero)
+
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return {} end
+		if not Ability.IsCastable(timberChain, myMana) then return {} end
+	
+	local chainCastRange = Ability.GetCastRange(timberChain)
+	
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroTimberPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
+	local remainingDis = chainCastRange - (enemyPos - Entity.GetAbsOrigin(myHero)):Length2D()
+
+	local trees = Trees.InRadius(enemyPos, remainingDis, true)
+		if next(trees) == nil then return {} end
+
+	local returnTrees = {}
+	for _, targetTree in ipairs(trees) do		
+		if targetTree then
+			table.insert(returnTrees, targetTree)
+		end
+	end
+
+	if next(returnTrees) ~= nil then
+		return returnTrees
+	end
+	return {}
+
+end
+
+function fooAllInOne.GetClosestPoint(A,  B,  P, segmentClamp)
+	
+	A:SetZ(0)
+	B:SetZ(0)
+	P:SetZ(0)
+
+	local Ax = A:GetX()
+	local Ay = A:GetY()
+	local Bx = B:GetX()
+	local By = B:GetY()
+	local Px = P:GetX()
+	local Py = P:GetY()
+
+	local AP = P - A
+	local AB = B - A
+
+	local APx = AP:GetX()
+	local APy = AP:GetY()
+
+	local ABx = AB:GetX()
+	local ABy = AB:GetY()
+
+	local ab2 = ABx*ABx + ABy*ABy
+	local ap_ab = APx*ABx + APy*ABy
+
+	local t = ap_ab / ab2
+ 
+	if (segmentClamp or true) then
+		if (t < 0.0) then
+			t = 0.0
+		elseif (t > 1.0) then
+			t = 1.0
+		end
+	end
+ 
+	local Closest = Vector(Ax + ABx*t, Ay + ABy * t, 0)
+ 
+	return Closest
+end
+
+function fooAllInOne.TimberGetBestChainPos(myHero, enemy, dist)
+
+	if not myHero then return Vector() end
+	if not enemy then return Vector() end
+
+	local myMana = NPC.GetMana(myHero)
+
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return Vector() end
+		if not Ability.IsCastable(timberChain, myMana) then return Vector() end
+
+	local chainCastRange = Ability.GetCastRange(timberChain)
+	
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroTimberPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
+	local remainingDis = chainCastRange - (enemyPos - Entity.GetAbsOrigin(myHero)):Length2D()
+
+	local chainPos = Vector()
+	local minDis = 99999
+
+	if fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy) == nil then
+		if next(fooAllInOne.TimberGetEnemyChainTrees(myHero, enemy)) ~= nil then
+			for _, targetTree in ipairs(fooAllInOne.TimberGetEnemyChainTrees(myHero, enemy)) do
+				if targetTree then
+					local vectorTreeToEnemy = enemyPos - Entity.GetAbsOrigin(targetTree)
+					local vectorTreeTomyHero = Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(targetTree)
+					local searchVec = enemyPos + vectorTreeToEnemy:Normalized():Scaled(chainCastRange)
+					local closestPointToSearchVec = fooAllInOne.GetClosestPoint(enemyPos, searchVec, Entity.GetAbsOrigin(myHero), true)
+					local disClosestPointToSearchVec = (closestPointToSearchVec - Entity.GetAbsOrigin(myHero)):Length2D()
+					if #Trees.InRadius(closestPointToSearchVec, 300, true) < 1 then
+						if (closestPointToSearchVec - Entity.GetAbsOrigin(targetTree)):Length2D() < chainCastRange then
+							if disClosestPointToSearchVec < minDis then
+								chainPos = closestPointToSearchVec
+								minDis = disClosestPointToSearchVec
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+		
+	
+	if chainPos:__tostring() ~= Vector():__tostring() and minDis < dist then
+		return chainPos
+	end
+
+	return Vector()
+
+end
+
+function fooAllInOne.TimberPanicIsTreeInChainWay(myHero, pos)
+
+	if not myHero then return false end
+	if not pos then return false end
+
+	local myPos = Entity.GetAbsOrigin(myHero)
+	local chainDistance = (pos - myPos):Length2D()
+	local chainVector = myPos - pos
+
+	local checkNum = tonumber(math.floor(chainDistance/40) + 1)
+	for i = checkNum, 1, -1 do 
+        	chainVector:Normalize()
+        	chainVector:Scale(40 * (i-1))
+        	local checkPos = pos + chainVector
+		if #Trees.InRadius(checkPos, 45, true) < 1 then
+            		return true
+		end
+	end
+
+	return false
+
+end
+
+function fooAllInOne.TimberGetEscapeChainTrees(myHero)
+
+	if not myHero then return {} end
+
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return {} end
+	
+	local chainCastRange = Ability.GetCastRange(timberChain)
+	
+	local myPos = Entity.GetAbsOrigin(myHero)
+
+	local trees = Trees.InRadius(myPos, chainCastRange, true)
+		if next(trees) == nil then return {} end
+
+	local returnTrees = {}
+	for _, targetTree in ipairs(trees) do		
+		if targetTree then
+			table.insert(returnTrees, targetTree)
+		end
+	end
+
+	if next(returnTrees) ~= nil then
+		return returnTrees
+	end
+	return {}
 
 end
 
@@ -3908,6 +4202,8 @@ function fooAllInOne.useDefensiveItems(myHero, enemy)
 	if fooAllInOne.ItemCastStop then return end
 	if NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then return end
 	if NPC.IsStunned(myHero) then return end
+	if NPC.IsChannellingAbility(myHero) then return end
+	if NPC.HasState(myHero, Enum.ModifierState.MODIFIER_STATE_INVISIBLE) then return end
 	if NPC.HasModifier(myHero, "modifier_axe_berserkers_call") then return end
 	if NPC.HasModifier(myHero, "modifier_legion_commander_duel") then return end
 
@@ -3920,6 +4216,7 @@ function fooAllInOne.useDefensiveItems(myHero, enemy)
 	local solarCrest = NPC.GetItem(myHero, "item_solar_crest", true)
 	local BKB = NPC.GetItem(myHero, "item_black_king_bar", true)
 	local satanic = NPC.GetItem(myHero, "item_satanic", true)
+	local medallion = NPC.GetItem(myHero, "item_medallion_of_courage", true)
 
 	if Menu.IsEnabled(fooAllInOne.optionDefensiveItemsGlimmer) then
 		if glimmerCape and Ability.IsCastable(glimmerCape, myMana) then
@@ -4013,6 +4310,24 @@ function fooAllInOne.useDefensiveItems(myHero, enemy)
 					if ally and not NPC.IsIllusion(ally) and Entity.IsAlive(ally) then
 						if fooAllInOne.IsNPCinDanger(myHero, ally) then
 							Ability.CastTarget(solarCrest, ally)
+							fooAllInOne.lastDefItemPop = os.clock()
+							break
+							return
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if Menu.IsEnabled(fooAllInOne.optionDefensiveItemsMedallion) then
+		if medallion and Ability.IsCastable(medallion, myMana) then
+			local teamMatesAround = NPC.GetHeroesInRadius(myHero, 975, Enum.TeamType.TEAM_FRIEND)
+			if next(teamMatesAround) ~= nil then
+				for _, ally in ipairs(teamMatesAround) do
+					if ally and not NPC.IsIllusion(ally) and Entity.IsAlive(ally) then
+						if fooAllInOne.IsNPCinDanger(myHero, ally) then
+							Ability.CastTarget(medallion, ally)
 							fooAllInOne.lastDefItemPop = os.clock()
 							break
 							return
@@ -4730,6 +5045,10 @@ function fooAllInOne.WindRunnerCombo(myHero, enemy)
 					Ability.CastPosition(blink, fooAllInOne.getEnemyShackledBestPosition(myHero, enemy, 1150))
 					return
 				end
+				if not blink or (blink and not Ability.IsReady(blink)) then
+					fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+					return
+				end
 			end
 		end
 	fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
@@ -4742,14 +5061,16 @@ function fooAllInOne.WindRunnerCombo(myHero, enemy)
 				if not shackleMod then return end
 			local shackleTime = Modifier.GetCreationTime(shackleMod) + Modifier.GetDuration(shackleMod)
 
-			if NPC.HasModifier(enemy, "modifier_windrunner_shackle_shot") and Modifier.GetDuration(shackleMod) >= 1.5 then
+			if NPC.HasModifier(enemy, "modifier_windrunner_shackle_shot") and Modifier.GetDuration(shackleMod) >= 1.5 and Menu.IsEnabled(fooAllInOne.optionHeroWindrunnerUlt) then
 				if focusFire and Ability.IsCastable(focusFire, myMana) then
 					Ability.CastTarget(focusFire, enemy)
 					return
 				end
-				if windRun and Ability.IsCastable(windRun, myMana) and #NPC.GetHeroesInRadius(myHero, 600, Enum.TeamType.TEAM_ENEMY) >= 3 then
-					Ability.CastNoTarget(windRun)
-					return
+				if Menu.GetValue(fooAllInOne.optionHeroWindrunnerWind) > 0 then
+					if windRun and Ability.IsCastable(windRun, myMana) and #NPC.GetHeroesInRadius(myHero, 600, Enum.TeamType.TEAM_ENEMY) >= Menu.GetValue(fooAllInOne.optionHeroWindrunnerWind) then
+						Ability.CastNoTarget(windRun)
+						return
+					end
 				end
 			end
 		end
@@ -4774,11 +5095,12 @@ function fooAllInOne.WindRunnerCombo(myHero, enemy)
 --		end
 --	end
 	
-end
+end	
 
 function fooAllInOne.TimberCombo(myHero, enemy)
 
 	if not Menu.IsEnabled(fooAllInOne.optionHeroTimber) then return end
+	if not NPC.IsEntityInRange(myHero, enemy, 2200)	then return end
 	
 	if (os.clock() - fooAllInOne.lastTick) < fooAllInOne.delay then return end
 
@@ -4792,71 +5114,99 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 	local aghanims = NPC.GetItem(myHero, "item_ultimate_scepter", true)
 	local blink = NPC.GetItem(myHero, "item_blink", true)
 	
-	local chainCheckRange = Ability.GetCastRange(timberChain) + NPC.GetCastRangeBonus(myHero)
-		if blink then
-			chainCheckRange = chainCheckRange + 1150
-		end
-	if not NPC.IsPositionInRange(myHero, Input.GetWorldCursorPos(), chainCheckRange, 0) then return end
-
 	local myMana = NPC.GetMana(myHero)
 
-	if Entity.GetHealth(enemy) > 0 and NPC.HasModifier(myHero, "modifier_shredder_timber_chain") then
-		if whirlingDeath and Ability.IsCastable(whirlingDeath, myMana) and NPC.IsEntityInRange(myHero, enemy, 300) then
-			Ability.CastNoTarget(whirlingDeath)
-			fooAllInOne.makeDelay(Ability.GetCastPoint(whirlingDeath))
-			return
+	local rangeChecker = 500
+	if blink and Ability.IsReady(blink) then
+		rangeChecker = 1150
+	end
+
+	if Menu.IsEnabled(fooAllInOne.optionHeroTimberWhirling) then
+		if Entity.GetHealth(enemy) > 0 and NPC.HasModifier(myHero, "modifier_shredder_timber_chain") then
+			if whirlingDeath and Ability.IsCastable(whirlingDeath, myMana) and NPC.IsEntityInRange(myHero, enemy, 275) then
+				Ability.CastNoTarget(whirlingDeath)
+				fooAllInOne.makeDelay(0.3)
+				return
+			end
 		end
 	end
 
 	fooAllInOne.itemUsage(myHero, enemy)
 	
 	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 then
-	
-		if not NPC.IsPositionInRange(myHero, Input.GetWorldCursorPos(), Ability.GetCastRange(timberChain), 0) then
-			if blink and Ability.IsReady(blink) then
-				Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy) - (Entity.GetAbsOrigin(enemy) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(250))
-			end
-		else	
-			if timberChain and Ability.IsCastable(timberChain, myMana) then
-				Ability.CastPosition(timberChain, Input.GetWorldCursorPos())
-				return
-			end
-			if NPC.HasModifier(enemy, "modifier_shredder_whirling_death_debuff") then
-				local chakramPrediction = Ability.GetCastPoint(chakram) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 900) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
-				if blink and Ability.IsReady(blink) and (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D()) >= 800 then
-					Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy))
+		if fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy) ~= nil or fooAllInOne.TimberGetBestChainPos(myHero, enemy, rangeChecker):__tostring() ~= Vector():__tostring() then
+			if fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy) ~= nil then
+				if timberChain and Ability.IsCastable(timberChain, myMana) then
+					Ability.CastPosition(timberChain, Entity.GetAbsOrigin(fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy)))
+					fooAllInOne.makeDelay(0.1)
 					return
-				elseif not Ability.IsHidden(chakram) then
+				end
+			else
+				if blink and Ability.IsReady(blink) and Menu.IsEnabled(fooAllInOne.optionHeroTimberBlink) then
+					if fooAllInOne.TimberGetBestChainPos(myHero, enemy, rangeChecker):__tostring() ~= Vector():__tostring() then
+						Ability.CastPosition(blink, fooAllInOne.TimberGetBestChainPos(myHero, enemy, 1150))
+						return
+					end
+				elseif (not blink or (blink and not Ability.IsReady(blink)) or not Menu.IsEnabled(fooAllInOne.optionHeroTimberBlink)) and Ability.IsReady(timberChain) then
+					if fooAllInOne.TimberGetBestChainPos(myHero, enemy, rangeChecker):__tostring() ~= Vector():__tostring() then
+						fooAllInOne.GenericAttackIssuer("Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, fooAllInOne.TimberGetBestChainPos(myHero, enemy, 500), myHero)
+						return
+					else
+						if Ability.IsReady(timberChain) then
+							fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+							return
+						end
+					end
+				end
+			end
+		else
+			if Menu.IsEnabled(fooAllInOne.optionHeroTimberUlt) then
+				if not Ability.IsHidden(chakram) then
 					if chakram and Ability.IsCastable(chakram, myMana) then
+						local chakramPrediction = Ability.GetCastPoint(chakram) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 900) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
 						Ability.CastPosition(chakram, fooAllInOne.castLinearPrediction(myHero, enemy, chakramPrediction))
 						fooAllInOne.lastCastTime = 1
+						fooAllInOne.makeDelay(0.3)
 						return
 					end
 				elseif not Ability.IsHidden(chakramAgha) and Ability.IsHidden(chakram) then
 					if chakramAgha and Ability.IsCastable(chakramAgha, myMana) then
+						local chakramPrediction = Ability.GetCastPoint(chakram) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 900) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
 						Ability.CastPosition(chakramAgha, fooAllInOne.castLinearPrediction(myHero, enemy, chakramPrediction))
 						fooAllInOne.lastCastTime2 = 1
+						fooAllInOne.makeDelay(0.3)
 						return
 					end
 				end
 			end
+		fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 		end
 	end
 
 	if not Ability.IsHidden(chakramReturn) and fooAllInOne.lastCastTime == 1 then
-		if chakramReturn and Ability.IsCastable(chakramReturn, myMana) and (Ability.SecondsSinceLastUse(chakram) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakram) >= 2.5) then
+		if chakramReturn and Ability.IsCastable(chakramReturn, myMana) and (Ability.SecondsSinceLastUse(chakram) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakram) >= 1.75) then
 			Ability.CastNoTarget(chakramReturn)
 			fooAllInOne.lastCastTime = 0
+			fooAllInOne.makeDelay(0.3)
 			return
 		end
 	end
 	if not Ability.IsHidden(chakramAghaReturn) and fooAllInOne.lastCastTime2 == 1 then
-		if chakramAghaReturn and Ability.IsCastable(chakramAghaReturn, myMana) and (Ability.SecondsSinceLastUse(chakramAgha) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakramAgha) >= 2.5) then
+		if chakramAghaReturn and Ability.IsCastable(chakramAghaReturn, myMana) and (Ability.SecondsSinceLastUse(chakramAgha) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakramAgha) >= 1.75) then
 			Ability.CastNoTarget(chakramAghaReturn)
 			fooAllInOne.lastCastTime2 = 0
+			fooAllInOne.makeDelay(0.3)
 			return
 		end
 	end
+
+	if Menu.IsKeyDown(fooAllInOne.optionHeroTimberPanicKey) then
+		if fooAllInOne.TimberPanic(myHero) ~= nil then
+			Ability.CastPosition(timberChain, Entity.GetAbsOrigin(fooAllInOne.TimberPanic(myHero)))
+			return
+		end
+	end
+		
 end
 
 function fooAllInOne.TimberSaveChakramReturn(myHero, enemy)
@@ -4884,6 +5234,75 @@ function fooAllInOne.TimberSaveChakramReturn(myHero, enemy)
 			end
 		end
 	end
+end
+
+function fooAllInOne.TimberPanic(myHero)
+
+	if not myHero then return end
+
+	local myMana = NPC.GetMana(myHero)
+
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return end
+		if not Ability.IsCastable(timberChain, myMana) then return end
+
+	local chainCastRange = Ability.GetCastRange(timberChain)
+
+	local chainTree
+	local minDis = 99999
+	local maxDis = 0
+
+	if Menu.GetValue(fooAllInOne.optionHeroTimberPanicDir) < 2 then
+		if next(fooAllInOne.TimberGetEscapeChainTrees(myHero)) ~= nil then
+			for _, targetTree in ipairs(fooAllInOne.TimberGetEscapeChainTrees(myHero)) do
+				if targetTree then
+					if Menu.GetValue(fooAllInOne.optionHeroTimberPanicDir) == 0 then
+						local myFountainPos = fooAllInOne.GetMyFountainPos(myHero)
+						local disTreeToFountain = (myFountainPos - Entity.GetAbsOrigin(targetTree)):Length2D()
+						local vectormyHeroToTree = Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(myHero)
+						if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true and disTreeToFountain < minDis then
+							chainTree = targetTree
+							minDis = disTreeToFountain
+						end
+					else
+						local myPos = Entity.GetAbsOrigin(myHero)
+						local vectormyHeroToTree = Entity.GetAbsOrigin(targetTree) - myPos
+						local disTreeTomyHero = vectormyHeroToTree:Length2D()
+						if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true and disTreeTomyHero > maxDis then
+							chainTree = targetTree
+							maxDis = disTreeTomyHero
+						end
+					end
+				end
+			end
+		end
+	else
+		local tree = Input.GetNearestTreeToCursor(true)
+		if tree ~= nil then
+			local dismyHeroToTree = (Entity.GetAbsOrigin(tree) - Entity.GetAbsOrigin(myHero)):Length2D()
+			if dismyHeroToTree < chainCastRange then
+				chainTree = tree
+			else
+				local altTrees = Trees.InRadius(Input.GetWorldCursorPos(), 500, true)
+					if next(altTrees) == nil then return end
+
+				for _, targetTree in ipairs(altTrees) do
+					if targetTree then
+						local dismyHeroToTree = (Entity.GetAbsOrigin(tree) - Entity.GetAbsOrigin(myHero)):Length2D()
+						if dismyHeroToTree < chainCastRange then
+							chainTree = targetTree
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if chainTree ~= nil then
+		return chainTree
+	end
+	return
+
 end
 
 function fooAllInOne.EmberCombo(myHero, enemy)
