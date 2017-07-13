@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.84.9f
+-- Version: beta.0.85.1
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/07/13
@@ -97,11 +97,12 @@ fooAllInOne.optionHeroWindrunnerUlt = Menu.AddOption({ "Utility","foos AllInOne"
 fooAllInOne.optionHeroWindrunnerWind = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Windrunner" }, "3. Auto use windrun", "will trigger windrun, if enough enemies around (radius 600) (set enemy count here)", 0, 5, 1)
 fooAllInOne.optionHeroTimber = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "0. Enable", "meh, cant target trees.. timberchain to cursor, if enemys are hit, full combo with chakram prediction")
 fooAllInOne.optionHeroTimberPredict = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "1. Use prediction for timberchain", "")
-fooAllInOne.optionHeroTimberWhirling = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "2. Auto use whirling death", "")
+fooAllInOne.optionHeroTimberWhirling = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "2. Auto use whirling death", "", 0, 2, 1)
 fooAllInOne.optionHeroTimberUlt = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "3. Use chakram", "will use chakram in combo")
 fooAllInOne.optionHeroTimberBlink = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "4. Use blink", "will use blink in combo to find best chain position")
 fooAllInOne.optionHeroTimberPanicKey = Menu.AddKeyOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "5. Panic Key", Enum.ButtonCode.KEY_P)
 fooAllInOne.optionHeroTimberPanicDir = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "6. panic direction", "will find furthest tree away", 0, 2, 1)
+fooAllInOne.optionHeroTimberFastMoveKey = Menu.AddKeyOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Timbersaw" }, "7. Fast Move Key", Enum.ButtonCode.KEY_I)
 fooAllInOne.optionHeroEmber = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ember" }, "Ember Combo", "hold combo key -> full combo with remnant, release key after ~ 1 sec -> fist+chains")
 fooAllInOne.optionHeroEmberUlt = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ember" }, "Ember Ult Usage in Combo", "", 0, 1, 1)
 fooAllInOne.optionHeroUrsa = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Ursa", "full combo, trigger enrage if 2 or more heroes in range")
@@ -253,6 +254,9 @@ Menu.SetValueName(fooAllInOne.optionHeroWindrunnerWind, 0, 'Off')
 Menu.SetValueName(fooAllInOne.optionHeroTimberPanicDir, 0, 'fountain')
 Menu.SetValueName(fooAllInOne.optionHeroTimberPanicDir, 1, 'furthest away')
 Menu.SetValueName(fooAllInOne.optionHeroTimberPanicDir, 2, 'cursor')
+Menu.SetValueName(fooAllInOne.optionHeroTimberWhirling, 0, 'Off')
+Menu.SetValueName(fooAllInOne.optionHeroTimberWhirling, 1, 'only in combo')
+Menu.SetValueName(fooAllInOne.optionHeroTimberWhirling, 2, 'always')
 Menu.SetValueName(fooAllInOne.optionHeroArcWardenPushTPStyle, 0, 'auto select lane')
 Menu.SetValueName(fooAllInOne.optionHeroArcWardenPushTPStyle, 1, 'cursor')
 Menu.SetValueName(fooAllInOne.optionHeroArcWardenPushTPSelect, 0, 'furthest pushed')
@@ -1378,8 +1382,6 @@ function fooAllInOne.OnUpdate()
 				fooAllInOne.TACombo(myHero, enemy)
 			elseif NPC.GetUnitName(myHero) == "npc_dota_hero_legion_commander" then
 				fooAllInOne.LegionCombo(myHero, enemy)
-			elseif NPC.GetUnitName(myHero) == "npc_dota_hero_shredder" then
-				fooAllInOne.TimberCombo(myHero, enemy)
 			elseif NPC.GetUnitName(myHero) == "npc_dota_hero_slardar" then
 				fooAllInOne.SlardarCombo(myHero, enemy)
 			elseif NPC.GetUnitName(myHero) == "npc_dota_hero_clinkz" then
@@ -1432,8 +1434,12 @@ function fooAllInOne.OnUpdate()
 	end
 
 	if NPC.GetUnitName(myHero) == "npc_dota_hero_shredder" then
-		fooAllInOne.TimberSaveChakramReturn(myHero, enemy)
+		fooAllInOne.TimberCombo(myHero, enemy)
 	end
+
+--	if NPC.GetUnitName(myHero) == "npc_dota_hero_shredder" then
+--		fooAllInOne.TimberSaveChakramReturn(myHero, enemy)
+--	end
 	
 	if Menu.IsEnabled(fooAllInOne.optionUtilityEnable) then
 		fooAllInOne.utilityItemUsage(myHero)
@@ -3405,7 +3411,7 @@ function fooAllInOne.TimberPanicIsTreeInChainWay(myHero, pos)
         	chainVector:Normalize()
         	chainVector:Scale(40 * (i-1))
         	local checkPos = pos + chainVector
-		if #Trees.InRadius(checkPos, 45, true) < 1 then
+		if #Trees.InRadius(checkPos, 55, true) < 1 then
             		return true
 		end
 	end
@@ -5100,7 +5106,7 @@ end
 function fooAllInOne.TimberCombo(myHero, enemy)
 
 	if not Menu.IsEnabled(fooAllInOne.optionHeroTimber) then return end
-	if not NPC.IsEntityInRange(myHero, enemy, 2200)	then return end
+--	if not NPC.IsEntityInRange(myHero, enemy, 2200)	then return end
 	
 	if (os.clock() - fooAllInOne.lastTick) < fooAllInOne.delay then return end
 
@@ -5121,23 +5127,36 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 		rangeChecker = 1150
 	end
 
-	if Menu.IsEnabled(fooAllInOne.optionHeroTimberWhirling) then
-		if Entity.GetHealth(enemy) > 0 and NPC.HasModifier(myHero, "modifier_shredder_timber_chain") then
-			if whirlingDeath and Ability.IsCastable(whirlingDeath, myMana) and NPC.IsEntityInRange(myHero, enemy, 275) then
-				Ability.CastNoTarget(whirlingDeath)
-				fooAllInOne.makeDelay(0.3)
-				return
+	if Menu.GetValue(fooAllInOne.optionHeroTimberWhirling) > 0 then
+		for _, whirlingHero in ipairs(Entity.GetHeroesInRadius(myHero, 300, Enum.TeamType.TEAM_ENEMY)) do
+			if whirlingHero then
+				if Entity.GetHealth(whirlingHero) > 0 and not NPC.IsDormant(whirlingHero) and not NPC.IsIllusion(whirlingHero) then
+					if whirlingDeath and Ability.IsCastable(whirlingDeath, myMana) then
+						if Menu.GetValue(fooAllInOne.optionHeroTimberWhirling) == 2 then
+							Ability.CastNoTarget(whirlingDeath)
+							fooAllInOne.makeDelay(0.1)
+							return
+						else
+							if Menu.IsKeyDown(fooAllInOne.optionComboKey) then
+								Ability.CastNoTarget(whirlingDeath)
+								fooAllInOne.makeDelay(0.1)
+								return
+							end
+						end
+					end
+				end
 			end
 		end
 	end
 
 	fooAllInOne.itemUsage(myHero, enemy)
 	
-	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 then
+	if enemy and Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 then
 		if fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy) ~= nil or fooAllInOne.TimberGetBestChainPos(myHero, enemy, rangeChecker):__tostring() ~= Vector():__tostring() then
 			if fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy) ~= nil then
 				if timberChain and Ability.IsCastable(timberChain, myMana) then
 					Ability.CastPosition(timberChain, Entity.GetAbsOrigin(fooAllInOne.TimberIsTreeInRangeForChain(myHero, enemy)))
+					fooAllInOne.lastCastTime3 = os.clock()
 					fooAllInOne.makeDelay(0.1)
 					return
 				end
@@ -5160,8 +5179,8 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 				end
 			end
 		else
-			if Menu.IsEnabled(fooAllInOne.optionHeroTimberUlt) then
-				if not Ability.IsHidden(chakram) then
+			if Menu.IsEnabled(fooAllInOne.optionHeroTimberUlt) and (os.clock() - fooAllInOne.lastCastTime3) > 0.4 and NPC.IsEntityInRange(myHero, enemy, 700) then
+				if not Ability.IsHidden(chakram) and not Ability.IsInAbilityPhase(timberChain) and not NPC.HasModifier(myHero, "modifier_shredder_timber_chain") then
 					if chakram and Ability.IsCastable(chakram, myMana) then
 						local chakramPrediction = Ability.GetCastPoint(chakram) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 900) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
 						Ability.CastPosition(chakram, fooAllInOne.castLinearPrediction(myHero, enemy, chakramPrediction))
@@ -5169,7 +5188,7 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 						fooAllInOne.makeDelay(0.3)
 						return
 					end
-				elseif not Ability.IsHidden(chakramAgha) and Ability.IsHidden(chakram) then
+				elseif not Ability.IsHidden(chakramAgha) and Ability.IsHidden(chakram) and not Ability.IsInAbilityPhase(timberChain) and not NPC.HasModifier(myHero, "modifier_shredder_timber_chain") then
 					if chakramAgha and Ability.IsCastable(chakramAgha, myMana) then
 						local chakramPrediction = Ability.GetCastPoint(chakram) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 900) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
 						Ability.CastPosition(chakramAgha, fooAllInOne.castLinearPrediction(myHero, enemy, chakramPrediction))
@@ -5183,20 +5202,39 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 		end
 	end
 
-	if not Ability.IsHidden(chakramReturn) and fooAllInOne.lastCastTime == 1 then
-		if chakramReturn and Ability.IsCastable(chakramReturn, myMana) and (Ability.SecondsSinceLastUse(chakram) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakram) >= 1.75) then
-			Ability.CastNoTarget(chakramReturn)
-			fooAllInOne.lastCastTime = 0
-			fooAllInOne.makeDelay(0.3)
-			return
+	if enemy then
+		if not Ability.IsHidden(chakramReturn) and fooAllInOne.lastCastTime == 1 then
+			if chakramReturn and Ability.IsCastable(chakramReturn, myMana) and (Ability.SecondsSinceLastUse(chakram) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakram) >= 1.75) then
+				Ability.CastNoTarget(chakramReturn)
+				fooAllInOne.lastCastTime = 0
+				fooAllInOne.makeDelay(0.3)
+				return
+			end
 		end
-	end
-	if not Ability.IsHidden(chakramAghaReturn) and fooAllInOne.lastCastTime2 == 1 then
-		if chakramAghaReturn and Ability.IsCastable(chakramAghaReturn, myMana) and (Ability.SecondsSinceLastUse(chakramAgha) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakramAgha) >= 1.75) then
-			Ability.CastNoTarget(chakramAghaReturn)
-			fooAllInOne.lastCastTime2 = 0
-			fooAllInOne.makeDelay(0.3)
-			return
+		if not Ability.IsHidden(chakramAghaReturn) and fooAllInOne.lastCastTime2 == 1 then
+			if chakramAghaReturn and Ability.IsCastable(chakramAghaReturn, myMana) and (Ability.SecondsSinceLastUse(chakramAgha) >= 1 and not NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff")) or (NPC.HasModifier(enemy, "modifier_shredder_chakram_debuff") and Ability.SecondsSinceLastUse(chakramAgha) >= 1.75) then
+				Ability.CastNoTarget(chakramAghaReturn)
+				fooAllInOne.lastCastTime2 = 0
+				fooAllInOne.makeDelay(0.3)
+				return
+			end
+		end
+	else
+		if not Ability.IsHidden(chakramReturn) and fooAllInOne.lastCastTime == 1 then
+			if chakramReturn and Ability.IsCastable(chakramReturn, myMana) and Ability.SecondsSinceLastUse(chakram) >= 1 then
+				Ability.CastNoTarget(chakramReturn)
+				fooAllInOne.lastCastTime = 0
+				fooAllInOne.makeDelay(0.1)
+				return
+			end
+		end
+		if not Ability.IsHidden(chakramAghaReturn) and fooAllInOne.lastCastTime2 == 1 then
+			if chakramAghaReturn and Ability.IsCastable(chakramAghaReturn, myMana) and Ability.SecondsSinceLastUse(chakramAgha) >= 1 then
+				Ability.CastNoTarget(chakramAghaReturn)
+				fooAllInOne.lastCastTime2 = 0
+				fooAllInOne.makeDelay(0.1)
+				return
+			end
 		end
 	end
 
@@ -5206,34 +5244,53 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 			return
 		end
 	end
-		
+
+	if Menu.IsKeyDown(fooAllInOne.optionHeroTimberFastMoveKey) then
+		if fooAllInOne.TimberFastMove(myHero) ~= nil then
+			Ability.CastPosition(timberChain, Entity.GetAbsOrigin(fooAllInOne.TimberFastMove(myHero)))
+			return
+		else
+			fooAllInOne.GenericAttackIssuer("Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, Input.GetWorldCursorPos(), myHero)
+			return
+		end
+	end		
+
 end
 
-function fooAllInOne.TimberSaveChakramReturn(myHero, enemy)
+function fooAllInOne.TimberFastMove(myHero)
 
-	if not Menu.IsEnabled(fooAllInOne.optionHeroTimber) then return end
+	if not myHero then return end
 
-	local chakramReturn = NPC.GetAbility(myHero, "shredder_return_chakram")
-	local chakramAghaReturn = NPC.GetAbility(myHero, "shredder_return_chakram_2")
-	
-	if Menu.IsKeyDownOnce(fooAllInOne.optionComboKey)then
-		if not enemy then
-			if not Ability.IsHidden(chakramReturn) and fooAllInOne.lastCastTime == 1 then
-				if chakramReturn and Ability.IsReady(chakramReturn) then
-					Ability.CastNoTarget(chakramReturn)
-					fooAllInOne.lastCastTime = 0
-					return
-				end
-			end
-			if not Ability.IsHidden(chakramAghaReturn) and fooAllInOne.lastCastTime2 == 1 then
-				if chakramAghaReturn and Ability.IsReady(chakramAghaReturn) then
-					Ability.CastNoTarget(chakramAghaReturn)
-					fooAllInOne.lastCastTime2 = 0
-					return
+	local myMana = NPC.GetMana(myHero)
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return end
+		if not Ability.IsCastable(timberChain, myMana) then return end
+
+	local chainCastRange = Ability.GetCastRange(timberChain)
+
+	local cursorPos = Input.GetWorldCursorPos()
+
+	local chainTree
+	local minDis = 99999
+
+	if next(fooAllInOne.TimberGetEscapeChainTrees(myHero)) ~= nil then
+		for _, targetTree in ipairs(fooAllInOne.TimberGetEscapeChainTrees(myHero)) do
+			if targetTree then
+				local disTreeToCursor = (cursorPos - Entity.GetAbsOrigin(targetTree)):Length2D()
+				local vectormyHeroToTree = Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(myHero)
+				if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true and disTreeToCursor < minDis then
+						chainTree = targetTree
+						minDis = disTreeToCursor
 				end
 			end
 		end
 	end
+
+	if chainTree ~= nil then
+		return chainTree
+	end
+	return
+
 end
 
 function fooAllInOne.TimberPanic(myHero)
