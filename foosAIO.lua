@@ -1,8 +1,8 @@
 -- foosAIO.lua
--- Version: beta.0.85.1
+-- Version: beta.0.85.2c
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2017/07/13
+-- Last Update: 2017/07/14
 
 local fooAllInOne = {}
 -- Menu Items
@@ -3252,12 +3252,17 @@ function fooAllInOne.TimberAmIhittingWithChain(myHero, enemy, pos)
 	local chainDistance = (pos - myPos):Length2D()
 	local chainVector = myPos - pos
 
+	local enemyPos = Entity.GetAbsOrigin(enemy)
+	if Menu.IsEnabled(fooAllInOne.optionHeroTimberPredict) then
+		enemyPos = fooAllInOne.castPrediction(myHero, enemy, 0.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))
+	end
+
 	local checkNum = tonumber(math.floor(chainDistance/150) + 1)
 	for i = checkNum, 1, -1 do 
         	chainVector:Normalize()
         	chainVector:Scale(150 * (i-1))
         	local checkPos = pos + chainVector
-		if NPC.IsPositionInRange(enemy, checkPos + (Entity.GetAbsOrigin(enemy) - fooAllInOne.castPrediction(myHero, enemy, 0.7 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2))), 180, 0) then 
+		if (checkPos - enemyPos):Length2D() < 200 then
             		return true
 		end
 	end
@@ -3406,12 +3411,12 @@ function fooAllInOne.TimberPanicIsTreeInChainWay(myHero, pos)
 	local chainDistance = (pos - myPos):Length2D()
 	local chainVector = myPos - pos
 
-	local checkNum = tonumber(math.floor(chainDistance/40) + 1)
+	local checkNum = tonumber(math.floor(chainDistance/50))
 	for i = checkNum, 1, -1 do 
         	chainVector:Normalize()
-        	chainVector:Scale(40 * (i-1))
+        	chainVector:Scale(50 * (i))
         	local checkPos = pos + chainVector
-		if #Trees.InRadius(checkPos, 55, true) < 1 then
+		if #Trees.InRadius(checkPos, 50, true) < 1 then
             		return true
 		end
 	end
@@ -3437,16 +3442,107 @@ function fooAllInOne.TimberGetEscapeChainTrees(myHero)
 	local returnTrees = {}
 	for _, targetTree in ipairs(trees) do		
 		if targetTree then
-			table.insert(returnTrees, targetTree)
+			local disTreeTomyHero = (Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(myHero)):Length2D()
+			if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true then
+				table.insert(returnTrees, { disTreeTomyHero, targetTree })
+			end
 		end
 	end
 
 	if next(returnTrees) ~= nil then
+		table.sort(returnTrees, function(a, b)
+        		return a[1] > b[1]
+    		end)
+
 		return returnTrees
 	end
 	return {}
 
 end
+
+function fooAllInOne.TimberGetEscapeChainTreesFountain(myHero)
+
+	if not myHero then return {} end
+
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return {} end
+	
+	local chainCastRange = Ability.GetCastRange(timberChain)
+	
+	local myPos = Entity.GetAbsOrigin(myHero)
+
+	local trees = Trees.InRadius(myPos, chainCastRange, true)
+		if next(trees) == nil then return {} end
+
+	local returnTrees = {}
+	for _, targetTree in ipairs(trees) do		
+		if targetTree then
+			local myFountainPos = fooAllInOne.GetMyFountainPos(myHero)
+			local disTreeToFountain = (Entity.GetAbsOrigin(targetTree) - myFountainPos):Length2D()
+			local dismyHeroToFountain = (myPos - myFountainPos):Length2D()
+			if disTreeToFountain < dismyHeroToFountain then
+				if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true then
+					table.insert(returnTrees, { disTreeToFountain, targetTree })
+				end
+			end
+		end
+	end
+
+	if next(returnTrees) ~= nil then
+		table.sort(returnTrees, function(a, b)
+        		return a[1] < b[1]
+    		end)
+
+		return returnTrees
+	end
+	return {}
+
+end
+
+function fooAllInOne.TimberGetTreesFastMoveCursor(myHero)
+
+	if not myHero then return {} end
+
+	local timberChain = NPC.GetAbilityByIndex(myHero, 1)
+		if not timberChain then return {} end
+	
+	local chainCastRange = Ability.GetCastRange(timberChain)
+	
+	local myPos = Entity.GetAbsOrigin(myHero)
+
+	local trees = Trees.InRadius(myPos, chainCastRange, true)
+		if next(trees) == nil then return {} end
+
+	local returnTrees = {}
+	for _, targetTree in ipairs(trees) do		
+		if targetTree then
+		local cursorPos = Input.GetWorldCursorPos()
+		local disTreeToCursor = (Entity.GetAbsOrigin(targetTree) - cursorPos):Length2D()
+		local disTreeTomyHero = (Entity.GetAbsOrigin(targetTree) - myPos):Length2D()
+		local dismyHeroToCursor = (myPos - cursorPos):Length2D()
+			if disTreeToCursor < dismyHeroToCursor then
+				if disTreeTomyHero > 500 then
+					if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true then
+						table.insert(returnTrees, { disTreeToCursor, targetTree })
+					end
+				end
+			end
+		end
+	end
+
+	if next(returnTrees) ~= nil then
+		table.sort(returnTrees, function(a, b)
+        		return a[1] < b[1]
+    		end)
+
+		return returnTrees
+	end
+	return {}
+
+end
+
+
+
 
 -- item usage functions
 function fooAllInOne.itemUsage(myHero, enemy)
@@ -5179,8 +5275,8 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 				end
 			end
 		else
-			if Menu.IsEnabled(fooAllInOne.optionHeroTimberUlt) and (os.clock() - fooAllInOne.lastCastTime3) > 0.4 and NPC.IsEntityInRange(myHero, enemy, 700) then
-				if not Ability.IsHidden(chakram) and not Ability.IsInAbilityPhase(timberChain) and not NPC.HasModifier(myHero, "modifier_shredder_timber_chain") then
+			if Menu.IsEnabled(fooAllInOne.optionHeroTimberUlt) and (os.clock() - fooAllInOne.lastCastTime3) > 0.35 and NPC.IsEntityInRange(myHero, enemy, 700) then
+				if not Ability.IsHidden(chakram) and not Ability.IsInAbilityPhase(timberChain) then
 					if chakram and Ability.IsCastable(chakram, myMana) then
 						local chakramPrediction = Ability.GetCastPoint(chakram) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 900) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
 						Ability.CastPosition(chakram, fooAllInOne.castLinearPrediction(myHero, enemy, chakramPrediction))
@@ -5188,7 +5284,7 @@ function fooAllInOne.TimberCombo(myHero, enemy)
 						fooAllInOne.makeDelay(0.3)
 						return
 					end
-				elseif not Ability.IsHidden(chakramAgha) and Ability.IsHidden(chakram) and not Ability.IsInAbilityPhase(timberChain) and not NPC.HasModifier(myHero, "modifier_shredder_timber_chain") then
+				elseif not Ability.IsHidden(chakramAgha) and Ability.IsHidden(chakram) and not Ability.IsInAbilityPhase(timberChain) then
 					if chakramAgha and Ability.IsCastable(chakramAgha, myMana) then
 						local chakramPrediction = Ability.GetCastPoint(chakram) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 900) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
 						Ability.CastPosition(chakramAgha, fooAllInOne.castLinearPrediction(myHero, enemy, chakramPrediction))
@@ -5273,17 +5369,8 @@ function fooAllInOne.TimberFastMove(myHero)
 	local chainTree
 	local minDis = 99999
 
-	if next(fooAllInOne.TimberGetEscapeChainTrees(myHero)) ~= nil then
-		for _, targetTree in ipairs(fooAllInOne.TimberGetEscapeChainTrees(myHero)) do
-			if targetTree then
-				local disTreeToCursor = (cursorPos - Entity.GetAbsOrigin(targetTree)):Length2D()
-				local vectormyHeroToTree = Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(myHero)
-				if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true and disTreeToCursor < minDis then
-						chainTree = targetTree
-						minDis = disTreeToCursor
-				end
-			end
-		end
+	if next(fooAllInOne.TimberGetTreesFastMoveCursor(myHero)) ~= nil then
+		chainTree = fooAllInOne.TimberGetTreesFastMoveCursor(myHero)[1][2]
 	end
 
 	if chainTree ~= nil then
@@ -5310,27 +5397,13 @@ function fooAllInOne.TimberPanic(myHero)
 	local maxDis = 0
 
 	if Menu.GetValue(fooAllInOne.optionHeroTimberPanicDir) < 2 then
-		if next(fooAllInOne.TimberGetEscapeChainTrees(myHero)) ~= nil then
-			for _, targetTree in ipairs(fooAllInOne.TimberGetEscapeChainTrees(myHero)) do
-				if targetTree then
-					if Menu.GetValue(fooAllInOne.optionHeroTimberPanicDir) == 0 then
-						local myFountainPos = fooAllInOne.GetMyFountainPos(myHero)
-						local disTreeToFountain = (myFountainPos - Entity.GetAbsOrigin(targetTree)):Length2D()
-						local vectormyHeroToTree = Entity.GetAbsOrigin(targetTree) - Entity.GetAbsOrigin(myHero)
-						if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true and disTreeToFountain < minDis then
-							chainTree = targetTree
-							minDis = disTreeToFountain
-						end
-					else
-						local myPos = Entity.GetAbsOrigin(myHero)
-						local vectormyHeroToTree = Entity.GetAbsOrigin(targetTree) - myPos
-						local disTreeTomyHero = vectormyHeroToTree:Length2D()
-						if fooAllInOne.TimberPanicIsTreeInChainWay(myHero, Entity.GetAbsOrigin(targetTree)) == true and disTreeTomyHero > maxDis then
-							chainTree = targetTree
-							maxDis = disTreeTomyHero
-						end
-					end
-				end
+		if Menu.GetValue(fooAllInOne.optionHeroTimberPanicDir) == 0 then
+			if next(fooAllInOne.TimberGetEscapeChainTreesFountain(myHero)) ~= nil then
+				chainTree = fooAllInOne.TimberGetEscapeChainTreesFountain(myHero)[1][2]
+			end
+		else
+			if next(fooAllInOne.TimberGetEscapeChainTrees(myHero)) ~= nil then
+				chainTree = fooAllInOne.TimberGetEscapeChainTrees(myHero)[1][2]
 			end
 		end
 	else
@@ -5340,16 +5413,8 @@ function fooAllInOne.TimberPanic(myHero)
 			if dismyHeroToTree < chainCastRange then
 				chainTree = tree
 			else
-				local altTrees = Trees.InRadius(Input.GetWorldCursorPos(), 500, true)
-					if next(altTrees) == nil then return end
-
-				for _, targetTree in ipairs(altTrees) do
-					if targetTree then
-						local dismyHeroToTree = (Entity.GetAbsOrigin(tree) - Entity.GetAbsOrigin(myHero)):Length2D()
-						if dismyHeroToTree < chainCastRange then
-							chainTree = targetTree
-						end
-					end
+				if fooAllInOne.TimberFastMove(myHero) ~= nil then
+					chainTree = fooAllInOne.TimberFastMove(myHero)
 				end
 			end
 		end
