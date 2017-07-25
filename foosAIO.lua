@@ -1,8 +1,8 @@
 -- foosAIO.lua
--- Version: beta.0.88.3
+-- Version: beta.0.88.9b
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2017/07/24
+-- Last Update: 2017/07/25
 
 local fooAllInOne = {}
 -- Menu Items
@@ -91,6 +91,8 @@ fooAllInOne.optionHeroAxeForceBlinkRange = Menu.AddOption({ "Utility","foos AllI
 fooAllInOne.optionHeroClock = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Clockwerk", "full combo with hookshot prediction (will not check for collision with npcs)")
 fooAllInOne.optionHeroSky = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Skywrath Mage" }, "0. Enable {{sky}}", "full combo")
 fooAllInOne.optionHeroSkyDrawDMG = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Skywrath Mage" }, "1. draw dmg indicators {{sky}}", "")
+fooAllInOne.optionHeroSkyHarass = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Skywrath Mage" }, "2. use bolt to harass {{sky}}", "")
+fooAllInOne.optionHeroSkyHarassKey = Menu.AddKeyOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Skywrath Mage" }, "2.1 harass key {{sky}}", Enum.ButtonCode.KEY_P)
 fooAllInOne.optionHeroTiny = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts" }, "Tiny", "full combo")
 fooAllInOne.optionHeroWindrunner = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Windrunner" }, "0. Enable {{windrunner}}", "basic windrunner combo")
 fooAllInOne.optionHeroWindrunnerPredict = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Windrunner" }, "1. Use prediction for shackleshot", "if activated, script will use predicted position instead of the current position for calculating shackleshot and blink position")
@@ -223,9 +225,13 @@ fooAllInOne.invokerDisplayX = Menu.AddOption({ "Utility","foos AllInOne", "6. He
 fooAllInOne.invokerDisplaySortAbilitiesOption = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Invoker", "8. Invoker Spell Panel" }, "Sort Abilities by Name {{invoker spell panel}}", "")
 fooAllInOne.optionHeroZuus = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "1. Zuus Combo", "basic zuus combo")
 fooAllInOne.optionHeroZuusFarmKey = Menu.AddKeyOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "2. arc farm key", Enum.ButtonCode.KEY_P)
+fooAllInOne.optionHeroZuusHarass = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "2.1 harass with arc", "if no creep can be killed with arc and enemy hero is in range, enemy will be harassed with arc")
+fooAllInOne.optionHeroZuusHarassMana = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "2.2 harass arc mana threshold", "stop harassing below threshold", 10, 90, 10)
 fooAllInOne.optionHeroZuusKillsteal = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "3. killsteal", "killstealing with bolt, arc, wrath (also combinations, eg bolt + arc)")
 fooAllInOne.optionHeroZuusUltCount = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "3.1 wrath kill count", "minimum targets killed by ult", 1, 5, 1)
 fooAllInOne.optionHeroZuusUltCountRefresher = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "3.2 refresher wrath kill count", "minimum targets killed by ult-refresher-ult combo", 1, 5, 1)
+fooAllInOne.optionHeroZuusBlink = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "4. use blink in combo {{zuus}}", "")
+fooAllInOne.optionHeroZuusRightClick = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Zuus" }, "5. use right click attacks in combo {{zuus}}", "zuus will go in attack range")
 
 	-- Menu set values
 Menu.SetValueName(fooAllInOne.optionItemVeil, 0, 'OFF')
@@ -1254,7 +1260,7 @@ fooAllInOne.AbilityList = {
 	{ "npc_dota_hero_skywrath_mage", "skywrath_mage_arcane_bolt", "nuke", "target" , "bolt_damage" },
 	{ "npc_dota_hero_skywrath_mage", "skywrath_mage_ancient_seal", "disable", "target" , "0" },
 	{ "npc_dota_hero_skywrath_mage", "skywrath_mage_mystic_flare", "nuke", "position" , "0" },
-	{ "npc_dota_hero_skywrath_mage", "skywrath_mage_concussive_shot", "utility", "0" , "0" },
+	{ "npc_dota_hero_skywrath_mage", "skywrath_mage_concussive_shot", "nuke", "special" , "damage" },
 	{ "npc_dota_hero_slardar", "slardar_slithereen_crush", "disable", "no target" , "0" },
 	{ "npc_dota_hero_slardar", "slardar_amplify_damage", "utility", "0" , "0" },
 	{ "npc_dota_hero_slardar", "slardar_bash", "utility", "0" , "0" },
@@ -5038,6 +5044,13 @@ function fooAllInOne.skywrathCombo(myHero, enemy)
 	fooAllInOne.skywrathComboTotalDamage(myHero, myMana, enemy, ancientSeal, arcaneBolt, concussiveShot, mysticFlare)
 	fooAllInOne.skywrathComboKillableWithoutUlt(myHero, myMana, enemy, ancientSeal, arcaneBolt, concussiveShot)
 
+	if Menu.IsKeyDown(fooAllInOne.optionHeroSkyHarassKey) then
+		fooAllInOne.skywrathComboHarass(myHero, myMana, arcaneBolt)
+		Engine.ExecuteCommand("dota_range_display 875")
+	else
+		Engine.ExecuteCommand("dota_range_display 0")
+	end
+
 	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and fooAllInOne.heroCanCastSpells(myHero) == true then
 		if not NPC.IsEntityInRange(myHero, enemy, 800) then
 			if blink and Ability.IsReady(blink) then
@@ -5108,23 +5121,31 @@ function fooAllInOne.skywrathComboWithoutUlt(myHero, myMana, enemy, ancientSeal,
 	end
 
 	if fooAllInOne.SleepReady(Ability.GetCastPoint(ancientSeal)) and mysticFlare and Ability.IsCastable(mysticFlare, myMana) then
-		if fooAllInOne.TargetDisableTimer(myHero, enemy) > 1.5 or NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_HEXED) then
+		if fooAllInOne.TargetDisableTimer(myHero, enemy) > 1.5 then
 			if not aghanimsBuffed then
-				Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy))
+				Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy) + Entity.GetRotation(enemy):GetForward():Normalized():Scaled(95))
 				return
 			else
-				Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(175))
+				Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy) + Entity.GetRotation(enemy):GetForward():Normalized():Scaled(175))
 				return
 			end
 		elseif NPC.HasItem(myHero, "item_rod_of_atos", true) then
 			if Ability.SecondsSinceLastUse(NPC.GetItem(myHero, "item_rod_of_atos", true)) > ((Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D() / 1500) and Ability.SecondsSinceLastUse(NPC.GetItem(myHero, "item_rod_of_atos", true)) < (((Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D() / 1500) + 2) then
 				if not aghanimsBuffed then
-					Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy))
+					Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy) + Entity.GetRotation(enemy):GetForward():Normalized():Scaled(95))
 					return
 				else
-					Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(175))
+					Ability.CastPosition(mysticFlare, Entity.GetAbsOrigin(enemy) + Entity.GetRotation(enemy):GetForward():Normalized():Scaled(175))
 					return
 				end
+			end
+		elseif NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_HEXED) then
+			if not aghanimsBuffed then
+				local flarePrediction = Ability.GetCastPoint(mysticFlare) + 0.2 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+				Ability.CastPosition(mysticFlare, fooAllInOne.castPrediction(myHero, enemy, flarePrediction))
+			else
+				Ability.CastPosition(mysticFlare, fooAllInOne.skywrathComboPredictDoubleUltWhileHexed(myHero, enemy))
+				return
 			end
 		else
 			local flarePrediction = Ability.GetCastPoint(mysticFlare) + 0.2 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
@@ -5332,6 +5353,47 @@ function fooAllInOne.skywrathComboDrawDamage(myHero)
 	end
 		
 
+end
+
+function fooAllInOne.skywrathComboHarass(myHero, myMana, arcaneBolt)
+
+	if not myHero then return end
+	if not Menu.IsEnabled(fooAllInOne.optionHeroSkyHarass) then return end
+
+	if fooAllInOne.heroCanCastSpells(myHero) == false then return end
+	if fooAllInOne.isHeroChannelling(myHero) == true then return end 
+	if fooAllInOne.IsHeroInvisible(myHero) == true then return end
+
+	if not arcaneBolt then return end
+		if not Ability.IsCastable(arcaneBolt, myMana) then return end
+
+	for _, hero in ipairs(NPC.GetHeroesInRadius(myHero, 875, Enum.TeamType.TEAM_ENEMY)) do
+		if hero and Entity.IsHero(hero) and not Entity.IsDormant(hero) and not NPC.IsIllusion(hero) then 
+			if Entity.IsAlive(hero) then
+        			Ability.CastTarget(arcaneBolt, hero)
+				break
+        			return
+			end
+      		end		
+	end	
+
+end
+
+function fooAllInOne.skywrathComboPredictDoubleUltWhileHexed(myHero, enemy)
+
+	if not myHero then return end
+	if not enemy then return end
+
+	local enemyRotation = Entity.GetRotation(enemy)
+    	local enemyOrigin = NPC.GetAbsOrigin(enemy)
+		enemyOrigin:SetZ(0)
+
+	if enemyRotation and enemyOrigin then
+			if not NPC.IsRunning(enemy) then
+				return enemyOrigin + enemyRotation:GetForward():Normalized():Scaled(175)
+			else return enemyOrigin:__add(enemyRotation:GetForward():Normalized():Scaled(fooAllInOne.GetMoveSpeed(enemy) * (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + 0.15) + 175))
+			end
+	end
 end
 
 function fooAllInOne.PACombo(myHero, enemy)
@@ -7996,9 +8058,9 @@ function fooAllInOne.ZuusCombo(myHero, enemy)
 		if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.IsAlive(enemy) and fooAllInOne.heroCanCastSpells(myHero) == true then
 			if not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_INVULNERABLE) then
 				if not NPC.IsEntityInRange(myHero, enemy, boltCastRange) then
-					if blink and Ability.IsReady(blink) then
-						if NPC.IsEntityInRange(myHero, enemy, 1650) then
-							Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(500))
+					if blink and Ability.IsReady(blink) and Menu.IsEnabled(fooAllInOne.optionHeroZuusBlink) then
+						if NPC.IsEntityInRange(myHero, enemy, 1900) then
+							Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(750))
 							return
 						else
 							if fooAllInOne.SleepReady(0.5) then
@@ -8008,18 +8070,31 @@ function fooAllInOne.ZuusCombo(myHero, enemy)
 							end
 						end
 					end
+					if not blink or (blink and not Ability.IsReady(blink)) or not Menu.IsEnabled(fooAllInOne.optionHeroZuusBlink) then
+						if fooAllInOne.SleepReady(0.5) then
+							NPC.MoveTo(myHero, Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(boltCastRange - 75), false, false)
+							fooAllInOne.lastTick = os.clock()
+							return
+						end
+					end
+					if arc and Ability.IsCastable(arc, myMana) and NPC.IsEntityInRange(myHero, enemy, arcCastRange) then
+						Ability.CastTarget(arc, enemy)
+						fooAllInOne.lastTick = os.clock()
+					end	
 				else
-					if bolt and Ability.IsCastable(bolt, myMana) then
-						Ability.CastTarget(bolt, enemy)
+					if arc and Ability.IsCastable(arc, myMana) then
+						Ability.CastTarget(arc, enemy)
 						fooAllInOne.lastTick = os.clock()
 					end
-					if fooAllInOne.SleepReady(Ability.GetCastPoint(bolt)) and arc and Ability.IsCastable(arc, myMana) then
-						Ability.CastTarget(arc, enemy)
+					if fooAllInOne.SleepReady(Ability.GetCastPoint(arc)) and bolt and Ability.IsCastable(bolt, myMana) then
+						Ability.CastTarget(bolt, enemy)
 						fooAllInOne.lastTick = os.clock()
 					end
 				end
 			end
-		fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+			if Menu.IsEnabled(fooAllInOne.optionHeroZuusRightClick) then
+				fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+			end
 		end
 	end
 
@@ -8044,6 +8119,21 @@ function fooAllInOne.ZuusArcFarm(myHero, myMana, arc, arcDamage, arcCastRange, s
         				Ability.CastTarget(arc, npc)
 					break
         				return
+				end
+				if Menu.IsEnabled(fooAllInOne.optionHeroZuusHarass) then
+					if (NPC.GetMana(myHero) / NPC.GetMaxMana(myHero)) >= (Menu.GetValue(fooAllInOne.optionHeroZuusHarassMana) / 100) then
+						if Entity.GetHealth(npc) > ((arcDamage + (Entity.GetHealth(npc) * (staticDamage / 100))) * NPC.GetMagicalArmorDamageMultiplier(npc)) * 2.5 then
+							for _, hero in ipairs(NPC.GetHeroesInRadius(myHero, arcCastRange - 25, Enum.TeamType.TEAM_ENEMY)) do
+								if hero and Entity.IsHero(hero) and not Entity.IsDormant(hero) and not NPC.IsIllusion(hero) then
+									if Entity.IsAlive(hero) then
+										Ability.CastTarget(arc, hero)
+										break
+        									return
+									end
+								end
+							end
+						end
+					end
 				end
 			end
       		end		
@@ -13119,7 +13209,7 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 							local razePos = Entity.GetAbsOrigin(myHero) + Entity.GetRotation(myHero):GetForward():Normalized():Scaled(200)
 							if NPC.IsPositionInRange(stealEnemy, razePos, 200, 0) and not Entity.IsTurning(myHero) then
 								local skillDamage = Ability.GetDamage(NPC.GetAbility(myHero, skillName))
-								if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) and NPC.GetMana(stealEnemy) >= Entity.GetHealth(stealEnemy) then
+								if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) then
 									if NPC.GetAbility(myHero, skillName) and Ability.IsCastable(NPC.GetAbility(myHero, skillName), myMana) then
 										if os.clock() - fooAllInOne.lastCastTime2 >= 0.55 then
 											Ability.CastNoTarget(NPC.GetAbility(myHero, skillName))
@@ -13134,7 +13224,7 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 							local razePos = Entity.GetAbsOrigin(myHero) + Entity.GetRotation(myHero):GetForward():Normalized():Scaled(450)
 							if NPC.IsPositionInRange(stealEnemy, razePos, 200, 0) and not Entity.IsTurning(myHero) then
 								local skillDamage = Ability.GetDamage(NPC.GetAbility(myHero, skillName))
-								if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) and NPC.GetMana(stealEnemy) >= Entity.GetHealth(stealEnemy) then
+								if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) then
 									if NPC.GetAbility(myHero, skillName) and Ability.IsCastable(NPC.GetAbility(myHero, skillName), myMana) then
 										if os.clock() - fooAllInOne.lastCastTime2 >= 0.55 then
 											Ability.CastNoTarget(NPC.GetAbility(myHero, skillName))
@@ -13149,11 +13239,34 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 							local razePos = Entity.GetAbsOrigin(myHero) + Entity.GetRotation(myHero):GetForward():Normalized():Scaled(700)
 							if NPC.IsPositionInRange(stealEnemy, razePos, 200, 0) and not Entity.IsTurning(myHero) then
 								local skillDamage = Ability.GetDamage(NPC.GetAbility(myHero, skillName))
-								if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) and NPC.GetMana(stealEnemy) >= Entity.GetHealth(stealEnemy) then
+								if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) then
 									if NPC.GetAbility(myHero, skillName) and Ability.IsCastable(NPC.GetAbility(myHero, skillName), myMana) then
 										if os.clock() - fooAllInOne.lastCastTime2 >= 0.55 then
 											Ability.CastNoTarget(NPC.GetAbility(myHero, skillName))
 											fooAllInOne.lastCastTime2 = os.clock()
+											return
+										end
+									end
+								end
+							end
+						end
+						if skillName == "skywrath_mage_concussive_shot" and targetMode == "special" then
+							local skillDamage = Ability.GetLevelSpecialValueFor(NPC.GetAbility(myHero, skillName), specialAttribute)
+							if NPC.IsEntityInRange(myHero, stealEnemy, 1600, 0) then
+								if Entity.GetHealth(stealEnemy) <= (((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))) then
+									local enemyDis = (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(stealEnemy)):Length2D()
+									local aghanimsBuffed = false
+										if NPC.HasItem(myHero, "item_ultimate_scepter", true) or NPC.HasModifier(myHero, "modifier_item_ultimate_scepter_consumed") then
+											aghanimsBuffed = true
+										end
+									if not aghanimsBuffed then
+										if #Entity.GetHeroesInRadius(myHero, enemyDis, Enum.TeamType.TEAM_ENEMY) <= 1 then
+											Ability.CastNoTarget(NPC.GetAbility(myHero, skillName))
+											return
+										end
+									else
+										if #Entity.GetHeroesInRadius(myHero, enemyDis, Enum.TeamType.TEAM_ENEMY) <= 2 then
+											Ability.CastNoTarget(NPC.GetAbility(myHero, skillName))
 											return
 										end
 									end
