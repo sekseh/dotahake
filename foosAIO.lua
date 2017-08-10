@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.94.7f
+-- Version: beta.0.94.7g
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/08/09
@@ -4361,7 +4361,7 @@ function fooAllInOne.dodger(myHero)
 		if NPC.GetUnitName(myHero) == "npc_dota_hero_alchemist" then
 			if NPC.HasModifier(myHero, "modifier_alchemist_unstable_concoction") then
 				if Modifier.GetCreationTime(NPC.GetModifier(myHero, "modifier_alchemist_unstable_concoction")) + 5.5 - GameRules.GetGameTime() < 0.15 then
-					fooAllInOne.dodgeIt({time = GameRules.GetGameTime(); delay = 0.15; style = 1; source = myHero, lotus = 0, castpoint = 0, spellname = "alchemist_unstable_concoction"})
+					fooAllInOne.dodgeIt({time = GameRules.GetGameTime(); delay = 0.15; style = 1; source = myHero, lotus = 0, castpoint = 0, spellname = "alchemist_unstable_concoction_throw"})
 					return
 				end
 			end
@@ -10692,37 +10692,41 @@ function fooAllInOne.InvokerCombo(myHero, enemy)
 	end
 
 	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and not Menu.IsKeyDown(fooAllInOne.optionHeroInvokerAltKey) then
-		if invokerTarget and Entity.GetHealth(invokerTarget) > 0 and not NPC.HasState(invokerTarget, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
-			if fooAllInOne.InvokerComboSelector == 0 then
-				return
-			elseif fooAllInOne.InvokerComboSelector == 1 then
-				fooAllInOne.InvokerComboCSAlacritySpirit(myHero, myMana, invokerTarget, coldSnap, alacrity, forgeSpirit, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 2 then
-				fooAllInOne.InvokerComboCSSpiritSunstrike(myHero, myMana, invokerTarget, coldSnap, forgeSpirit, sunStrike, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 3 then
-				fooAllInOne.InvokerComboTornadoEmpIcewall(myHero, myMana, invokerTarget, tornado, emp, iceWall, coldSnap, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 4 then
-				fooAllInOne.InvokerComboTornadoMeteorBlast(myHero, myMana, invokerTarget, tornado, chaosMeteor, deafeningBlast, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 5 then
-				fooAllInOne.InvokerComboEulsSunstrikeMeteorBlast(myHero, myMana, invokerTarget, sunStrike, chaosMeteor, deafeningBlast, blink, euls, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 6 then
-				fooAllInOne.InvokerComboAghaTornadoEmpMeteorBlast(myHero, myMana, invokerTarget, tornado, emp, chaosMeteor, deafeningBlast, aghanims, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 7 then
-				fooAllInOne.InvokerComboAghaTornadoSunstrikeMeteorBlast(myHero, myMana, invokerTarget, tornado, sunStrike, chaosMeteor, deafeningBlast, aghanims, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 8 then
-				fooAllInOne.InvokerComboRefresherAghaTornadoSunstrikeMeteorBlast(myHero, myMana, invokerTarget, tornado, sunStrike, chaosMeteor, deafeningBlast, aghanims, refresher, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 9 then
-				fooAllInOne.InvokerComboRefresherAghaTornadoEmpMeteorBlast(myHero, myMana, invokerTarget, tornado, emp, chaosMeteor, deafeningBlast, aghanims, refresher, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 10 then
-				fooAllInOne.InvokerComboRefresherAghaBlastMeteorSunstrike(myHero, myMana, invokerTarget, deafeningBlast, chaosMeteor, sunStrike, blink, aghanims, refresher, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 11 then
-				fooAllInOne.InvokerComboDynamicMode(myHero, myMana, invokerTarget, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 12 then
-				fooAllInOne.InvokerComboCustomMode(myHero, myMana, invokerTarget, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 13 then
-				fooAllInOne.InvokerComboCustomMode(myHero, myMana, invokerTarget, blink, invoke)
-			elseif fooAllInOne.InvokerComboSelector == 14 then
-				fooAllInOne.InvokerComboCustomMode(myHero, myMana, invokerTarget, blink, invoke)
+		if enemy and Entity.GetHealth(enemy) > 0 then
+			if NPC.IsEntityInRange(myHero, enemy, 1500) and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+				if fooAllInOne.InvokerComboSelector == 0 then
+					fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+				elseif fooAllInOne.InvokerComboSelector == 1 then
+					fooAllInOne.InvokerComboCSAlacritySpirit(myHero, myMana, enemy, coldSnap, alacrity, forgeSpirit, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 2 then
+					fooAllInOne.InvokerComboCSSpiritSunstrike(myHero, myMana, enemy, coldSnap, forgeSpirit, sunStrike, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 3 then
+					fooAllInOne.InvokerComboTornadoEmpIcewall(myHero, myMana, enemy, tornado, emp, iceWall, coldSnap, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 4 then
+					fooAllInOne.InvokerComboTornadoMeteorBlast(myHero, myMana, enemy, tornado, chaosMeteor, deafeningBlast, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 5 then
+					fooAllInOne.InvokerComboEulsSunstrikeMeteorBlast(myHero, myMana, enemy, sunStrike, chaosMeteor, deafeningBlast, blink, euls, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 6 then
+					fooAllInOne.InvokerComboAghaTornadoEmpMeteorBlast(myHero, myMana, enemy, tornado, emp, chaosMeteor, deafeningBlast, aghanims, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 7 then
+					fooAllInOne.InvokerComboAghaTornadoSunstrikeMeteorBlast(myHero, myMana, enemy, tornado, sunStrike, chaosMeteor, deafeningBlast, aghanims, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 8 then
+					fooAllInOne.InvokerComboRefresherAghaTornadoSunstrikeMeteorBlast(myHero, myMana, enemy, tornado, sunStrike, chaosMeteor, deafeningBlast, aghanims, refresher, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 9 then
+					fooAllInOne.InvokerComboRefresherAghaTornadoEmpMeteorBlast(myHero, myMana, enemy, tornado, emp, chaosMeteor, deafeningBlast, aghanims, refresher, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 10 then
+					fooAllInOne.InvokerComboRefresherAghaBlastMeteorSunstrike(myHero, myMana, enemy, deafeningBlast, chaosMeteor, sunStrike, blink, aghanims, refresher, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 11 then
+					fooAllInOne.InvokerComboDynamicMode(myHero, myMana, enemy, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 12 then
+					fooAllInOne.InvokerComboCustomMode(myHero, myMana, enemy, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 13 then
+					fooAllInOne.InvokerComboCustomMode(myHero, myMana, enemy, blink, invoke)
+				elseif fooAllInOne.InvokerComboSelector == 14 then
+					fooAllInOne.InvokerComboCustomMode(myHero, myMana, enemy, blink, invoke)
+				end
+			else
+				fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 			end
 		end
 	end
@@ -15646,3 +15650,4 @@ function fooAllInOne.Debugger(time, npc, ability, order)
 end
 
 return fooAllInOne
+
