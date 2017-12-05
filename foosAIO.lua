@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.98.07b
+-- Version: beta.0.98.07c
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/12/05
@@ -7,7 +7,7 @@
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.07b", "Release date: 2017/12/05", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.07c", "Release date: 2017/12/05", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -10401,7 +10401,7 @@ function fooAllInOne.SFCombo(myHero, enemy)
 					if razeShort and Ability.IsCastable(razeShort, myMana) then
 						local razePos = Entity.GetAbsOrigin(myHero) + Entity.GetRotation(myHero):GetForward():Normalized():Scaled(200)
 						local razePrediction = 0.55 + 0.1 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)			
-						local predictedPos = fooAllInOne.castPrediction(myHero, stealEnemy, razePrediction)
+						local predictedPos = fooAllInOne.castPrediction(myHero, enemy, razePrediction)
 						local disRazePOSpredictedPOS = (razePos - predictedPos):Length2D()
 						if disRazePOSpredictedPOS <= 200 and not Entity.IsTurning(myHero) then
 							if os.clock() - fooAllInOne.lastTick >= 0.55 then
@@ -10414,7 +10414,7 @@ function fooAllInOne.SFCombo(myHero, enemy)
 					if razeMid and Ability.IsCastable(razeMid, myMana) then
 						local razePos = Entity.GetAbsOrigin(myHero) + Entity.GetRotation(myHero):GetForward():Normalized():Scaled(450)
 						local razePrediction = 0.55 + 0.1 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)			
-						local predictedPos = fooAllInOne.castPrediction(myHero, stealEnemy, razePrediction)
+						local predictedPos = fooAllInOne.castPrediction(myHero, enemy, razePrediction)
 						local disRazePOSpredictedPOS = (razePos - predictedPos):Length2D()
 						if disRazePOSpredictedPOS <= 200 and not Entity.IsTurning(myHero) then
 							if os.clock() - fooAllInOne.lastTick >= 0.55 then
@@ -10427,7 +10427,7 @@ function fooAllInOne.SFCombo(myHero, enemy)
 					if razeLong and Ability.IsCastable(razeLong, myMana) then
 						local razePos = Entity.GetAbsOrigin(myHero) + Entity.GetRotation(myHero):GetForward():Normalized():Scaled(700)
 						local razePrediction = 0.55 + 0.1 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)			
-						local predictedPos = fooAllInOne.castPrediction(myHero, stealEnemy, razePrediction)
+						local predictedPos = fooAllInOne.castPrediction(myHero, enemy, razePrediction)
 						local disRazePOSpredictedPOS = (razePos - predictedPos):Length2D()
 						if disRazePOSpredictedPOS <= 200 and not Entity.IsTurning(myHero) then
 							if os.clock() - fooAllInOne.lastTick >= 0.55 then
