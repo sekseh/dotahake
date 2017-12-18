@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.98.08k
+-- Version: beta.0.98.08l
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/12/18
@@ -7,7 +7,7 @@
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.08k", "Release date: 2017/12/18", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.08l", "Release date: 2017/12/18", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -248,9 +248,10 @@ fooAllInOne.optionHeroTimberFastMoveKey = Menu.AddKeyOption({ "Utility","foos Al
 fooAllInOne.optionHeroEmber = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ember" }, "Ember Combo", "hold combo key -> full combo with remnant, release key after ~ 1 sec -> fist+chains")
 fooAllInOne.optionHeroEmberUlt = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ember" }, "Ember Ult Usage in Combo", "", 0, 1, 1)
 fooAllInOne.optionHeroUrsa = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "0. Ursa Combo", "full combo")
-fooAllInOne.optionHeroUrsaEnrage = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "1. Auto use enrage", "will use enrage if requirements below are fullfilled")
-fooAllInOne.optionHeroUrsaEnrageHP = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "2. Enrage hp treshold", "will only use enrage if hero HP is below threshold", 5, 75, 5)
-fooAllInOne.optionHeroUrsaEnrageEnemies = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "3. Min. enemies around", "will only use enrage if enemiy heroes are around", 1, 5, 1)
+fooAllInOne.optionHeroUrsaEnrageCombo = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "1. Use ult in combo {{ursa}}", "if enabled, your hero will always use enrage in combo")
+fooAllInOne.optionHeroUrsaEnrage = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "2. Auto use enrage", "will use enrage if requirements below are fullfilled")
+fooAllInOne.optionHeroUrsaEnrageHP = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "2.1 Enrage hp treshold", "will only use enrage if hero HP is below threshold", 5, 75, 5)
+fooAllInOne.optionHeroUrsaEnrageEnemies = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Ursa" }, "2.2 Min. enemies around", "will only use enrage if enemiy heroes are around", 1, 5, 1)
 fooAllInOne.optionHeroTA = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Templar Assassin" }, "0. TA Combo", "full combo")
 fooAllInOne.optionHeroTABlink = Menu.AddOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Templar Assassin" }, "1. Use blink in Combo {{TA}}", "")
 fooAllInOne.optionHeroTAHarassKey = Menu.AddKeyOption({ "Utility","foos AllInOne", "6. Hero Scripts", "Templar Assassin" }, "4. psi blades harass key {{TA}}", Enum.ButtonCode.KEY_P)
@@ -12594,26 +12595,37 @@ function fooAllInOne.UrsaCombo(myHero, enemy)
 			earthShockOffset = 200
 		end
 
-	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
-		if overPower and Ability.IsCastable(overPower, myMana) and NPC.IsEntityInRange(myHero, enemy, 1200) then
-			Ability.CastNoTarget(overPower)
-			fooAllInOne.lastTick = os.clock()
-		end
-		if fooAllInOne.SleepReady(0.2) then
-			if not NPC.IsEntityInRange(myHero, enemy, earthShockOffset) then
-				if blink and Ability.IsReady(blink) and NPC.IsEntityInRange(myHero, enemy, 1150) then
-					Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy))
-					return
-				end
-			else
-				if earthShock and Ability.IsCastable(earthShock, myMana) then
-					Ability.CastNoTarget(earthShock)
-					fooAllInOne.lastTick = os.clock()
-					return
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 then
+		if fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
+			if overPower and Ability.IsCastable(overPower, myMana) and NPC.IsEntityInRange(myHero, enemy, 1200) and not NPC.HasModifier(myHero, "modifier_ursa_overpower") then
+				Ability.CastNoTarget(overPower)
+				fooAllInOne.lastTick = os.clock()
+				return
+			end
+			if fooAllInOne.SleepReady(0.2) then
+				if not NPC.IsEntityInRange(myHero, enemy, earthShockOffset) then
+					if blink and Ability.IsReady(blink) and NPC.IsEntityInRange(myHero, enemy, 1150) then
+						Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy))
+						return
+					end
+				else
+					if earthShock and Ability.IsCastable(earthShock, myMana) then
+						Ability.CastNoTarget(earthShock)
+						fooAllInOne.lastTick = os.clock()
+						return
+					end
+					if Menu.IsEnabled(fooAllInOne.optionHeroUrsaEnrageCombo) then
+						if enrage and Ability.IsCastable(enrage, myMana) then
+							Ability.CastNoTarget(enrage)
+							fooAllInOne.lastTick = os.clock()
+							return
+						end
+					end
 				end
 			end
 		end
-	fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+		fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+		return
 	end
 
 	if Menu.IsEnabled(fooAllInOne.optionHeroUrsaEnrage) then
@@ -21483,4 +21495,3 @@ function fooAllInOne.Debugger(time, npc, ability, order)
 end
 
 return fooAllInOne
-
