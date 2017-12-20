@@ -1,5 +1,5 @@
 -- foosAIO.lua
--- Version: beta.0.98.08n
+-- Version: beta.0.98.08o
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2017/12/20
@@ -7,7 +7,7 @@
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.08n", "Release date: 2017/12/20", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.08o", "Release date: 2017/12/20", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -15,8 +15,8 @@ fooAllInOne.optionComboKey = Menu.AddKeyOption({ "Utility","foos AllInOne" }, "1
 fooAllInOne.optionTargetStyle = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector" }, "0. Targeting style {{overall targeting}}", "", 0, 1, 1)
 fooAllInOne.optionTargetRange = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector" }, "1. Target acquisition range {{overall targeting}}", "target needs to be in range of your cursor", 200, 1000, 50)
 fooAllInOne.optionMoveToCursor = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector" }, "2. Move to Cursor Pos {{overall targeting}}", "if no enemy in acquisition range, your hero will move to cursor pos")
-fooAllInOne.optionLockTargetIndicator = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector" }, "3.1 Draw target indicator {{overall targeting}}", "draws some particle indicator", 0, 1, 1)
-fooAllInOne.optionLockTargetParticle = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector" }, "3.2 Indicator style {{overall targeting}}", "", 0, 1, 1)
+fooAllInOne.optionLockTargetIndicator = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector" }, "3.1 Draw target indicator {{overall targeting}}", "draws some particle indicator")
+fooAllInOne.optionLockTargetParticle = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector" }, "3.2 Indicator style {{overall targeting}}", "", 0, 2, 1)
 fooAllInOne.optionTargetCheckAM = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector", "4. Target exclusions" }, "Exclude AM with agha {{targetselect}}", "if enabled, script will not combo/target an anti-mage with agha spell shield off cooldown")
 fooAllInOne.optionTargetCheckLotus = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector", "4. Target exclusions" }, "Exclude active lotus orb {{targetselect}}", "if enabled, script will not combo/target an enemy with lotus orb active")
 fooAllInOne.optionTargetCheckBlademail = Menu.AddOption({ "Utility","foos AllInOne", "1.2 Target selector", "4. Target exclusions" }, "Exclude blademail {{targetselect}}", "if enabled, script will not combo/target an enemy with blademail active, if own HP is low")
@@ -35,6 +35,7 @@ fooAllInOne.optionOrbwalkDistance = Menu.AddOption({ "Utility","foos AllInOne", 
 fooAllInOne.optionOrbwalkKiting = Menu.AddOption({ "Utility","foos AllInOne", "8. Orbwalker", "3. Orbwalk to enemy options" }, "2. kiting {{orbwalker}}", "if enabled, your ranged hero tries to hit and run away if enemy is to close (only if turning-running-turning is faster then attack animation)")
 fooAllInOne.optionOrbwalkDistanceMouse = Menu.AddOption({ "Utility","foos AllInOne", "8. Orbwalker", "4. Orbwalk to mouse options" }, "2. Min. distance for ranged heroes {{orbwalker mouse}}", "ranged heroes will not go nearer then minimum range to target - values are percentage of your attack range", 20, 80, 10)
 fooAllInOne.optionOrbwalkMouseStyle = Menu.AddOption({ "Utility","foos AllInOne", "8. Orbwalker", "4. Orbwalk to mouse options" }, "1. Mouse orbwalk {{orbwalker mouse}}", "select if you only wanna mouse orb walk if your hero is ranged or with any hero", 0, 1, 1)
+fooAllInOne.optionOrbwalkMouseHold = Menu.AddOption({ "Utility","foos AllInOne", "8. Orbwalker", "4. Orbwalk to mouse options" }, "3. Hold distance {{orbwalker mouse}}", "mouse must be outside of hold distance to your hero to trigger a move", 50, 250, 25)
 fooAllInOne.optionWorldToMinimapOffsetX = Menu.AddOption({ "Utility","foos AllInOne", "7. WorldToMinimap" }, "X-Offset {{minimap}}", "Adjustment variable for World-to-minimap renderer", -30, 30, 1)
 fooAllInOne.optionWorldToMinimapOffsetY = Menu.AddOption({ "Utility","foos AllInOne", "7. WorldToMinimap" }, "Y-Offset {{minimap}}", "Adjustment variable for World-to-minimap renderer", -30, 30, 1)
 fooAllInOne.optionDodgeItEnable = Menu.AddOption({ "Utility","foos AllInOne", "98. <BETA> DodgeIt" }, "0. Enable {{dodgeit}}", "experimental manta dodger")
@@ -537,6 +538,7 @@ Menu.SetValueName(fooAllInOne.optionHeroInvokerPanelCD, 1, 'only longest')
 Menu.SetValueName(fooAllInOne.optionHeroInvokerPanelCD, 2, 'all cooldowns')
 Menu.SetValueName(fooAllInOne.optionLockTargetParticle, 0, 'blinding light')
 Menu.SetValueName(fooAllInOne.optionLockTargetParticle, 1, 'blood bath')
+Menu.SetValueName(fooAllInOne.optionLockTargetParticle, 2, 'tower aggro')
 Menu.SetValueName(fooAllInOne.optionHeroInvokerInstanceDelay, 1, '0.25')
 Menu.SetValueName(fooAllInOne.optionHeroInvokerInstanceDelay, 2, '0.50')
 Menu.SetValueName(fooAllInOne.optionHeroInvokerInstanceDelay, 3, '0.75')
@@ -888,7 +890,8 @@ fooAllInOne.GlimpseParticlePosition = Vector()
 fooAllInOne.GlimpseParticleIndexStart = nil
 fooAllInOne.GlimpseParticlePositionStart = Vector()
 fooAllInOne.particleNextTime = 0
-fooAllInOne.currentParticle = nil
+fooAllInOne.currentParticle = 0
+fooAllInOne.currentParticleTarget = nil
 fooAllInOne.skywrathDMGwithoutUlt = 0
 fooAllInOne.skywrathDMGwithUlt = 0
 fooAllInOne.skywrathComboSelect = false
@@ -2119,7 +2122,8 @@ function fooAllInOne.ResetGlobalVariables()
 	fooAllInOne.GlimpseParticleIndexStart = nil
 	fooAllInOne.GlimpseParticlePositionStart = Vector()
 	fooAllInOne.particleNextTime = 0
-	fooAllInOne.currentParticle = nil
+	fooAllInOne.currentParticle = 0
+	fooAllInOne.currentParticleTarget = nil
 	fooAllInOne.skywrathDMGwithoutUlt = 0
 	fooAllInOne.skywrathDMGwithUlt = 0
 	fooAllInOne.skywrathComboSelect = false
@@ -5113,7 +5117,8 @@ function fooAllInOne.OrbWalker(myHero, enemy)
 			end
 		else
 			if os.clock() - fooAllInOne.OrbwalkerDelay > attackBackSwing + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) then
-				if moveDistance2 > 50 then
+				local myDisToMouse = (Entity.GetAbsOrigin(myHero) - mousePos):Length2D()
+				if moveDistance2 > 50 and myDisToMouse > Menu.GetValue(fooAllInOne.optionOrbwalkMouseHold) then
 					local targetVector = Entity.GetAbsOrigin(myHero) + (mousePos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(moveDistance2)
 					if not NPC.IsPositionInRange(enemy, targetVector, breakPoint2, 0) then
 						NPC.MoveTo(myHero, targetVector, false, false)
@@ -5124,11 +5129,6 @@ function fooAllInOne.OrbWalker(myHero, enemy)
 			end
 		end
 	end
-
-
-
-
-
 
 end
 
@@ -6116,29 +6116,48 @@ end
 function fooAllInOne.TargetIndicator(myHero)
 
 	if not myHero then return end
-	if fooAllInOne.LockedTarget == nil then return end
 
 	local curtime = GameRules.GetGameTime()	
 
-	if curtime > fooAllInOne.particleNextTime then
-		if fooAllInOne.currentParticle ~= nil then
-			Particle.Destroy(fooAllInOne.currentParticle)
-			fooAllInOne.currentParticle = nil
-		end
-
-	if Menu.GetValue(fooAllInOne.optionLockTargetParticle) == 0 then
-		local sparkParticle = Particle.Create("particles/items_fx/aegis_resspawn_flash.vpcf")
-		fooAllInOne.currentParticle = sparkParticle
-		
-		Particle.SetControlPoint(sparkParticle, 0, Entity.GetAbsOrigin(fooAllInOne.LockedTarget))
-	else
-		local bloodParticle = Particle.Create("particles/items2_fx/soul_ring_blood.vpcf")
-		fooAllInOne.currentParticle = bloodParticle
-		Particle.SetControlPoint(bloodParticle, 0, Entity.GetAbsOrigin(fooAllInOne.LockedTarget))
-	end
-
-        fooAllInOne.particleNextTime = curtime + 0.35
+	if Menu.GetValue(fooAllInOne.optionLockTargetParticle) < 2 then
+		if fooAllInOne.LockedTarget ~= nil then
+			if curtime > fooAllInOne.particleNextTime then
+				if fooAllInOne.currentParticle > 0 then
+					Particle.Destroy(fooAllInOne.currentParticle)
+					fooAllInOne.currentParticle = 0
+				end
 	
+				if Menu.GetValue(fooAllInOne.optionLockTargetParticle) == 0 then
+					local sparkParticle = Particle.Create("particles/items_fx/aegis_resspawn_flash.vpcf")
+					fooAllInOne.currentParticle = sparkParticle
+			
+					Particle.SetControlPoint(sparkParticle, 0, Entity.GetAbsOrigin(fooAllInOne.LockedTarget))
+				else
+					local bloodParticle = Particle.Create("particles/items2_fx/soul_ring_blood.vpcf")
+					fooAllInOne.currentParticle = bloodParticle
+					Particle.SetControlPoint(bloodParticle, 0, Entity.GetAbsOrigin(fooAllInOne.LockedTarget))
+				end
+
+	      		fooAllInOne.particleNextTime = curtime + 0.35
+			end
+		end
+	else
+		if (not fooAllInOne.LockedTarget or fooAllInOne.LockedTarget ~= fooAllInOne.currentParticleTarget) and fooAllInOne.currentParticle > 0 then
+			Particle.Destroy(fooAllInOne.currentParticle)			
+			fooAllInOne.currentParticle = 0
+			fooAllInOne.currentParticleTarget = fooAllInOne.LockedTarget
+		else
+			if fooAllInOne.currentParticle == 0 and fooAllInOne.LockedTarget then
+				local towerParticle = Particle.Create("particles/ui_mouseactions/range_finder_tower_aoe.vpcf", Enum.ParticleAttachment.PATTACH_INVALID, fooAllInOne.LockedTarget)	
+				fooAllInOne.currentParticle = towerParticle
+				fooAllInOne.currentParticleTarget = fooAllInOne.LockedTarget			
+			end
+			if fooAllInOne.currentParticle > 0 then
+				Particle.SetControlPoint(fooAllInOne.currentParticle, 2, Entity.GetOrigin(myHero))
+				Particle.SetControlPoint(fooAllInOne.currentParticle, 6, Vector(1, 0, 0))
+				Particle.SetControlPoint(fooAllInOne.currentParticle, 7, Entity.GetOrigin(fooAllInOne.currentParticleTarget))
+			end
+		end
 	end
 
 end
