@@ -1,13 +1,13 @@
 ﻿-- foosAIO.lua
--- Version: beta.0.98.09d
+-- Version: beta.0.98.09e
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2018/01/05
+-- Last Update: 2018/01/07
 
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.09d", "Release date: 2018/01/05", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.09e", "Release date: 2018/01/07", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -4124,7 +4124,7 @@ function fooAllInOne.lastHitterDrawing(myHero)
 	if Menu.IsEnabled(fooAllInOne.optionLastHitDrawCreepTimer) then
 		local imageHandle = fooAllInOne.lastHitterKillableImage
 			if imageHandle == nil then
-				imageHandle = Renderer.LoadImage("resource/flash3/images/broadcast/statpop_exclaim.png")
+				imageHandle = Renderer.LoadImage("resource/flash3/images/heroes/selection/fav_heart.png")
 				fooAllInOne.lastHitterKillableImage = imageHandle
 			end
 		for i, v in pairs(fooAllInOne.lastHitCreepHPPredictionTime) do
@@ -4139,10 +4139,10 @@ function fooAllInOne.lastHitterDrawing(myHero)
 					if visible then
 						if dieTime - GameRules.GetGameTime() > fooAllInOne.lastHitterTimingOffsetter(myHero, target) then
 							Renderer.SetDrawColor(255,215,0,200)
-							Renderer.DrawImage(imageHandle, x-20, y-47, 40, 40)
+							Renderer.DrawImage(imageHandle, x-20, y-49, 40, 40)
 						else
 							Renderer.SetDrawColor(50,205,50,200)
-							Renderer.DrawImage(imageHandle, x-20, y-47, 40, 40)
+							Renderer.DrawImage(imageHandle, x-20, y-49, 40, 40)
 						end
 					end
 				else
@@ -4150,10 +4150,10 @@ function fooAllInOne.lastHitterDrawing(myHero)
 						if visible then
 							if dieTime - GameRules.GetGameTime() > fooAllInOne.lastHitterTimingOffsetter(myHero, target) then
 								Renderer.SetDrawColor(255,215,0,200)
-								Renderer.DrawImage(imageHandle, x-20, y-47, 40, 40)
+								Renderer.DrawImage(imageHandle, x-20, y-49, 40, 40)
 							else
 								Renderer.SetDrawColor(50,205,50,200)
-								Renderer.DrawImage(imageHandle, x-20, y-47, 40, 40)
+								Renderer.DrawImage(imageHandle, x-20, y-49, 40, 40)
 							end
 						end
 					end
