@@ -1,13 +1,12 @@
 ﻿-- foosAIO.lua
--- Version: beta.0.98.09g
+-- Version: beta.0.98.09h
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2018/01/11
---------------------------------------  cursor/auto, ...
+-- Last Update: 2018/01/16
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.09g", "Release date: 2018/01/11", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.09h", "Release date: 2018/01/16", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -24221,7 +24220,7 @@ function fooAllInOne.TinkerFullCombo(myHero, enemy, myMana, laser, missile, marc
 		if not NPC.IsEntityInRange(myHero, enemy, 900) then
 			if Menu.IsEnabled(fooAllInOne.optionHeroTinkerBlink) and blink and Ability.IsReady(blink) and NPC.IsEntityInRange(myHero, enemy, 1150 + Menu.GetValue(fooAllInOne.optionHeroTinkerBlinkRange)) then
 				Ability.CastPosition(blink, (Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(Menu.GetValue(fooAllInOne.optionHeroTinkerBlinkRange))))
-				fooAllInOne.lastTick = os.clock() + 0.05
+				fooAllInOne.lastTick = os.clock() + 0.15
 				return
 			end
 		end	
@@ -24230,7 +24229,7 @@ function fooAllInOne.TinkerFullCombo(myHero, enemy, myMana, laser, missile, marc
 			if not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
 				if missile and Ability.IsCastable(missile, myMana) then
 					Ability.CastNoTarget(missile)
-					fooAllInOne.lastTick = os.clock() + 0.05
+					fooAllInOne.lastTick = os.clock() + 0.15
 					return
 				end
 				
@@ -24242,10 +24241,10 @@ function fooAllInOne.TinkerFullCombo(myHero, enemy, myMana, laser, missile, marc
 					end
 				end
 			end
-			if fooAllInOne.TinkerCheckForFullDMGRearm(myHero, myMana) then
+			if fooAllInOne.TinkerCheckForFullDMGRearm(myHero, myMana, rearm) then
 				if rearm and Ability.IsCastable(rearm, myMana) then
 					Ability.CastNoTarget(rearm)
-					fooAllInOne.lastTick = os.clock() + 0.5
+					fooAllInOne.lastTick = os.clock() + Ability.GetLevelSpecialValueForFloat(rearm, "channel_tooltip") + 0.53 + NetChannel.GetLatency(Enum.Flow.FLOW_OUTGOING)
 					return
 				end
 			end
@@ -24257,12 +24256,16 @@ function fooAllInOne.TinkerFullCombo(myHero, enemy, myMana, laser, missile, marc
 
 end
 
-function fooAllInOne.TinkerCheckForFullDMGRearm(myHero, myMana)
+function fooAllInOne.TinkerCheckForFullDMGRearm(myHero, myMana, rearm)
 
 	if not myHero then return false end
+	if not rearm then return false end
+
+	local rearmMana = Ability.GetManaCost(rearm)
 
 	local laser = NPC.GetAbilityByIndex(myHero, 0)
  	local missile = NPC.GetAbilityByIndex(myHero, 1)
+	local soulRing = NPC.GetItem(myHero, "item_soul_ring", true)
 	local eBlade = NPC.GetItem(myHero, "item_ethereal_blade", true)
 	local shivas = NPC.GetItem(myHero, "item_shivas_guard", true)
 	local dagon = NPC.GetItem(myHero, "item_dagon", true)
@@ -24275,11 +24278,25 @@ function fooAllInOne.TinkerCheckForFullDMGRearm(myHero, myMana)
 	
 	if (laser and Ability.GetLevel(laser) < 1) or (missile and Ability.GetLevel(missile) < 1) then return false end
 
-	if laser and Ability.IsCastable(laser, myMana) then return false end
-	if missile and Ability.IsCastable(missile, myMana) then return false end
-	if eBlade and Ability.IsCastable(eBlade, myMana) then return false end
-	if shivas and Ability.IsCastable(shivas, myMana) then return false end
-	if dagon and Ability.IsCastable(dagon, myMana) then return false end
+	local neededMana = 0
+		if laser and Ability.GetLevel(laser) > 0 then
+			neededMana = neededMana + Ability.GetManaCost(laser)
+		end
+		if missile and Ability.GetLevel(missile) > 0 then
+			neededMana = neededMana + Ability.GetManaCost(missile)
+		end
+		if soulRing and Menu.IsEnabled(fooAllInOne.optionItemSoulring) then
+			neededMana = neededMana - 150
+		end
+		
+		if neededMana + rearmMana > myMana then return false end
+
+	if laser and Ability.IsReady(laser) then return false end
+	if missile and Ability.IsReady(missile) then return false end
+
+	if Menu.GetValue(fooAllInOne.optionItemeBlade) > 0 and eBlade and Ability.IsReady(eBlade) then return false end
+	if Menu.GetValue(fooAllInOne.optionItemShivas) > 0 and shivas and Ability.IsReady(shivas) then return false end
+	if Menu.GetValue(fooAllInOne.optionItemDagon) > 0 and dagon and Ability.IsReady(dagon) then return false end
 
 	return true
 
@@ -24353,7 +24370,7 @@ function fooAllInOne.TinkerRocketSpam(myHero, myMana, missile, rearm, blink)
 		if rearm and Ability.IsCastable(rearm, myMana) then
 			if myMana > Ability.GetManaCost(missile) + Ability.GetManaCost(rearm) then
 				Ability.CastNoTarget(rearm)
-				fooAllInOne.lastTick = os.clock() + 0.15
+				fooAllInOne.lastTick = os.clock() + Ability.GetLevelSpecialValueForFloat(rearm, "channel_tooltip") + 0.53 + NetChannel.GetLatency(Enum.Flow.FLOW_OUTGOING)
 				return
 			end
 		end
@@ -25801,4 +25818,3 @@ function fooAllInOne.KunkkaShipCombo(myHero, enemy)
 end
 
 return fooAllInOne
-			
