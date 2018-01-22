@@ -1,12 +1,12 @@
 ﻿-- foosAIO.lua
--- Version: beta.0.98.09h
+-- Version: beta.0.98.09j
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2018/01/16
+-- Last Update: 2018/01/22
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.09h", "Release date: 2018/01/16", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.09j", "Release date: 2018/01/22", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -7832,7 +7832,7 @@ function fooAllInOne.dodgeProcessing(myHero, unit, activity, castpoint)
 		local castrange = 725
 		if activity == Enum.GameActivity.ACT_DOTA_CAST_ABILITY_4 then
 			if NPC.IsEntityInRange(myHero, unit, radius+castrange) and fooAllInOne.dodgeIsTargetMe(myHero, unit, radius, castrange) then
-				fooAllInOne.dodgeIt({time = GameRules.GetGameTime(); delay = castpoint + 0.225; style = 2; source = unit, lotus = 1, castpoint = castpoint, spellname = "lina_laguna_blade", global = 0, type = "nuke"})
+				fooAllInOne.dodgeIt({time = GameRules.GetGameTime(); delay = castpoint + 0.275; style = 2; source = unit, lotus = 1, castpoint = castpoint, spellname = "lina_laguna_blade", global = 0, type = "nuke"})
 			else
 				if NPC.IsEntityInRange(myHero, unit, radius+castrange+885) then
 					local targetAlly = fooAllInOne.saverGetAllyTarget(myHero, unit, radius, castrange)
@@ -15698,7 +15698,7 @@ function fooAllInOne.ClinkzCombo(myHero, enemy)
 	end
 	
 	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 then
-		if NPC.IsEntityInRange(myHero, enemy, clinkzAttackRange) then
+		if NPC.IsEntityInRange(myHero, enemy, NPC.GetAttackRange(myHero)) then
 			if strafe and Ability.IsCastable(strafe, myMana) and fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
 				Ability.CastNoTarget(strafe)
 				return
@@ -24384,11 +24384,16 @@ function fooAllInOne.TinkerRocketSpam(myHero, myMana, missile, rearm, blink)
 				end
 			else
 				if not NPC.IsPositionInRange(myHero, mousePos, Menu.GetValue(fooAllInOne.optionHeroTinkerRocketBlinkMin), 0) then
-					if NPC.IsPositionInRange(myHero, mousePos, 1180, 0) then
-						Ability.CastPosition(blink, mousePos)
-						return
+					if blink and Ability.IsReady(blink) then
+						if NPC.IsPositionInRange(myHero, mousePos, 1180, 0) then
+							Ability.CastPosition(blink, mousePos)
+							return
+						else
+							Ability.CastPosition(blink, (Entity.GetAbsOrigin(myHero) + (mousePos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(1180)))
+							return
+						end
 					else
-						Ability.CastPosition(blink, (Entity.GetAbsOrigin(myHero) + (mousePos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(1180)))
+						fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, mousePos)
 						return
 					end
 				else
@@ -24469,33 +24474,6 @@ function fooAllInOne.TinkerSetCampsToCleared(myHero, pos)
 	end
 
 	return
-
-end
-
-function fooAllInOne.TinkerIsFarmTupleAlive(myHero, camp1, camp2)
-
-	if not myHero then return false end
-	if next(fooAllInOne.JungleTrackTable) == nil then return false end
-
-	local check = false
-	local checkPos = false
-	for _, info in ipairs(fooAllInOne.JungleTrackTable) do
-		if info then
-			local pos = info[1]
-			local alive = info[2]
-			if (camp1 - pos):Length2D() < 250 and alive then
-				checkPos = true
-			end
-			if checkPos then
-				if (camp2 - pos):Length2D() < 250 and alive then
-					check = true
-					break
-				end
-			end
-		end
-	end
-
-	return check
 
 end
 
@@ -24926,7 +24904,7 @@ function fooAllInOne.TinkerPush(myHero, myMana, march, rearm, blink, travels)
 	local targetCreep = nil
 	for _, v in ipairs(Entity.GetUnitsInRadius(myHero, 1150, Enum.TeamType.TEAM_ENEMY)) do
 		if v and Entity.IsNPC(v) and Entity.IsAlive(v) and not Entity.IsDormant(v) and NPC.IsLaneCreep(v) and not NPC.IsWaitingToSpawn(v) and NPC.GetUnitName(v) ~= nil and NPC.GetUnitName(v) ~= "npc_dota_neutral_caster" then
-			if fooAllInOne.TinkerPortGetCreepCount(myHero, myHero, 1150) >= 2 + fooAllInOne.TinkerMarched then
+			if fooAllInOne.TinkerPortGetCreepCount(myHero, myHero, 1250) >= 2 + fooAllInOne.TinkerMarched then
 				targetCreep = v
 				break
 			end
@@ -24949,7 +24927,7 @@ function fooAllInOne.TinkerPush(myHero, myMana, march, rearm, blink, travels)
 
 			if fooAllInOne.TinkerMarched < Menu.GetValue(fooAllInOne.optionHeroTinkerPushMarch) then
 				if Ability.IsCastable(march, myMana) then
-					Ability.CastPosition(march, Entity.GetAbsOrigin(myHero) + (Entity.GetAbsOrigin(targetCreep) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(Ability.GetCastRange(march) - 35))
+					Ability.CastPosition(march, Entity.GetAbsOrigin(myHero) + (Entity.GetAbsOrigin(targetCreep) - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(Ability.GetCastRange(march) - 1))
 					fooAllInOne.lastTick = os.clock() + 0.75 + NetChannel.GetLatency(Enum.Flow.FLOW_OUTGOING) + NetChannel.GetLatency(Enum.Flow.FLOW_INCOMING)
 					fooAllInOne.TinkerMarched = fooAllInOne.TinkerMarched + 1
 					return
@@ -25216,7 +25194,128 @@ function fooAllInOne.TinkerFarmAmISave(myHero)
 
 	local myPos = Entity.GetAbsOrigin(myHero)
 
-	if #Trees.InRadius(myPos, 200, true) >= 4 then
+	for _, hero in ipairs(Entity.GetHeroesInRadius(myHero, 200, Enum.TeamType.TEAM_ENEMY)) do
+		if hero and Entity.IsHero(hero) then
+			if fooAllInOne.targetChecker(hero) ~= nil then
+				return false
+			end
+		end
+	end
+
+	local saveSpotTable = {
+		{ Vector(-7332.3, -3269.6, 384.0), 5},
+		{ Vector(-7233.3, -1376.7, 384.0), 10}, 
+		{ Vector(-7200.2, -1017.2, 384.0), 8}, 
+		{ Vector(-7212.0, -551.6, 384.0), 8}, 
+		{ Vector(-7125.0, -81.5, 384.0), 8},
+		{ Vector(-7114.0, 337.9, 384.0), 5}, 
+		{ Vector(-7194.7, 732.3, 384.0), 5}, 
+		{ Vector(-7129.5, 1337.3, 384.0), 7},
+		{ Vector(-7140.7, 1645.0, 384.0), 7},
+		{ Vector(-7176.3, 2070.1, 384.0), 6}, 
+		{ Vector(-7089.6, 2307.1, 512.0), 5}, 
+		{ Vector(-6847.4, 3532.0, 384.0), 5}, 
+		{ Vector(-7226.3, 3989.3, 384.0), 7}, 
+		{ Vector(-6994.7, 4915.7, 384.0), 7}, 
+		{ Vector(-6900.2, 5118.8, 384.0), 7}, 
+		{ Vector(-6732.6, 5540.4, 384.0), 4}, 
+		{ Vector(-6581.3, 5919.3, 384.0), 6}, 
+		{ Vector(-6273.9, 6178.2, 384.0), 6}, 
+		{ Vector(-6104.3, 6542.5, 384.0), 6}, 
+		{ Vector(-5458.8, 6709.4, 384.0), 11}, 
+		{ Vector(-5130.0, 6783.1, 384.0), 7}, 
+		{ Vector(-4631.4, 6760.8, 384.0), 6}, 
+		{ Vector(-4308.8, 6977.7, 384.0), 6}, 
+		{ Vector(-3791.8, 6757.7, 384.0), 11}, 
+		{ Vector(-3497.5, 6873.4, 384.0), 8}, 
+		{ Vector(-3117.5, 6930.3, 384.0), 9}, 
+		{ Vector(-2696.9, 6878.1, 384.0), 7}, 
+		{ Vector(-2321.5, 6938.8, 384.0), 7}, 
+		{ Vector(-1731.7, 6864.3, 384.0), 8}, 
+		{ Vector(-1100.2, 6951.0, 384.0), 9}, 
+		{ Vector(-767.3, 7021.9, 384.0), 11}, 
+		{ Vector(-82.5, 6823.9, 384.0), 7}, 
+		{ Vector(183.7, 6728.6, 384.0), 7},
+		{ Vector(673.7, 6884.9, 384.0), 13}, 
+		{ Vector(1009.9, 6861.5, 384.0), 10}, 
+		{ Vector(1561.7, 6964.7, 384.0), 6}, 
+		{ Vector(2540.2, 6960.1, 384.0), 4}, 
+		{ Vector(3445.1, 6863.7, 384.0), 5}, 
+		{ Vector(7400.6, 2808.3, 384.0), 6}, 
+		{ Vector(7456.3, 2090.7, 256.0), 6}, 
+		{ Vector(7226.0, 866.5, 384.0), 7}, 
+		{ Vector(7029.8, 494.1, 384.0), 7}, 
+		{ Vector(7086.8, -37.7, 384.0), 8}, 
+		{ Vector(6932.5, -577.0, 384.0), 4}, 
+		{ Vector(6918.2, -908.3, 384.0), 8}, 
+		{ Vector(7080.6, -1472.4, 384.0), 7}, 
+		{ Vector(7171.4, -1807.0, 384.0), 7}, 
+		{ Vector(7297.8, -2177.6, 384.0), 9}, 
+		{ Vector(7031.2, -3224.0, 384.0), 5}, 
+		{ Vector(6898.3, -3549.7, 384.0), 7}, 
+		{ Vector(7460.4, -4648.6, 384.0), 8}, 
+		{ Vector(6924.8, -4814.6, 384.0), 6}, 
+		{ Vector(6891.3, -5163.1, 384.0), 7}, 
+		{ Vector(6701.0, -5480.9, 384.0), 5}, 
+		{ Vector(6647.3, -5824.5, 384.0), 10},
+		{ Vector(6583.7, -6132.0, 384.0), 11}, 
+		{ Vector(6381.3, -6424.0, 384.0), 9}, 
+		{ Vector(6059.3, -6451.0, 384.0), 9}, 
+		{ Vector(6021.2, -6588.0, 384.0), 8}, 
+		{ Vector(5650.1, -6737.3, 384.0), 5}, 
+		{ Vector(5378.8, -6735.7, 384.0), 7}, 
+		{ Vector(4971.6, -6738.0, 384.0), 7}, 
+		{ Vector(4536.9, -6652.2, 384.0), 6}, 
+		{ Vector(4333.0, -6725.9, 384.0), 8}, 
+		{ Vector(3879.9, -6734.2, 384.0), 10}, 
+		{ Vector(3364.7, -6777.9, 384.0), 9}, 
+		{ Vector(3013.5, -6804.8, 384.0), 10}, 
+		{ Vector(2696.2, -6795.6, 384.0), 9}, 
+		{ Vector(2388.5, -6791.8, 384.0), 9}, 
+		{ Vector(1970.3, -6840.6, 384.0), 5}, 
+		{ Vector(1594.9, -6898.8, 384.0), 2}, 
+		{ Vector(1150.0, -6852.4, 384.0), 6}, 
+		{ Vector(759.1, -6957.8, 384.0), 6}, 
+		{ Vector(289.0, -6964.5, 384.0), 5}, 
+		{ Vector(-330.1, -6876.5, 384.0), 8},
+		{ Vector(-623.6, -6858.6, 384.0), 6}, 
+		{ Vector(-1073.9, -6927.4, 384.0), 5}, 
+		{ Vector(-2947.8, -6995.1, 256.0), 1}, 
+		{ Vector(-3990.3, -7001.3, 384.0), 7}, 
+		{ Vector(-530.9, -5611.3, 384.0), 7}, 
+		{ Vector(2463.7, -5622.4, 384.0), 8}, 
+		{ Vector(3951.0, -5522.6, 384.0), 7}, 
+		{ Vector(5655.3, -3890.3, 384.0), 6}, 
+		{ Vector(5565.6, -1369.1, 384.0), 7}, 
+		{ Vector(5690.3, 995.4, 384.0), 6}, 
+		{ Vector(2228.6, 2684.7, 256.0), 6}, 
+		{ Vector(2939.3, 1222.4, 256.0), 8}, 
+		{ Vector(1008.6, 1594.0, 256.0), 8}, 
+		{ Vector(489.5, 1282.0, 256.0), 7}, 
+		{ Vector(1283.7, 19.7, 256.0), 8}, 
+		{ Vector(-907.4, -1464.5, 256.0), 7}, 
+		{ Vector(-2041.0, -936.2, 256.0), 7}, 
+		{ Vector(-2490.0, -1083.8, 256.0), 5}, 
+		{ Vector(-1236.1, -1858.3, 256.0), 7}, 
+		{ Vector(-2032.8, -2420.4, 256.0), 7}, 
+		{ Vector(-2303.3, -2759.6, 256.0), 6}, 
+		{ Vector(-2832.8, -1435.9, 256.0), 5}, 
+		{ Vector(-3888.1, -2336.0, 256.0), 3}, 
+		{ Vector(-2676.4, 5523.4, 384.0), 8}, 
+		{ Vector(-1180.0, 5551.6, 384.0), 8}
+			}
+
+	for _, saveInfo in ipairs(saveSpotTable) do
+		local savePos = saveInfo[1]
+		if savePos then
+			local distance = (myPos - savePos):Length2D()
+			if distance < 75 then
+				return true
+			end
+		end
+	end
+
+	if #Trees.InRadius(myPos, 250, true) >= 4 then
 		return true
 	end
 
@@ -25290,14 +25389,131 @@ function fooAllInOne.TinkerFarmGetSaveSpot(myHero, target, blink)
 	local targetPos = Entity.GetAbsOrigin(target)
 	local myPos = Entity.GetAbsOrigin(myHero)
 
+	local saveSpotTable = {
+		{ Vector(-7332.3, -3269.6, 384.0), 5},
+		{ Vector(-7233.3, -1376.7, 384.0), 10}, 
+		{ Vector(-7200.2, -1017.2, 384.0), 8}, 
+		{ Vector(-7212.0, -551.6, 384.0), 8}, 
+		{ Vector(-7125.0, -81.5, 384.0), 8},
+		{ Vector(-7114.0, 337.9, 384.0), 5}, 
+		{ Vector(-7194.7, 732.3, 384.0), 5}, 
+		{ Vector(-7129.5, 1337.3, 384.0), 7},
+		{ Vector(-7140.7, 1645.0, 384.0), 7},
+		{ Vector(-7176.3, 2070.1, 384.0), 6}, 
+		{ Vector(-7089.6, 2307.1, 512.0), 5}, 
+		{ Vector(-6847.4, 3532.0, 384.0), 5}, 
+		{ Vector(-7226.3, 3989.3, 384.0), 7}, 
+		{ Vector(-6994.7, 4915.7, 384.0), 7}, 
+		{ Vector(-6900.2, 5118.8, 384.0), 7}, 
+		{ Vector(-6732.6, 5540.4, 384.0), 4}, 
+		{ Vector(-6581.3, 5919.3, 384.0), 6}, 
+		{ Vector(-6273.9, 6178.2, 384.0), 6}, 
+		{ Vector(-6104.3, 6542.5, 384.0), 6}, 
+		{ Vector(-5458.8, 6709.4, 384.0), 11}, 
+		{ Vector(-5130.0, 6783.1, 384.0), 7}, 
+		{ Vector(-4631.4, 6760.8, 384.0), 6}, 
+		{ Vector(-4308.8, 6977.7, 384.0), 6}, 
+		{ Vector(-3791.8, 6757.7, 384.0), 11}, 
+		{ Vector(-3497.5, 6873.4, 384.0), 8}, 
+		{ Vector(-3117.5, 6930.3, 384.0), 9}, 
+		{ Vector(-2696.9, 6878.1, 384.0), 7}, 
+		{ Vector(-2321.5, 6938.8, 384.0), 7}, 
+		{ Vector(-1731.7, 6864.3, 384.0), 8}, 
+		{ Vector(-1100.2, 6951.0, 384.0), 9}, 
+		{ Vector(-767.3, 7021.9, 384.0), 11}, 
+		{ Vector(-82.5, 6823.9, 384.0), 7}, 
+		{ Vector(183.7, 6728.6, 384.0), 7},
+		{ Vector(673.7, 6884.9, 384.0), 13}, 
+		{ Vector(1009.9, 6861.5, 384.0), 10}, 
+		{ Vector(1561.7, 6964.7, 384.0), 6}, 
+		{ Vector(2540.2, 6960.1, 384.0), 4}, 
+		{ Vector(3445.1, 6863.7, 384.0), 5}, 
+		{ Vector(7400.6, 2808.3, 384.0), 6}, 
+		{ Vector(7456.3, 2090.7, 256.0), 6}, 
+		{ Vector(7226.0, 866.5, 384.0), 7}, 
+		{ Vector(7029.8, 494.1, 384.0), 7}, 
+		{ Vector(7086.8, -37.7, 384.0), 8}, 
+		{ Vector(6932.5, -577.0, 384.0), 4}, 
+		{ Vector(6918.2, -908.3, 384.0), 8}, 
+		{ Vector(7080.6, -1472.4, 384.0), 7}, 
+		{ Vector(7171.4, -1807.0, 384.0), 7}, 
+		{ Vector(7297.8, -2177.6, 384.0), 9}, 
+		{ Vector(7031.2, -3224.0, 384.0), 5}, 
+		{ Vector(6898.3, -3549.7, 384.0), 7}, 
+		{ Vector(7460.4, -4648.6, 384.0), 8}, 
+		{ Vector(6924.8, -4814.6, 384.0), 6}, 
+		{ Vector(6891.3, -5163.1, 384.0), 7}, 
+		{ Vector(6701.0, -5480.9, 384.0), 5}, 
+		{ Vector(6647.3, -5824.5, 384.0), 10},
+		{ Vector(6583.7, -6132.0, 384.0), 11}, 
+		{ Vector(6381.3, -6424.0, 384.0), 9}, 
+		{ Vector(6059.3, -6451.0, 384.0), 9}, 
+		{ Vector(6021.2, -6588.0, 384.0), 8}, 
+		{ Vector(5650.1, -6737.3, 384.0), 5}, 
+		{ Vector(5378.8, -6735.7, 384.0), 7}, 
+		{ Vector(4971.6, -6738.0, 384.0), 7}, 
+		{ Vector(4536.9, -6652.2, 384.0), 6}, 
+		{ Vector(4333.0, -6725.9, 384.0), 8}, 
+		{ Vector(3879.9, -6734.2, 384.0), 10}, 
+		{ Vector(3364.7, -6777.9, 384.0), 9}, 
+		{ Vector(3013.5, -6804.8, 384.0), 10}, 
+		{ Vector(2696.2, -6795.6, 384.0), 9}, 
+		{ Vector(2388.5, -6791.8, 384.0), 9}, 
+		{ Vector(1970.3, -6840.6, 384.0), 5}, 
+		{ Vector(1594.9, -6898.8, 384.0), 2}, 
+		{ Vector(1150.0, -6852.4, 384.0), 6}, 
+		{ Vector(759.1, -6957.8, 384.0), 6}, 
+		{ Vector(289.0, -6964.5, 384.0), 5}, 
+		{ Vector(-330.1, -6876.5, 384.0), 8},
+		{ Vector(-623.6, -6858.6, 384.0), 6}, 
+		{ Vector(-1073.9, -6927.4, 384.0), 5}, 
+		{ Vector(-2947.8, -6995.1, 256.0), 1}, 
+		{ Vector(-3990.3, -7001.3, 384.0), 7}, 
+		{ Vector(-530.9, -5611.3, 384.0), 7}, 
+		{ Vector(2463.7, -5622.4, 384.0), 8}, 
+		{ Vector(3951.0, -5522.6, 384.0), 7}, 
+		{ Vector(5655.3, -3890.3, 384.0), 6}, 
+		{ Vector(5565.6, -1369.1, 384.0), 7}, 
+		{ Vector(5690.3, 995.4, 384.0), 6}, 
+		{ Vector(2228.6, 2684.7, 256.0), 6}, 
+		{ Vector(2939.3, 1222.4, 256.0), 8}, 
+		{ Vector(1008.6, 1594.0, 256.0), 8}, 
+		{ Vector(489.5, 1282.0, 256.0), 7}, 
+		{ Vector(1283.7, 19.7, 256.0), 8}, 
+		{ Vector(-907.4, -1464.5, 256.0), 7}, 
+		{ Vector(-2041.0, -936.2, 256.0), 7}, 
+		{ Vector(-2490.0, -1083.8, 256.0), 5}, 
+		{ Vector(-1236.1, -1858.3, 256.0), 7}, 
+		{ Vector(-2032.8, -2420.4, 256.0), 7}, 
+		{ Vector(-2303.3, -2759.6, 256.0), 6}, 
+		{ Vector(-2832.8, -1435.9, 256.0), 5}, 
+		{ Vector(-3888.1, -2336.0, 256.0), 3}, 
+		{ Vector(-2676.4, 5523.4, 384.0), 8}, 
+		{ Vector(-1180.0, 5551.6, 384.0), 8}
+			}
+
+	for _, saveInfo in ipairs(saveSpotTable) do
+		local savePos = saveInfo[1]
+		local treesAround = saveInfo[2]
+		if savePos and #Trees.InRadius(savePos, 251, true) >= treesAround - 1 then
+			local distance = (myPos - savePos):Length2D()
+			if distance > 200 and distance < 1125 then
+				local distanceCreep = (savePos - targetPos):Length2D()
+				if distanceCreep < 1050 then
+					return savePos
+				end
+			end
+		end
+	end
+
 	local treeCount = 0
 	local targetTree = nil
 	for _, tree in ipairs(Trees.InRadius(targetPos, 900, true)) do
 		if tree then
 			local treePos = Entity.GetAbsOrigin(tree)
 			local myDist = myPos:__sub(treePos):Length2D()
-			if myDist >= 315 then
-				local treesAround = #Trees.InRadius(treePos, 500, true)
+			if myDist >= 315 and myDist < 1100 then
+				local treesAround = #Trees.InRadius(treePos, 350, true)
 				if treesAround > treeCount then
 					treeCount = treesAround
 					targetTree = tree
@@ -25307,31 +25523,37 @@ function fooAllInOne.TinkerFarmGetSaveSpot(myHero, target, blink)
 	end
 
 	local treeTargetPos = nil
-	if treeCount >= 5 then
+	if treeCount >= 4 then
 		if targetTree ~= nil then
 			local bestPos = fooAllInOne.getBestPosition(Trees.InRadius(Entity.GetAbsOrigin(targetTree), 499, true), 500)
-			if bestPos ~= nil and bestPos:__sub(targetPos):Length2D() < 1000 then
+			if bestPos ~= nil and bestPos:__sub(targetPos):Length2D() < 1000 and bestPos:__sub(myPos):Length2D() < 1125 then
 				treeTargetPos = bestPos
 			end		
 		end
 	end
 
 	if treeTargetPos ~= nil then
-		if #Trees.InRadius(treeTargetPos, 30, true) > 0 then
-			return (treeTargetPos + (treeTargetPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(50))
+		if #Trees.InRadius(treeTargetPos, 25, true) > 0 then
+			return (treeTargetPos + (treeTargetPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(35))
 		else
 			return treeTargetPos
 		end
 	else
 		local myFountainPos = fooAllInOne.GetMyFountainPos(myHero)
 		local myDist = myPos:__sub(targetPos):Length2D()
-		local gap = math.floor((1050 - myDist) / 50)
-		for i = 1, gap do
-			local searchPos = myPos + (myFountainPos - myPos):Normalized():Scaled((gap + 1 - i) * 50)
-			local myPosZ = myPos:GetZ()
-			local searchPosZ = searchPos:GetZ()
-			if searchPosZ > myPosZ and math.abs(searchPosZ - myPosZ) > 50 then
-				return searchPos
+		local gap = 1050 - myDist
+		local searchPosition =  myPos + (myFountainPos - myPos):Normalized():Scaled(gap)
+		local treesArcoundPos = Trees.InRadius(searchPosition, gap, true)
+		local myPosZ = myPos:GetZ()
+		for _, tree in ipairs(treesArcoundPos) do
+			if tree then
+				local treePos = Entity.GetAbsOrigin(tree)
+				local treePosZ = treePos:GetZ()
+				if (treePos - myPos):Length2D() < 1050 then
+					if treePosZ > myPosZ and math.abs(treePosZ - myPosZ) > 50 then
+						return myPos + (treePos - myPos):Scaled(0.9)
+					end
+				end
 			end
 		end
 	end
@@ -25818,3 +26040,4 @@ function fooAllInOne.KunkkaShipCombo(myHero, enemy)
 end
 
 return fooAllInOne
+			
