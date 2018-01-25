@@ -1,12 +1,12 @@
 ﻿-- foosAIO.lua
--- Version: beta.0.98.10a
+-- Version: beta.0.98.10b
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2018/01/25
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.10a", "Release date: 2018/01/25", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.10b", "Release date: 2018/01/25", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -298,6 +298,10 @@ fooAllInOne.optionHeroViperFarm = Menu.AddOption({ "Utility","foos AllInOne", "3
 fooAllInOne.optionHeroViperFarmMana = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Viper" }, "4.1 Nethertoxin mana threshold {{viper}}", "only cast W when above threshold - in mana %", 10, 80, 10)
 fooAllInOne.optionHeroViperFarmCount = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Viper" }, "4.2 Nethertoxin creep count {{viper}}", "only cast W when above threshold", 1, 5, 1)
 fooAllInOne.optionHeroViperForceUlt = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Viper" }, "1.1 Force movement to ult range", "if ult cast range is lower then your attack range, force your hero to move and cast ult")
+fooAllInOne.optionHeroVS = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Vengeful Spirit" }, "1. Vengeful Combo", "combos with q+w")
+fooAllInOne.optionHeroVSBlink = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Vengeful Spirit" }, "2. Use blink in combo {{vengeful}}", "")
+fooAllInOne.optionHeroVSBlinkRange = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Vengeful Spirit" }, "2.1 Blink range to enemy {{vengeful}}", "will keep distance to enemy", 100, 400, 50)
+fooAllInOne.optionHeroVSStun = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Vengeful Spirit" }, "3. Force stun first", "will always use stun before wave of terror")
 
 		-- INT
 fooAllInOne.optionHeroSky = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "3. Intelligence heroes", "Skywrath Mage" }, "0. Enable {{sky}}", "full combo")
@@ -1139,7 +1143,8 @@ fooAllInOne.heroList = {
 	"npc_dota_hero_pugna",
 	"npc_dota_hero_undying",
 	"npc_dota_hero_viper",
-	"npc_dota_hero_pudge"
+	"npc_dota_hero_pudge",
+	"npc_dota_hero_vengefulspirit"
 		}
 
 fooAllInOne.dodgeItItems = { 
@@ -2653,6 +2658,8 @@ function fooAllInOne.OnUpdate()
 				fooAllInOne.PugnaCombo(myHero, comboTarget)
 			elseif fooAllInOne.myUnitName == "npc_dota_hero_undying" then
 				fooAllInOne.UndyingCombo(myHero, comboTarget)
+			elseif fooAllInOne.myUnitName == "npc_dota_hero_vengefulspirit" then
+				fooAllInOne.VSCombo(myHero, comboTarget)
 			end
 		else
 			if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.IsAlive(comboTarget) then	
@@ -11217,6 +11224,11 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 		if force and Ability.IsCastable(force, myMana) and Menu.IsEnabled(fooAllInOne.optionHeroPudgeStaff) then
 			maxInitRange = maxInitRange + 600
 		end
+		if enemy then
+			if NPC.HasModifier(enemy, "modifier_pudge_meat_hook") then
+				maxInitRange = 0
+			end
+		end	
 
 	if fooAllInOne.PudgeRotComboActivation and not Menu.IsKeyDown(fooAllInOne.optionComboKey) then
 		if Ability.GetToggleState(W) then
@@ -11285,12 +11297,13 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 					end
 				end
 				if maxInitRange == 600 then
-					if NPC.IsEntityInRange(myHero, enemy, 750) then
+					if NPC.IsEntityInRange(myHero, enemy, 725) then
 						if not NPC.IsEntityInRange(myHero, enemy, 550) then
 							local pred = 600/1500 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
 							local predPos = fooAllInOne.castPrediction(myHero, enemy, pred)
 							if fooAllInOne.AmIFacingPos(myHero, predPos, 5) then
 								Ability.CastTarget(force, myHero)
+								fooAllInOne.lastTick = os.clock() + 600/1500 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
 								return
 							else
 								fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, predPos)
@@ -11327,7 +11340,21 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 						return
 					end
 
-					if Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookCombo) then
+					local check = false
+						if maxInitRange == 600 then
+							if NPC.IsEntityInRange(myHero, enemy, 725) then
+								if not NPC.IsEntityInRange(myHero, enemy, 550) then
+									check = true
+								end
+							end
+						end
+						if ult and Ability.IsCastable(ult, myMana) then
+							if force and Ability.SecondsSinceLastUse(force) > -1 and Ability.SecondsSinceLastUse(force) < 1 then
+								check = true
+							end
+						end	
+
+					if Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookCombo) and not check and not NPC.HasModifier(myHero, "modifier_item_forcestaff_active") then
 						if Q and Ability.IsCastable(Q, myMana) and NPC.IsEntityInRange(myHero, enemy, Menu.GetValue(fooAllInOne.optionHeroPudgeHookComboMaxRange)) and not NPC.IsChannellingAbility(myHero) then
 							if fooAllInOne.PudgeHookCollisionChecker(myHero, enemy) and not fooAllInOne.PudgeHookJukingChecker(myHero, enemy) then
 								local hookPrediction = Ability.GetCastPoint(Q) + NPC.GetTimeToFace(myHero, enemy) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 1450) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
@@ -11343,8 +11370,10 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 				end
 			end
 
-			fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
-			return
+			if not NPC.HasModifier(enemy, "modifier_pudge_meat_hook") then
+				fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+				return
+			end
 		end
 	end
 
@@ -11990,6 +12019,82 @@ function fooAllInOne.OgreCombo(myHero, enemy)
 					fooAllInOne.lastTick = os.clock() + 0.45
 					return
 				end
+			end
+		end
+
+		fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+		return
+	end
+
+end
+
+function fooAllInOne.VSCombo(myHero, enemy)
+
+	if not Menu.IsEnabled(fooAllInOne.optionHeroVS) then return end
+	if not  NPC.IsEntityInRange(myHero, enemy, 3000) then return end
+
+  	local Q = NPC.GetAbilityByIndex(myHero, 0)
+ 	local W = NPC.GetAbilityByIndex(myHero, 1)
+
+	local blink = NPC.GetItem(myHero, "item_blink", true)
+
+	local myMana = NPC.GetMana(myHero)
+
+	fooAllInOne.itemUsage(myHero, enemy)
+
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.IsAlive(enemy) then
+ 		if not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
+			if not NPC.IsEntityInRange(myHero, enemy, 999) then
+				if Menu.IsEnabled(fooAllInOne.optionHeroVSBlink) and blink and Ability.IsReady(blink) and NPC.IsEntityInRange(myHero, enemy, 1150 + Menu.GetValue(fooAllInOne.optionHeroVSBlinkRange)) then
+					Ability.CastPosition(blink, (Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(Menu.GetValue(fooAllInOne.optionHeroVSBlinkRange))))
+					return
+				end
+			end	
+
+			if os.clock() > fooAllInOne.lastTick then
+
+				if not Menu.IsEnabled(fooAllInOne.optionHeroVSStun) then
+		
+					if Q and Ability.IsCastable(Q, myMana) and NPC.IsEntityInRange(myHero, enemy, Ability.GetCastRange(Q)) and not NPC.IsLinkensProtected(enemy) then
+						Ability.CastTarget(Q, enemy)
+						fooAllInOne.lastTick = os.clock() + 0.35
+						return
+					end
+
+					if W and Ability.IsCastable(W, myMana) and NPC.IsEntityInRange(myHero, enemy, Ability.GetCastRange(W)) then
+						if not NPC.HasModifier(enemy, "modifier_vengefulspirit_wave_of_terror") then
+							local pred = 0.3 + ((Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D() / 2000) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+							Ability.CastPosition(W, fooAllInOne.castPrediction(myHero, enemy, pred))
+							fooAllInOne.lastTick = os.clock() + 0.35
+							return
+						end
+					end
+
+				else
+
+					if Q and Ability.IsCastable(Q, myMana) and NPC.IsEntityInRange(myHero, enemy, Ability.GetCastRange(Q)) and not NPC.IsLinkensProtected(enemy) then
+						Ability.CastTarget(Q, enemy)
+						fooAllInOne.lastTick = os.clock() + 0.35
+						return
+					end
+
+					local check = false
+						if Q and Ability.IsCastable(Q, myMana) then
+							check = true
+						end
+
+					if not check then
+						if W and Ability.IsCastable(W, myMana) and NPC.IsEntityInRange(myHero, enemy, Ability.GetCastRange(W)) then
+							if not NPC.HasModifier(enemy, "modifier_vengefulspirit_wave_of_terror") then
+								local pred = 0.3 + ((Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length2D() / 2000) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+								local predPos = fooAllInOne.castPrediction(myHero, enemy, pred)
+								Ability.CastPosition(W, Entity.GetAbsOrigin(myHero) + (predPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(300))
+								fooAllInOne.lastTick = os.clock() + 0.35
+								return
+							end
+						end
+					end
+				end	
 			end
 		end
 
