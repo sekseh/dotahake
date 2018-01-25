@@ -1,12 +1,12 @@
 ﻿-- foosAIO.lua
--- Version: beta.0.98.09j
+-- Version: beta.0.98.10a
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2018/01/22
+-- Last Update: 2018/01/25
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.09j", "Release date: 2018/01/22", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.10a", "Release date: 2018/01/25", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -69,6 +69,7 @@ fooAllInOne.optionHeroInvokerCataKSCount = Menu.AddOption({ "Utility","foos AllI
 	-- Items Menu
 fooAllInOne.optionItemEnable = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "1. Offensive items" }, "0. Enabled {{off items}}", "Helpers helper")
 fooAllInOne.optionItemStyle = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "1. Offensive items", "1. Combo usage" }, "Choose activation style", "", 0, 2, 1)
+fooAllInOne.optionItemStack = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "1. Offensive items", "1. Combo usage" }, "Stack hex and silence", "if enabled, you will cast bloodthorn/orchid into hex for max dps")
 fooAllInOne.optionItemSoulring = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "1. Offensive items", "1. Combo usage", "Items" }, "Soulring", "Use Soulring before using spells")
 fooAllInOne.optionItemVeil = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "1. Offensive items", "1. Combo usage", "Items" }, "Use Item Veil Of Discord", "cast order - highest number will be cast first", 0, 18, 1)
 fooAllInOne.optionItemHex = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "1. Offensive items", "1. Combo usage", "Items" }, "Use Item Scythe Of Vyse", "cast order - highest number will be cast first", 0, 18, 1)
@@ -133,14 +134,15 @@ fooAllInOne.optionDefensiveItemsCrimson = Menu.AddOption({ "Utility","foos AllIn
 fooAllInOne.optionDefensiveItemsCrest = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "5. Solar Crest", "on ally when in danger")
 fooAllInOne.optionDefensiveItemsPipe = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "6. Pipe", "self/ally when in danger")
 fooAllInOne.optionDefensiveItemsBKB = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items", "1. BKB" }, "0. Enabled {{bkb}}", "will trigger BKB if one of the abilities below is around and ready and if there are at least #min. enemies around (set option)")
-fooAllInOne.optionDefensiveItemsBKBEnemies = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items", "2. BKB" }, "1. Min. enemies around", "", 1, 5, 1)
-fooAllInOne.optionDefensiveItemsBKBRadius = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items", "2. BKB" }, "2. Search radius", "radius to search for enemies and abilities", 500, 1000, 100)
+fooAllInOne.optionDefensiveItemsBKBEnemies = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items", "1. BKB" }, "1. Min. enemies around", "", 1, 5, 1)
+fooAllInOne.optionDefensiveItemsBKBRadius = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items", "1. BKB" }, "2. Search radius", "radius to search for enemies and abilities", 500, 1000, 100)
 fooAllInOne.optionDefensiveItemsSatanic = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "7. Satanic", "logic tbd")
 fooAllInOne.optionDefensiveItemsThreshold = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "0.1 HP Threshold {{deff}}", "below this treshold, npc is always treated as in danger (regardless of stun, root, ...) (in life %)", 10, 50, 5)
+fooAllInOne.optionDefensiveItemsThresholdDisable = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "0.2 HP Threshold if disabled {{deff}}", "if disabled, you will cast deff items if below threshold (in life %)", 35, 100, 5)
 fooAllInOne.optionDefensiveItemsMedallion = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "8. Medallion of Courage", "on self/ally when in danger")
 fooAllInOne.optionDefensiveItemsGhost = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "9. Ghost scepter", "on self when in danger")
-fooAllInOne.optionDefensiveItemsAlly = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "0.2 Cast defensive items on allies {{deff}}", "if enabled, you will cast items that needs to be targeted also on allies (not only on self)")
-fooAllInOne.optionDefensiveItemsSaver = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "0.3 Advanced lotus/glimmer ally saving {{deff}}", "if enabled, hero will use lotus or glimmer on ally heroes; base is dodgeIT module (enabled skills to dodge do apply also for this option); will use saving items on enemy animation to save allies")
+fooAllInOne.optionDefensiveItemsAlly = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "0.3 Cast defensive items on allies {{deff}}", "if enabled, you will cast items that needs to be targeted also on allies (not only on self)")
+fooAllInOne.optionDefensiveItemsSaver = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items" }, "0.4 Advanced lotus/glimmer ally saving {{deff}}", "if enabled, hero will use lotus or glimmer on ally heroes; base is dodgeIT module (enabled skills to dodge do apply also for this option); will use saving items on enemy animation to save allies")
 
 	-- Hero Menu
 		-- STR
@@ -214,6 +216,24 @@ fooAllInOne.optionHeroUndyingSoulCount = Menu.AddOption({ "Utility","foos AllInO
 fooAllInOne.optionHeroUndyingUlt = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Undying" }, "4.1 Use ult in combo {{Undying}}", "")
 fooAllInOne.optionHeroUndyingUltCount = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Undying" }, "4.2 Min. enemy heroes around {{Undying}}", "minimum enemies around to cast ult", 1, 5, 1)
 fooAllInOne.optionHeroUndyingSoulKS = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Undying" }, "5. Use soulrip for kill stealing {{Undying}}", "")
+fooAllInOne.optionHeroPudge = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge" }, "1. Pudge Combo", "basic combo")
+fooAllInOne.optionHeroPudgeBlink = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge" }, "2. Use blink for initiation {{pudge}}", "")
+fooAllInOne.optionHeroPudgeBlinkMinRange = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge" }, "2.1 Blink min. range {{pudge}}", "minimum range to cast blink", 250, 1000, 50)
+fooAllInOne.optionHeroPudgeStaff = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge" }, "3. Use force staff for initiation {{pudge}}", "")
+fooAllInOne.optionHeroPudgeHookCombo = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge" }, "4. Use hook in combo {{pudge}}", "")
+fooAllInOne.optionHeroPudgeHookComboMaxRange = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge" }, "4.1 Max hook range in combo {{pudge}}", "", 250, 1000, 50)
+fooAllInOne.optionHeroPudgeHook = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "1. Enable hook helper {{pudge hook}}", "")
+fooAllInOne.optionHeroPudgeHookKey = Menu.AddKeyOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "1.1 Hook helper key {{pudge hook}}", Enum.ButtonCode.KEY_P)
+fooAllInOne.optionHeroPudgeHookAcquiRange = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "1.2 Target acquisition range {{pudge hook}}", "distance mouse to enemy to get target - dont set it too high if you also wanna target allies sometimes", 250, 1000, 50)
+fooAllInOne.optionHeroPudgeHookAllies = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "2.1 Also target allies {{pudge hook}}", "")
+fooAllInOne.optionHeroPudgeHookStaff = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "2.2 Use force staff to avoid collision {{pudge hook}}", "if you have force staff and an enemy is hiding e.g. inbetween creeps, you will force staff and hook him")
+fooAllInOne.optionHeroPudgeHookUlt = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "3. Use dismember {{pudge hook}}", "")
+fooAllInOne.optionHeroPudgeHookRot = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "4. Use rot {{pudge hook}}", "")
+fooAllInOne.optionHeroPudgeHookItems = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "5. Use offensive items {{pudge hook}}", "")
+fooAllInOne.optionHeroPudgeHookJuke = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "5. Hook helper" }, "6. Anti-juke-offset {{pudge hook}}", "", 0, 12, 2)
+fooAllInOne.optionHeroPudgeFarm = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "6. Misc" }, "1. Rot farm {{pudge misc}}", "")
+fooAllInOne.optionHeroPudgeFarmHP = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "6. Misc" }, "1.1 Rot farm HP treshold {{pudge misc}}", "in life %", 5, 75, 5)
+fooAllInOne.optionHeroPudgeSuicide = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "1. Strength heroes", "Pudge", "6. Misc" }, "2. Auto suicide {{pudge misc}}", "")
 
 		-- AGI
 fooAllInOne.optionHeroEmber = Menu.AddOption({ "Utility","foos AllInOne", "3. Hero Scripts", "2. Agility heroes", "Ember" }, "Ember Combo", "hold combo key -> full combo with remnant, release key after ~ 1 sec -> fist+chains")
@@ -1033,6 +1053,18 @@ fooAllInOne.TinkerPushAllies = 0
 fooAllInOne.TinkerPushJungle = true
 fooAllInOne.TinkerPushSave = true
 fooAllInOne.TinkerPushDefend = true
+fooAllInOne.PudgeRotComboActivation = false
+fooAllInOne.PudgeRotComboDeactivation = 0
+fooAllInOne.PudgeHookStartTimer = 0
+fooAllInOne.PudgeHookDelayer = 0
+fooAllInOne.PudgeHookRotDelayer = 0
+fooAllInOne.PudgeHookTarget = nil
+fooAllInOne.PudgeHookTargetedPos = nil
+fooAllInOne.PudgeHookHit = false
+fooAllInOne.PudgecurrentParticle = 0
+fooAllInOne.PudgecurrentParticleTarget = nil
+fooAllInOne.PudgeRotFarmToggled = false
+fooAllInOne.PudgeRotFarmToggledTime = 0
 
 	-- global Tables
 fooAllInOne.LinkensBreakerItemOrder = {}
@@ -1106,7 +1138,8 @@ fooAllInOne.heroList = {
 	"npc_dota_hero_lion",
 	"npc_dota_hero_pugna",
 	"npc_dota_hero_undying",
-	"npc_dota_hero_viper"
+	"npc_dota_hero_viper",
+	"npc_dota_hero_pudge"
 		}
 
 fooAllInOne.dodgeItItems = { 
@@ -1116,7 +1149,7 @@ fooAllInOne.dodgeItItems = {
 	{"item_lotus_orb", 1, "target", 0.1},
 	{"item_black_king_bar", 2, "no target", 0.1},
 	{"item_blade_mail", 0, "no target", 0.1},
-	{"item_glimmer_cape", 0, "target", 0.7}
+	{"item_glimmer_cape", 0, "target", 0.1}
 		}
 
 fooAllInOne.dodgeItSkills = {
@@ -1937,7 +1970,7 @@ fooAllInOne.AbilityList = {
 	{ "npc_dota_hero_windrunner", "windrunner_focusfire", "utility", "0" , "0" },
 	{ "npc_dota_hero_windrunner", "windrunner_windrun", "utility", "0" , "0" },
 	{ "npc_dota_hero_winter_wyvern", "winter_wyvern_winters_curse", "disable", "target" , "0" },
-	{ "npc_dota_hero_winter_wyvern", "winter_wyvern_splinter_blast", "nuke", "target" , "0" },
+	{ "npc_dota_hero_winter_wyvern", "winter_wyvern_splinter_blast", "nuke", "special" , "0" },
 	{ "npc_dota_hero_winter_wyvern", "winter_wyvern_arctic_burn", "utility", "0" , "0" },
 	{ "npc_dota_hero_winter_wyvern", "winter_wyvern_cold_embrace", "utility", "0" , "0" },
 	{ "npc_dota_hero_wisp", "wisp_empty1", "utility", "0" , "0" },
@@ -1963,7 +1996,7 @@ fooAllInOne.AbilityList = {
 	{ "npc_dota_hero_dark_willow", "dark_willow_cursed_crown", "utility", "0" , "0" },
 	{ "npc_dota_hero_dark_willow", "dark_willow_bedlam", "utility", "0" , "0" },
 	{ "npc_dota_hero_dark_willow", "dark_willow_terrorize", "utility", "0" , "0" },
-	{ "npc_dota_hero_pangolier", "pangolier_swashbuckle", "nuke", "special" , "damage" },
+	{ "npc_dota_hero_pangolier", "pangolier_swashbuckle", "nuke", "special", "damage" },
 	{ "npc_dota_hero_pangolier", "pangolier_shield_crash", "utility", "0" , "0" },
 	{ "npc_dota_hero_pangolier", "pangolier_heartpiercer", "utility", "0" , "0" },
 	{ "npc_dota_hero_pangolier", "pangolier_gyroshell", "utility", "0" , "0" } }
@@ -2209,7 +2242,7 @@ fooAllInOne.NeutralMainNPChard = {
 
 fooAllInOne.preemptiveBKB = {}
 for i = 1, #fooAllInOne.preemptiveBKBtable do
-	fooAllInOne.preemptiveBKB[i] = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items", "2. BKB", "3. dangerous disables" }, fooAllInOne.preemptiveBKBtable[i], "")
+	fooAllInOne.preemptiveBKB[i] = Menu.AddOption({ "Utility","foos AllInOne", "2. Item Usage", "2. Defensive Items", "1. BKB", "3. dangerous disables" }, fooAllInOne.preemptiveBKBtable[i], "")
 end
 
 fooAllInOne.dodgeItOptionTable = {}
@@ -2373,6 +2406,18 @@ function fooAllInOne.ResetGlobalVariables()
 	fooAllInOne.TinkerPushJungle = true
 	fooAllInOne.TinkerPushSave = true
 	fooAllInOne.TinkerPushDefend = true
+	fooAllInOne.PudgeRotComboActivation = false
+	fooAllInOne.PudgeRotComboDeactivation = 0
+	fooAllInOne.PudgeHookStartTimer = 0
+	fooAllInOne.PudgeHookDelayer = 0
+	fooAllInOne.PudgeHookRotDelayer = 0
+	fooAllInOne.PudgeHookTarget = nil
+	fooAllInOne.PudgeHookTargetedPos = nil
+	fooAllInOne.PudgeHookHit = false
+	fooAllInOne.PudgecurrentParticle = 0
+	fooAllInOne.PudgecurrentParticleTarget = nil
+	fooAllInOne.PudgeRotFarmToggled = false
+	fooAllInOne.PudgeRotFarmToggledTime = 0
 	fooAllInOne.TinkerJungleFarmPos = {}
 	fooAllInOne.JungleTrackTable = {}
 	fooAllInOne.ShrinePositionTable = {}
@@ -2412,7 +2457,6 @@ function fooAllInOne.OnGameEnd()
 
 end
 	
-
 -- main callback
 function fooAllInOne.OnUpdate()
 
@@ -2563,8 +2607,6 @@ function fooAllInOne.OnUpdate()
 				fooAllInOne.TACombo(myHero, comboTarget)
 			elseif fooAllInOne.myUnitName == "npc_dota_hero_slardar" then
 				fooAllInOne.SlardarCombo(myHero, comboTarget)
-			elseif fooAllInOne.myUnitName == "npc_dota_hero_clinkz" then
-				fooAllInOne.ClinkzCombo(myHero, comboTarget)
 			elseif fooAllInOne.myUnitName == "npc_dota_hero_queenofpain" then
 				fooAllInOne.QoPCombo(myHero, comboTarget)
 			elseif fooAllInOne.myUnitName == "npc_dota_hero_sven" then
@@ -2632,7 +2674,8 @@ function fooAllInOne.OnUpdate()
 		fooAllInOne.ProphetHelper(myHero, comboTarget)
 	end
 	
-	if NPC.GetUnitName(myHero) == "npc_dota_hero_clinkz" then
+	if fooAllInOne.myUnitName == "npc_dota_hero_clinkz" then
+		fooAllInOne.ClinkzCombo(myHero, comboTarget)
 		if Menu.IsEnabled(fooAllInOne.optionHeroClinkzUlt) then
 			fooAllInOne.ClinkzAutoUlt(myHero)
 		end
@@ -2692,6 +2735,10 @@ function fooAllInOne.OnUpdate()
 
 	if fooAllInOne.myUnitName == "npc_dota_hero_viper" then
 		fooAllInOne.ViperCombo(myHero, comboTarget)
+	end
+
+	if fooAllInOne.myUnitName == "npc_dota_hero_pudge" then
+		fooAllInOne.PudgeCombo(myHero, comboTarget)
 	end
 
 	fooAllInOne.lastHitter(myHero)
@@ -2763,7 +2810,6 @@ function fooAllInOne.OnUpdate()
 --	local abilityNames = Ability.GetName(abilities)
 --	Log.Write(abilityNames)
 --	end
-
 
 end
 
@@ -3072,7 +3118,7 @@ function fooAllInOne.OnUnitAnimation(animation)
 		if not NPC.IsRanged(animation.unit) then
 			local attackRange = NPC.GetAttackRange(animation.unit) + 155
 			if NPC.IsEntityInRange(Heroes.GetLocal(), animation.unit, attackRange) and NPC.FindFacingNPC(animation.unit) == Heroes.GetLocal() then
-				local damage = NPC.GetDamageMultiplierVersus(animation.unit, Heroes.GetLocal()) * ((NPC.GetTrueMaximumDamage(animation.unit)) * NPC.GetArmorDamageMultiplier(Heroes.GetLocal()))
+				local damage = fooAllInOne.getAdjustedMaxTrueDamage(animation.unit, Heroes.GetLocal())
 				table.insert(fooAllInOne.armletDamageInstanceTable, { instanceindex = Entity.GetIndex(animation.unit), time = fooAllInOne.utilityRoundNumber((GameRules.GetGameTime() + animation.castpoint - 0.035 - NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING)), 3), casttime = animation.castpoint, backswingstart = GameRules.GetGameTime() + animation.castpoint - 0.035, backswingend = GameRules.GetGameTime() + NPC.GetAttackTime(animation.unit) - 0.035, type = "attack", damage = damage, isProjectile = false })
 			end
 		else
@@ -3080,7 +3126,7 @@ function fooAllInOne.OnUnitAnimation(animation)
 			if Entity.IsHero(animation.unit) and NPC.IsEntityInRange(Heroes.GetLocal(), animation.unit, attackRange) and NPC.FindFacingNPC(animation.unit) == Heroes.GetLocal() then
 				local myProjectedPosition = Entity.GetAbsOrigin(Heroes.GetLocal())
 				local projectileTiming = ((Entity.GetAbsOrigin(animation.unit) - myProjectedPosition):Length2D() - NPC.GetHullRadius(Heroes.GetLocal())) / fooAllInOne.attackPointTable[NPC.GetUnitName(animation.unit)][3]
-				local damage = NPC.GetDamageMultiplierVersus(animation.unit, Heroes.GetLocal()) * ((NPC.GetTrueMaximumDamage(animation.unit)) * NPC.GetArmorDamageMultiplier(Heroes.GetLocal()))
+				local damage = fooAllInOne.getAdjustedMaxTrueDamage(animation.unit, Heroes.GetLocal())
 				table.insert(fooAllInOne.armletDamageInstanceTable, { instanceindex = Entity.GetIndex(animation.unit), time = fooAllInOne.utilityRoundNumber((GameRules.GetGameTime() + animation.castpoint + projectileTiming - 0.035 - NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING)), 3), casttime = animation.castpoint, backswingstart = GameRules.GetGameTime() + animation.castpoint - 0.035, backswingend = GameRules.GetGameTime() + NPC.GetAttackTime(animation.unit) - 0.035, type = "rangeattack", damage = damage, projectileorigin = Entity.GetAbsOrigin(animation.unit), projectilestarttime = GameRules.GetGameTime() + animation.castpoint - 0.035, projectilespeed = fooAllInOne.attackPointTable[NPC.GetUnitName(animation.unit)][3], isProjectile = true })
 			end
 		end
@@ -3290,14 +3336,14 @@ function fooAllInOne.OnProjectile(projectile)
 					end
 				local myProjectedPosition = Entity.GetAbsOrigin(myHero)
 				local projectileTiming = ((Entity.GetAbsOrigin(projectile.source) - myProjectedPosition):Length() - NPC.GetHullRadius(projectile.target)) / projectile.moveSpeed
-				local damage = NPC.GetDamageMultiplierVersus(projectile.source, Heroes.GetLocal()) * ((NPC.GetTrueMaximumDamage(projectile.source)) * NPC.GetArmorDamageMultiplier(Heroes.GetLocal()))
+				local damage = fooAllInOne.getAdjustedMaxTrueDamage(projectile.source, Heroes.GetLocal())
 				table.insert(fooAllInOne.armletDamageInstanceTable, { instanceindex = Entity.GetIndex(projectile.source), time = fooAllInOne.utilityRoundNumber((GameRules.GetGameTime() + projectileTiming - 0.035 - NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING)), 3), casttime = casttime, backswingstart = GameRules.GetGameTime() - 0.035, backswingend = GameRules.GetGameTime() + NPC.GetAttackTime(projectile.source) - casttime - 0.035, type = "rangeattack", damage = damage, projectileorigin = Entity.GetAbsOrigin(projectile.source), projectilestarttime = GameRules.GetGameTime() - 0.035, projectilespeed = projectile.moveSpeed, isProjectile = true })
 			end
 		else
 			if projectile.target == Heroes.GetLocal() then
 				local myProjectedPosition = Entity.GetAbsOrigin(myHero)
 				local projectileTiming = ((Entity.GetAbsOrigin(projectile.source) - myProjectedPosition):Length2D() - NPC.GetHullRadius(projectile.target)) / projectile.moveSpeed
-				local damage = NPC.GetDamageMultiplierVersus(projectile.source, Heroes.GetLocal()) * ((NPC.GetTrueMaximumDamage(projectile.source)) * NPC.GetArmorDamageMultiplier(Heroes.GetLocal()))
+				local damage = fooAllInOne.getAdjustedMaxTrueDamage(projectile.source, Heroes.GetLocal())
 				local inserted = false
 				for k, info in ipairs(fooAllInOne.armletDamageInstanceTable) do
 					if info and info.instanceindex == Entity.GetIndex(projectile.source) then
@@ -3661,6 +3707,14 @@ function fooAllInOne.OnPrepareUnitOrders(orders)
 			return false
 		elseif Ship and Ability.IsInAbilityPhase(Ship) then
 			return false
+		end
+	end
+
+	if fooAllInOne.myUnitName == "npc_dota_hero_pudge" then
+		if orders.order == Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION or orders.order == Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET then
+			if fooAllInOne.PudgeHookHit then
+				fooAllInOne.PudgeHookHit = false
+			end
 		end
 	end
 
@@ -4361,6 +4415,16 @@ function fooAllInOne.myCreepDamageAdjuster(myHero, target)
 		end
 	end
 
+	if NPC.HasModifier(myHero, "modifier_storm_spirit_overload") then
+		local overload = NPC.GetAbility(myHero, "storm_spirit_overload")
+		local bonus = 0
+		if overload and Ability.GetLevel(overload) > 0 then
+			bonus = Ability.GetDamage(overload)
+		end
+		local bonusTrue = (1 - NPC.GetMagicalArmorValue(target)) * bonus + bonus * (Hero.GetIntellectTotal(myHero) / 14 / 100)
+		minCreepDamage = minCreepDamage + bonusTrue
+	end
+
 	local overallCreepDamage = minCreepDamage + bonusCreepDamage
 
 	return math.floor(overallCreepDamage)
@@ -4883,6 +4947,7 @@ function fooAllInOne.castLinearPrediction(myHero, enemy, adjustmentVariable)
 
 
 	local cosGamma = (NPC.GetAbsOrigin(myHero) - enemyOrigin):Dot2D(enemyRotation:Scaled(100)) / ((NPC.GetAbsOrigin(myHero) - enemyOrigin):Length2D() * enemyRotation:Scaled(100):Length2D())
+
 		if enemyRotation and enemyOrigin then
 			if not NPC.IsRunning(enemy) then
 				return enemyOrigin
@@ -6832,7 +6897,6 @@ function fooAllInOne.saverGetAllyTarget(myHero, unit, radius, castrange)
 	local angle = Entity.GetRotation(unit)
 
 	local direction = angle:GetForward()
-    	local name = NPC.GetUnitName(unit)
     		direction:SetZ(0)
 
     	local origin = NPC.GetAbsOrigin(unit)
@@ -6846,27 +6910,28 @@ function fooAllInOne.saverGetAllyTarget(myHero, unit, radius, castrange)
 
 	local pointsNum = math.floor(castrange/50) + 1
 	
-
 	local targetAlly = nil
+	local facing = 99999
+	local lowest = 99999
 	for i, v in ipairs(alliesAround) do
-		if v and Entity.IsHero(v) and Entity.IsSameTeam(myHero, v) then
-
-    			for i = pointsNum,1,-1 do 
-        			direction:Normalize()
-        			direction:Scale(50*(i-1))
-        			local pos = origin + direction
-        			if NPC.IsPositionInRange(v, pos, radius + NPC.GetHullRadius(v), 0) then 
-            				targetAlly = v
-					break
-        			end
-    			end
+		if v and Entity.IsHero(v) and Entity.IsAlive(v) and v ~= myHero then
+			if NPC.IsEntityInRange(unit, v, radius + castrange) and NPC.IsEntityInRange(myHero, v, 885) then
+				if castrange > 1 then
+					if NPC.GetTimeToFace(unit, v) < facing then
+						facing = NPC.GetTimeToFace(unit, v)
+						targetAlly = v
+					end
+				else
+					if Entity.GetHealth(v) < lowest then
+						lowest = Entity.GetHealth(v)
+						targetAlly = v
+					end
+				end	
+			end
 		end
-	end
+	end	
 
-	if targetAlly then
-		return targetAlly
-	end
-    	return
+	return targetAlly
 
 end
 
@@ -7337,20 +7402,21 @@ function fooAllInOne.dodger(myHero)
 					local burrowStrike = NPC.GetAbility(enemy, "sandking_burrowstrike")
 					local burrowRange = 650
 					local hitRange = 175
-					local burrowSpeed = 2000
 						if NPC.HasItem(enemy, "item_ultimate_scepter", true) or NPC.HasModifier(enemy, "modifier_item_ultimate_scepter_consumed") then
 							burrowRange = 1300
-							burrowSpeed = 3000
 						end
-					local impactTime = ((Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Length() / burrowSpeed) - 0.2
-						if impactTime < 0.1 then
-							impactTime = 0.1
-						end
-					if burrowStrike and Ability.SecondsSinceLastUse(burrowStrike) > -1 and Ability.SecondsSinceLastUse(burrowStrike) <= 0 and NPC.IsEntityInRange(myHero, enemy, burrowRange+hitRange) then	
+					if NPC.HasModifier(enemy, "modifier_sandking_burrowstrike") then
 						if fooAllInOne.dodgeIsTargetMe(myHero, enemy, hitRange, burrowRange) then
-							fooAllInOne.dodgeIt({time = GameRules.GetGameTime(); delay = impactTime; style = 2; source = enemy, lotus = 0, castpoint = 0, spellname = "sandking_burrowstrike", global = 0, type = "disable"})
+							fooAllInOne.dodgeIt({time = GameRules.GetGameTime(); delay = 0.05; style = 2; source = enemy, lotus = 1, castpoint = 0, spellname = "sandking_burrowstrike", global = 0, type = "disable"})
 							break
 							return
+						else
+							if NPC.IsEntityInRange(myHero, enemy, hitRange+burrowRange+885) then
+								local targetAlly = fooAllInOne.saverGetAllyTarget(myHero, enemy, hitRange, burrowRange)
+								if targetAlly and NPC.IsEntityInRange(myHero, targetAlly, 885) then
+									fooAllInOne.saveIt({lotus = 1, target = targetAlly})
+								end
+							end
 						end
 					end
 				end
@@ -9081,16 +9147,30 @@ function fooAllInOne.itemUsageSmartOrder(myHero, enemy, activation)
 
 			if NPC.HasModifier(enemy, "modifier_sheepstick_debuff") then
 				local dieTime = Modifier.GetDieTime(NPC.GetModifier(enemy, "modifier_sheepstick_debuff"))
-				if GameRules.GetGameTime() <= dieTime - 0.1 then
-					if v[2] == "item_abyssal_blade" or v[2] == "item_sheepstick" or v[2] == "item_bloodthorn" or v[2] == "item_orchid" or v[2] == "item_heavens_halberd" or v[2] == "item_nullifier" or v[2] == "item_diffusal_blade" then
-						skipItem = v[1]
+				if Menu.IsEnabled(fooAllInOne.optionItemStack) then
+					if GameRules.GetGameTime() <= dieTime - 0.1 then
+						if v[2] == "item_abyssal_blade" or v[2] == "item_sheepstick" or v[2] == "item_heavens_halberd" or v[2] == "item_nullifier" or v[2] == "item_diffusal_blade" then
+							skipItem = v[1]
+						end
+					end
+				else
+					if GameRules.GetGameTime() <= dieTime - 0.1 then
+						if v[2] == "item_abyssal_blade" or v[2] == "item_sheepstick" or v[2] == "item_bloodthorn" or v[2] == "item_orchid" or v[2] == "item_heavens_halberd" or v[2] == "item_nullifier" or v[2] == "item_diffusal_blade" then
+							skipItem = v[1]
+						end
 					end
 				end
 			end
 
 			if NPC.HasItem(myHero, "item_sheepstick", true) and Ability.SecondsSinceLastUse(NPC.GetItem(myHero, "item_sheepstick",true)) > -1 and Ability.SecondsSinceLastUse(NPC.GetItem(myHero, "item_sheepstick",true)) < 0.5 then
-				if v[2] == "item_abyssal_blade" or v[2] == "item_sheepstick" or v[2] == "item_bloodthorn" or v[2] == "item_orchid" or v[2] == "item_heavens_halberd" or v[2] == "item_nullifier" or v[2] == "item_diffusal_blade" then
-					skipItem = v[1]
+				if Menu.IsEnabled(fooAllInOne.optionItemStack) then
+					if v[2] == "item_abyssal_blade" or v[2] == "item_sheepstick" or v[2] == "item_heavens_halberd" or v[2] == "item_nullifier" or v[2] == "item_diffusal_blade" then
+						skipItem = v[1]
+					end
+				else
+					if v[2] == "item_abyssal_blade" or v[2] == "item_sheepstick" or v[2] == "item_bloodthorn" or v[2] == "item_orchid" or v[2] == "item_heavens_halberd" or v[2] == "item_nullifier" or v[2] == "item_diffusal_blade" then
+						skipItem = v[1]
+					end
 				end
 			end
 
@@ -9205,6 +9285,19 @@ function fooAllInOne.itemUsageSmartOrder(myHero, enemy, activation)
 				end
 			end
 
+			if fooAllInOne.myUnitName == "npc_dota_hero_tinker" then
+				if NPC.IsLinkensProtected(enemy) then
+					if v[2] == "item_sheepstick" then
+						skipItem = v[1]
+					end
+				end
+			end
+
+			if NPC.HasModifier(enemy, "modifier_pudge_meat_hook") then
+				if v[2] == "item_rod_of_atos" then
+					skipItem = v[1]
+				end
+			end
 
 			if NPC.HasItem(myHero, v[2], true) then
 				if Ability.IsCastable(NPC.GetItem(myHero, v[2], true), myMana) and (v[1] - skipItem) > customOrder then
@@ -9613,6 +9706,105 @@ function fooAllInOne.getDotDamageTicks(myHero)
 	end
 
 	return 
+
+end
+
+function fooAllInOne.getAdjustedMaxTrueDamage(unit, target)
+
+	if not unit then return 0 end
+	if not target then return 0 end
+
+	if Entity.IsDormant(unit) then return 0 end
+	if Entity.IsDormant(target) then return 0 end
+
+	local maxDamage = NPC.GetTrueMaximumDamage(unit)
+	local maxTrueDamage = NPC.GetDamageMultiplierVersus(unit, target) * maxDamage * NPC.GetArmorDamageMultiplier(target)
+
+	local bonusDamage = 0
+	if NPC.HasModifier(unit, "modifier_storm_spirit_overload") and not NPC.HasState(target, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+		local overload = NPC.GetAbility(unit, "storm_spirit_overload")
+		local bonus = 0
+		if overload and Ability.GetLevel(overload) > 0 then
+			bonus = Ability.GetDamage(overload)
+		end
+		local bonusTrue = (1 - NPC.GetMagicalArmorValue(target)) * bonus + bonus * (Hero.GetIntellectTotal(unit) / 14 / 100)
+		bonusDamage = bonusDamage + bonusTrue
+	end
+
+	if NPC.HasAbility(unit, "clinkz_searing_arrows") then
+		local orb = NPC.GetAbility(unit, "clinkz_searing_arrows")
+		if orb and Ability.IsCastable(orb, NPC.GetMana(unit)) and Ability.GetLevel(orb) > 0 then
+			local bonus = 20 + 10 * Ability.GetLevel(orb)
+				if NPC.HasAbility(unit, "special_bonus_unique_clinkz_1") then
+					if Ability.GetLevel(NPC.GetAbility(unit, "special_bonus_unique_clinkz_1")) > 0 then
+						bonus = bonus + 30
+					end
+				end
+			local bonusTrue = NPC.GetDamageMultiplierVersus(unit, target) * bonus * NPC.GetArmorDamageMultiplier(target)
+			bonusDamage = bonusDamage + bonusTrue
+		end
+	end
+
+	if NPC.HasAbility(unit, "obsidian_destroyer_arcane_orb") and not NPC.HasState(target, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+		local orb = NPC.GetAbility(unit, "obsidian_destroyer_arcane_orb")
+		if orb and Ability.IsCastable(orb, NPC.GetMana(unit)) and Ability.GetLevel(orb) > 0 then
+			local bonus = (0.05 + (0.01 * Ability.GetLevel(orb))) * NPC.GetMana(unit)
+			local bonusTrue = bonus
+			bonusDamage = bonusDamage + bonusTrue
+		end
+	end
+
+	if NPC.HasAbility(unit, "silencer_glaives_of_wisdom") and not NPC.HasState(target, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+		local orb = NPC.GetAbility(unit, "silencer_glaives_of_wisdom")
+		if orb and Ability.IsCastable(orb, NPC.GetMana(unit)) and Ability.GetLevel(orb) > 0 then
+			local bonus = 0.15 * Ability.GetLevel(orb) * Hero.GetIntellectTotal(unit)
+				if NPC.HasAbility(unit, "special_bonus_unique_silencer_3") then
+					if Ability.GetLevel(NPC.GetAbility(unit, "special_bonus_unique_silencer_3")) > 0 then
+						bonus = (0.2 + 0.15 * Ability.GetLevel(orb)) * Hero.GetIntellectTotal(unit)
+					end
+				end
+			local bonusTrue = bonus
+			bonusDamage = bonusDamage + bonusTrue
+		end
+	end
+
+	if NPC.HasAbility(unit, "kunkka_tidebringer") then
+		local orb = NPC.GetAbility(unit, "kunkka_tidebringer")
+		if orb and Ability.IsCastable(orb, NPC.GetMana(unit)) and Ability.GetLevel(orb) > 0 then
+			local bonus = Ability.GetLevelSpecialValueFor(orb, "damage_bonus")
+			local bonusTrue = NPC.GetDamageMultiplierVersus(unit, target) * bonus * NPC.GetArmorDamageMultiplier(target)
+			bonusDamage = bonusDamage + bonusTrue
+		end
+	end
+
+	if NPC.HasAbility(unit, "enchantress_impetus") then
+		local orb = NPC.GetAbility(unit, "enchantress_impetus")
+		if orb and Ability.IsCastable(orb, NPC.GetMana(unit)) and Ability.GetLevel(orb) > 0 then
+			local distance = (Entity.GetAbsOrigin(unit) - Entity.GetAbsOrigin(target)):Length2D() * 1.35
+				if distance > 1750 then
+					distance = 1750
+				end
+			local distanceDamage = Ability.GetLevelSpecialValueForFloat(orb, "distance_damage_pct")
+				if NPC.HasAbility(unit, "special_bonus_unique_enchantress_4") then
+					if Ability.GetLevel(NPC.GetAbility(unit, "special_bonus_unique_enchantress_4")) > 0 then
+						distanceDamage = distanceDamage + 8
+					end
+				end
+			local bonus = distance * (distanceDamage / 100)
+			local bonusTrue = bonus
+			bonusDamage = bonusDamage + bonusTrue
+		end
+	end
+
+	if Entity.IsSameTeam(unit, target) then
+		bonusDamage = 0
+	end
+
+	if NPC.IsStructure(target) then
+		bonusDamage = 0
+	end
+	
+	return math.ceil(maxTrueDamage + bonusDamage)
 
 end
 
@@ -10246,7 +10438,6 @@ function fooAllInOne.useDefensiveItems(myHero, enemy)
 	if fooAllInOne.ItemCastStop then return end
 
 	if fooAllInOne.heroCanCastItems(myHero) == false then return end
-	if fooAllInOne.isHeroChannelling(myHero) == true then return end
 	if fooAllInOne.IsHeroInvisible(myHero) == true then return end
 
 	local myMana = NPC.GetMana(myHero)
@@ -10262,6 +10453,18 @@ function fooAllInOne.useDefensiveItems(myHero, enemy)
 	local ghost = NPC.GetItem(myHero, "item_ghost", true)
 	local eBlade = NPC.GetItem(myHero, "item_ethereal_blade", true)
 
+	local channellingTable = {
+		"bane_fiends_grip",
+		"crystal_maiden_freezing_field",
+		"enigma_black_hole",
+		"pudge_dismember",
+		"pugna_life_drain",
+		"sandking_epicenter",
+		"shadow_shaman_shackles",
+		"warlock_upheaval",
+		"witch_doctor_death_ward"
+				}
+
 	if Menu.IsEnabled(fooAllInOne.optionDefensiveItemsGlimmer) then
 		if glimmerCape and Ability.IsCastable(glimmerCape, myMana) then
 			if fooAllInOne.IsNPCinDanger(myHero, myHero) then
@@ -10270,10 +10473,12 @@ function fooAllInOne.useDefensiveItems(myHero, enemy)
 				return
 			end
 			if NPC.IsChannellingAbility(myHero) then
-				if NPC.GetUnitName(myHero) ~= "npc_dota_hero_tinker" and NPC.GetUnitName(myHero) ~= "npc_dota_hero_windrunner" then
-					Ability.CastTarget(glimmerCape, myHero)
-					fooAllInOne.lastDefItemPop = os.clock()
-					return
+				for _, ability in ipairs(channellingTable) do
+					if NPC.HasAbility(myHero, ability) and Ability.IsChannelling(NPC.GetAbility(myHero, ability)) then
+						Ability.CastTarget(glimmerCape, myHero)
+						fooAllInOne.lastDefItemPop = os.clock()
+						return
+					end
 				end
 			end
 			if NPC.HasModifier(myHero, "modifier_teleporting") then
@@ -10288,17 +10493,28 @@ function fooAllInOne.useDefensiveItems(myHero, enemy)
 				local teamMatesAround = NPC.GetHeroesInRadius(myHero, 1000, Enum.TeamType.TEAM_FRIEND)
 				for _, ally in ipairs(teamMatesAround) do
 					if ally and not NPC.IsIllusion(ally) and Entity.IsAlive(ally) then
-						if fooAllInOne.IsNPCinDanger(myHero, ally) or (NPC.IsChannellingAbility(ally) and NPC.GetUnitName(ally) ~= "npc_dota_hero_tinker" and NPC.GetUnitName(ally) ~= "npc_dota_hero_windrunner") then
+						if fooAllInOne.IsNPCinDanger(myHero, ally) then
 							Ability.CastTarget(glimmerCape, ally)
 							fooAllInOne.lastDefItemPop = os.clock()
 							break
 							return
+						end
+						if NPC.IsChannellingAbility(ally) then
+							for _, ability in ipairs(channellingTable) do
+								if NPC.HasAbility(ally, ability) and Ability.IsChannelling(NPC.GetAbility(ally, ability)) then
+									Ability.CastTarget(glimmerCape, ally)
+									fooAllInOne.lastDefItemPop = os.clock()
+									return
+								end
+							end
 						end
 					end
 				end
 			end
 		end
 	end
+
+	if fooAllInOne.isHeroChannelling(myHero) == true then return end
 
 	if Menu.IsEnabled(fooAllInOne.optionDefensiveItemsGhost) then
 		if ghost and Ability.IsReady(ghost) then
@@ -10510,10 +10726,10 @@ function fooAllInOne.IsNPCinDanger(myHero, npc)
 	if fooAllInOne.TargetGotDisableModifier(myHero, npc) == true or (NPC.IsSilenced(npc) and not momSilenced) or
 		NPC.HasModifier(npc, "modifier_item_nullifier_mute") or NPC.HasState(npc, Enum.ModifierState.MODIFIER_STATE_HEXED) then
 
-		if Entity.GetHealth(npc) / Entity.GetMaxHealth(npc) < 0.6 then
+		if Entity.GetHealth(npc) / Entity.GetMaxHealth(npc) <= (Menu.GetValue(fooAllInOne.optionDefensiveItemsThresholdDisable) / 100) then
 			for _, v in ipairs(Entity.GetHeroesInRadius(myHero, 1000, Enum.TeamType.TEAM_ENEMY)) do
 				if v and Entity.IsHero(v) and not Entity.IsDormant(v) then
-					if NPC.FindFacingNPC(v) == npc then
+					if NPC.FindFacingNPC(v) == npc or NPC.IsEntityInRange(npc, v, NPC.GetAttackRange(v) + 150) then
 						return true
 					end
 				end
@@ -10974,6 +11190,759 @@ function fooAllInOne.centaurCombo(myHero, enemy)
 			end
 		end
 	fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+	end
+
+end
+
+function fooAllInOne.PudgeCombo(myHero, enemy)
+
+	if not Menu.IsEnabled(fooAllInOne.optionHeroPudge) then return end
+
+	local Q = NPC.GetAbilityByIndex(myHero, 0)
+ 	local W = NPC.GetAbilityByIndex(myHero, 1)
+	local ult = NPC.GetAbility(myHero, "pudge_dismember")
+
+	local blink = NPC.GetItem(myHero, "item_blink", true)
+	local force = NPC.GetItem(myHero, "item_force_staff", true)
+
+	local myMana = NPC.GetMana(myHero)
+
+	fooAllInOne.itemUsage(myHero, enemy)
+	fooAllInOne.PudgeHookTargetIndicatorDel(myHero)
+
+	local maxInitRange = 0
+		if blink and Ability.IsReady(blink) and Menu.IsEnabled(fooAllInOne.optionHeroPudgeBlink) then
+			maxInitRange = maxInitRange + 1200
+		end
+		if force and Ability.IsCastable(force, myMana) and Menu.IsEnabled(fooAllInOne.optionHeroPudgeStaff) then
+			maxInitRange = maxInitRange + 600
+		end
+
+	if fooAllInOne.PudgeRotComboActivation and not Menu.IsKeyDown(fooAllInOne.optionComboKey) then
+		if Ability.GetToggleState(W) then
+			if os.clock() > fooAllInOne.PudgeRotComboDeactivation then
+				Ability.Toggle(W)
+				fooAllInOne.PudgeRotComboActivation = false
+				fooAllInOne.PudgeRotComboDeactivation = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + 0.05
+				return
+			end
+		end
+	end
+
+	if Menu.IsEnabled(fooAllInOne.optionHeroPudgeHook) then
+		if Menu.IsKeyDown(fooAllInOne.optionHeroPudgeHookKey) then
+			local target = fooAllInOne.PudgeHookGetTarget(myHero)
+			if fooAllInOne.PudgeHookTarget == nil then
+				fooAllInOne.PudgeHookTarget = target
+			end
+			if fooAllInOne.PudgeHookTarget ~= nil then
+				if Entity.IsHero(fooAllInOne.PudgeHookTarget) and Entity.IsAlive(fooAllInOne.PudgeHookTarget) then
+					fooAllInOne.PudgeHookCombo(myHero, myMana, fooAllInOne.PudgeHookTarget, Q, W, ult)
+				else
+					fooAllInOne.PudgeHookTarget = nil
+				end	
+			end
+		else
+			if fooAllInOne.PudgeHookTarget ~= nil then
+				fooAllInOne.PudgeHookTarget = nil
+			end
+		end
+	end					
+
+	if enemy and NPC.IsEntityInRange(myHero, enemy, 3000) then
+		if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.IsAlive(enemy) then
+ 			if fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
+				if maxInitRange > 1200 then
+					if not NPC.IsEntityInRange(myHero, enemy, 1200) then
+						if NPC.IsEntityInRange(myHero, enemy, 1750) then
+							local pred = 600/1500 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+							local predPos = fooAllInOne.castPrediction(myHero, enemy, pred)
+							if fooAllInOne.AmIFacingPos(myHero, predPos, 10) then
+								Ability.CastTarget(force, myHero)
+								return
+							else
+								fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, predPos)
+								return
+							end
+						end
+					else
+						if not NPC.IsEntityInRange(myHero, enemy, Menu.GetValue(fooAllInOne.optionHeroPudgeBlinkMinRange)) then
+							if not NPC.HasModifier(myHero, "modifier_item_forcestaff_active") then
+								Ability.CastPosition(blink, (Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(75)))
+								return
+							end
+						end
+					end
+				end
+				if maxInitRange == 1200 then
+					if NPC.IsEntityInRange(myHero, enemy, 1200) then
+						if not NPC.IsEntityInRange(myHero, enemy, Menu.GetValue(fooAllInOne.optionHeroPudgeBlinkMinRange)) then
+							if not NPC.HasModifier(myHero, "modifier_item_forcestaff_active") then
+								Ability.CastPosition(blink, (Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(75)))
+								return
+							end
+						end
+					end
+				end
+				if maxInitRange == 600 then
+					if NPC.IsEntityInRange(myHero, enemy, 750) then
+						if not NPC.IsEntityInRange(myHero, enemy, 550) then
+							local pred = 600/1500 + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+							local predPos = fooAllInOne.castPrediction(myHero, enemy, pred)
+							if fooAllInOne.AmIFacingPos(myHero, predPos, 5) then
+								Ability.CastTarget(force, myHero)
+								return
+							else
+								fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, predPos)
+								return
+							end
+						end
+					end
+				end
+
+				if fooAllInOne.PudgeHookCanceller(myHero, enemy) then
+					Player.HoldPosition(Players.GetLocal(), myHero, false)
+					fooAllInOne.PudgeHookStartTimer = 0
+					fooAllInOne.lastTick = 0
+					fooAllInOne.PudgeHookTargetedPos = nil
+					return
+				end		
+
+				if os.clock() > fooAllInOne.lastTick then
+
+					if ult and Ability.IsCastable(ult, myMana) then
+						if NPC.IsEntityInRange(myHero, enemy, Ability.GetCastRange(ult)) then
+							if not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_HEXED) and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_STUNNED) then
+								Ability.CastTarget(ult, enemy)
+								fooAllInOne.lastTick = os.clock() + 0.3
+								return
+							end
+						end	
+					end
+
+					if W and Ability.IsReady(W) and NPC.IsEntityInRange(myHero, enemy, 250) and not Ability.GetToggleState(W) then
+						Ability.Toggle(W)
+						fooAllInOne.PudgeRotComboActivation = true
+						fooAllInOne.lastTick = os.clock() + 0.2
+						return
+					end
+
+					if Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookCombo) then
+						if Q and Ability.IsCastable(Q, myMana) and NPC.IsEntityInRange(myHero, enemy, Menu.GetValue(fooAllInOne.optionHeroPudgeHookComboMaxRange)) and not NPC.IsChannellingAbility(myHero) then
+							if fooAllInOne.PudgeHookCollisionChecker(myHero, enemy) and not fooAllInOne.PudgeHookJukingChecker(myHero, enemy) then
+								local hookPrediction = Ability.GetCastPoint(Q) + NPC.GetTimeToFace(myHero, enemy) + (Entity.GetAbsOrigin(enemy):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 1450) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+								local hookPredictedPos = fooAllInOne.castPrediction(myHero, enemy, hookPrediction)
+								Ability.CastPosition(Q, Entity.GetAbsOrigin(myHero) + (hookPredictedPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(500))
+								fooAllInOne.PudgeHookStartTimer = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, hookPredictedPos)
+								fooAllInOne.PudgeHookTargetedPos = hookPredictedPos
+								fooAllInOne.lastTick = os.clock() + 0.3
+								return
+							end
+						end
+					end
+				end
+			end
+
+			fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+			return
+		end
+	end
+
+	if Menu.IsEnabled(fooAllInOne.optionHeroPudgeFarm) then
+		fooAllInOne.PudgeAutoFarm(myHero, myMana, W)
+	end
+
+	if Menu.IsEnabled(fooAllInOne.optionHeroPudgeSuicide) then
+		fooAllInOne.PudgeAutoSuicide(myHero, myMana, W)
+	end
+
+end
+
+function fooAllInOne.PudgeAutoSuicide(myHero, myMana, rot)
+
+	if not myHero then return end
+	if not rot then return end
+
+	if fooAllInOne.heroCanCastItems(myHero) == false then return end
+	if fooAllInOne.isHeroChannelling(myHero) == true then return end
+	if fooAllInOne.IsHeroInvisible(myHero) == true then return end
+
+	if os.clock() < fooAllInOne.PudgeRotFarmToggledTime then return end
+
+	if NPC.HasItem(myHero, "item_armlet", true) then return end
+
+	local rotDamage = Ability.GetLevelSpecialValueFor(rot, "rot_damage")
+		if NPC.HasAbility(myHero, "special_bonus_unique_pudge_2") then
+			if Ability.GetLevel(NPC.GetAbility(myHero, "special_bonus_unique_pudge_2")) > 0 then
+				rotDamage = rotDamage + 35
+			end
+		end
+
+	rotDamage = ((1 - NPC.GetMagicalArmorValue(myHero)) * rotDamage + rotDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100)) / 4
+
+	local soulRing = NPC.GetItem(myHero, "item_soul_ring", true)
+		if soulRing and Ability.IsReady(soulRing) and fooAllInOne.heroCanCastItems(myHero) then
+			rotDamage = rotDamage + 150
+		end
+
+	local myHP = Entity.GetHealth(myHero)
+
+	if myHP <= rotDamage then
+		for _, v in ipairs(Entity.GetHeroesInRadius(myHero, 800, Enum.TeamType.TEAM_ENEMY)) do
+			if v and Entity.IsHero(v) and not Entity.IsDormant(v) and not NPC.IsIllusion(v) then
+				if NPC.IsAttacking(v) then
+					if NPC.IsEntityInRange(myHero, v, NPC.GetAttackRange(v) + 140) then
+						if NPC.FindFacingNPC(v) == myHero then
+							if soulRing and Ability.IsReady(soulRing) and fooAllInOne.heroCanCastItems(myHero) then
+								Ability.CastNoTarget(soulRing)
+								if not Ability.GetToggleState(rot) then
+									Ability.Toggle(rot)
+								end
+								fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+								break
+								return
+							else
+								if not Ability.GetToggleState(rot) then
+									Ability.Toggle(rot)
+								end
+								fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+								break
+								return
+							end		
+						end
+					end
+				end
+				for ability, info in pairs(fooAllInOne.RawDamageAbilityEstimation) do
+					if NPC.HasAbility(v, ability) and Ability.IsInAbilityPhase(NPC.GetAbility(v, ability)) then
+						local abilityRange = math.max(Ability.GetCastRange(NPC.GetAbility(v, ability)), info[2])
+						local abilityRadius = info[3]
+						if fooAllInOne.dodgeIsTargetMe(myHero, v, abilityRadius, abilityRange) then
+							if next(fooAllInOne.dodgeItTable) == nil then
+								if soulRing and Ability.IsReady(soulRing) and fooAllInOne.heroCanCastItems(myHero) then
+									Ability.CastNoTarget(soulRing)
+									if not Ability.GetToggleState(rot) then
+										Ability.Toggle(rot)
+									end
+									fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+									break
+									return
+								else
+									if not Ability.GetToggleState(rot) then
+										Ability.Toggle(rot)
+									end
+									fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+									break
+									return
+								end
+							end
+						end
+					end
+				end
+			end	
+		end
+	end
+
+	return	
+
+end
+
+function fooAllInOne.PudgeAutoFarm(myHero, myMana, rot)
+
+	if not myHero then return end
+	if not rot then return end
+
+	if fooAllInOne.heroCanCastItems(myHero) == false then return end
+	if fooAllInOne.isHeroChannelling(myHero) == true then return end
+	if fooAllInOne.IsHeroInvisible(myHero) == true then return end
+
+	if os.clock() < fooAllInOne.PudgeRotFarmToggledTime then return end
+
+	if fooAllInOne.PudgeRotFarmToggled and not Ability.GetToggleState(rot) then
+		fooAllInOne.PudgeRotFarmToggled = false
+		return
+	end
+
+	if Entity.GetHealth(myHero) / Entity.GetMaxHealth(myHero) < Menu.GetValue(fooAllInOne.optionHeroPudgeFarmHP) / 100 then
+		if Ability.GetToggleState(rot) and fooAllInOne.PudgeRotFarmToggled then
+			Ability.Toggle(rot)
+			fooAllInOne.PudgeRotFarmToggled = false
+			fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+			return
+		else
+			return
+		end
+	end
+
+	local rotDamage = Ability.GetLevelSpecialValueFor(rot, "rot_damage")
+		if NPC.HasAbility(myHero, "special_bonus_unique_pudge_2") then
+			if Ability.GetLevel(NPC.GetAbility(myHero, "special_bonus_unique_pudge_2")) > 0 then
+				rotDamage = rotDamage + 35
+			end
+		end
+
+	if #Entity.GetUnitsInRadius(myHero, 240, Enum.TeamType.TEAM_ENEMY) < 1 then
+		if Ability.GetToggleState(rot) and fooAllInOne.PudgeRotFarmToggled then
+			Ability.Toggle(rot)
+			fooAllInOne.PudgeRotFarmToggled = false
+			fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+			return
+		end
+	end	
+
+	
+	for _, creeps in ipairs(Entity.GetUnitsInRadius(myHero, 240, Enum.TeamType.TEAM_ENEMY)) do
+		if creeps and Entity.IsNPC(creeps) and not Entity.IsHero(creeps) and Entity.IsAlive(creeps) and not Entity.IsDormant(creeps) and not NPC.IsWaitingToSpawn(creeps) and NPC.GetUnitName(creeps) ~= "npc_dota_neutral_caster" and NPC.IsCreep(creeps) and NPC.GetUnitName(creeps) ~= nil and NPC.IsKillable(creeps) then
+			local rotTrueDamage = ((1 - NPC.GetMagicalArmorValue(creeps)) * rotDamage + rotDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100)) / 4
+			if Entity.GetHealth(creeps) < rotTrueDamage then
+				if not Ability.GetToggleState(rot) then
+					Ability.Toggle(rot)
+					fooAllInOne.PudgeRotFarmToggled = true
+					fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+					return
+				end
+			else
+				if Ability.GetToggleState(rot) and fooAllInOne.PudgeRotFarmToggled then
+					Ability.Toggle(rot)
+					fooAllInOne.PudgeRotFarmToggled = false
+					fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+					return
+				end
+			end
+		else
+			if Ability.GetToggleState(rot) and fooAllInOne.PudgeRotFarmToggled then
+				Ability.Toggle(rot)
+				fooAllInOne.PudgeRotFarmToggled = false
+				fooAllInOne.PudgeRotFarmToggledTime = os.clock() + 0.2 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+				return
+			end
+		end
+	end
+	
+	return
+		
+end
+
+function fooAllInOne.PudgeHookCombo(myHero, myMana, npc, hook, rot, ult)
+
+	if not myHero then return end
+	if not npc then return end
+
+	if not hook then return end
+		if Ability.GetLevel(hook) < 1 then return end
+
+	fooAllInOne.PudgeHookTargetIndicator(myHero, npc)
+	fooAllInOne.PudgeHookHitTracker(myHero, hook)
+
+	if not Entity.IsSameTeam(myHero, npc) then
+		if ult and Ability.IsCastable(ult, myMana) and Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookUlt) then
+			if not NPC.HasState(npc, Enum.ModifierState.MODIFIER_STATE_HEXED) and not NPC.HasState(npc, Enum.ModifierState.MODIFIER_STATE_STUNNED) then
+				if os.clock() > fooAllInOne.PudgeHookDelayer then
+					if NPC.IsEntityInRange(myHero, fooAllInOne.PudgeHookTarget, Ability.GetCastRange(ult)) then
+						Ability.CastTarget(ult, fooAllInOne.PudgeHookTarget)
+						fooAllInOne.PudgeHookDelayer = os.clock() + 0.3
+						return
+					end
+				end
+			end
+		end
+
+		if rot and Ability.IsReady(rot) and NPC.IsEntityInRange(myHero, fooAllInOne.PudgeHookTarget, 250) and not Ability.GetToggleState(rot) and Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookRot) then
+			if os.clock() > fooAllInOne.PudgeHookRotDelayer then
+				Ability.Toggle(rot)
+				fooAllInOne.PudgeHookRotDelayer = os.clock() + 0.25
+				return
+			end
+		end
+
+		if fooAllInOne.PudgeHookHit then
+			if Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookItems) then
+				fooAllInOne.itemUsageSmartOrder(myHero, npc, true)
+			end
+			if not NPC.HasModifier(npc, "modifier_pudge_meat_hook") then
+				fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", npc, nil)
+			end
+		end	
+	end
+
+	local hookRange = Ability.GetCastRange(hook)
+	local pred = Ability.GetCastPoint(hook) + NPC.GetTimeToFace(myHero, npc) + (Entity.GetAbsOrigin(npc):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 1450) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+	local predPos = fooAllInOne.castPrediction(myHero, npc, pred)
+
+	if not NPC.IsPositionInRange(myHero, predPos, hookRange + 100, 20) then return end
+
+	local atos = NPC.GetItem(myHero, "item_rod_of_atos", true)
+
+	if hook and Ability.IsCastable(hook, myMana) and not NPC.IsChannellingAbility(myHero) then
+
+		if fooAllInOne.PudgeHookCanceller(myHero, npc) then
+			Player.HoldPosition(Players.GetLocal(), myHero, false)
+			fooAllInOne.PudgeHookTarget = nil
+			fooAllInOne.PudgeHookStartTimer = 0
+			fooAllInOne.PudgeHookDelayer = 0
+			fooAllInOne.PudgeHookTargetedPos = nil
+			return
+		end
+			
+		if os.clock() > fooAllInOne.PudgeHookDelayer then
+			if not fooAllInOne.PudgeHookJukingChecker(myHero, npc) then
+				if fooAllInOne.PudgeHookCollisionChecker(myHero, npc) then
+					if fooAllInOne.PudgeHookTiming(myHero, npc) > 0 then
+						local modTiming = fooAllInOne.PudgeHookTiming(myHero, npc) + 0.1
+						local hookTiming = Ability.GetCastPoint(hook) + NPC.GetTimeToFace(myHero, npc) + ((Entity.GetAbsOrigin(npc):__sub(Entity.GetAbsOrigin(myHero)):Length2D() - 125) / 1450) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+						if GameRules.GetGameTime() > modTiming - hookTiming then
+							Ability.CastPosition(hook, Entity.GetAbsOrigin(myHero) + (predPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(500))
+							fooAllInOne.PudgeHookStartTimer = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, predPos)
+							fooAllInOne.PudgeHookDelayer = os.clock() + 0.35 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, predPos)
+							return	
+						end
+					else
+						if atos and Ability.IsCastable(atos, myMana) and NPC.IsEntityInRange(myHero, npc, 1150) and not NPC.HasState(npc, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and not NPC.IsLinkensProtected(npc) then
+							Ability.CastTarget(atos, npc)
+							fooAllInOne.PudgeHookTarget = npc
+							return
+						else
+							if atos and Ability.SecondsSinceLastUse(atos) > -1 and Ability.SecondsSinceLastUse(atos) < ((Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(npc)):Length2D() / 1500) + 0.55 then
+								local atosTiming = GameRules.GetGameTime() - math.max(Ability.SecondsSinceLastUse(atos), 0) + ((Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(npc)):Length2D() / 1500) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) - 0.1
+								if GameRules.GetGameTime() >= atosTiming then
+									Ability.CastPosition(hook, Entity.GetAbsOrigin(npc))
+									fooAllInOne.PudgeHookStartTimer = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, predPos)
+									fooAllInOne.PudgeHookDelayer = os.clock() + 0.35 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, predPos)
+									return
+								end	
+							else
+								Ability.CastPosition(hook, Entity.GetAbsOrigin(myHero) + (predPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(500))
+								fooAllInOne.PudgeHookStartTimer = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, predPos)
+								fooAllInOne.PudgeHookDelayer = os.clock() + 0.35 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, predPos)
+								fooAllInOne.PudgeHookTargetedPos = predPos
+								return
+							end
+						end
+					end
+				else
+					if fooAllInOne.PudgeHookForceStaffFun(myHero, myMana, npc, hook) then
+						local targetRotation = Entity.GetRotation(npc):GetForward()
+						local targetForcedPos = Entity.GetAbsOrigin(npc) + targetRotation:Normalized():Scaled(600)
+						Ability.CastTarget(NPC.GetItem(myHero, "item_force_staff", true), npc)
+						fooAllInOne.PudgeHookTarget = npc
+						Ability.CastPosition(hook, Entity.GetAbsOrigin(myHero) + (targetForcedPos - Entity.GetAbsOrigin(myHero)):Normalized():Scaled(500), true)
+						fooAllInOne.PudgeHookStartTimer = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, targetForcedPos)
+						fooAllInOne.PudgeHookDelayer = os.clock() + 0.35 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + fooAllInOne.TimeToFacePosition(myHero, targetForcedPos)
+						return	
+					end
+				end
+							
+			end
+		end
+
+	end
+
+end
+
+function fooAllInOne.PudgeHookCollisionChecker(myHero, target)
+
+	if not myHero then return false end
+	if not target then return false end
+
+	local pred = 0.3 + NPC.GetTimeToFace(myHero, target) + (Entity.GetAbsOrigin(target):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 1450) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+	local predPos = fooAllInOne.castPrediction(myHero, target, pred)
+
+	local searchRadius = 125
+	local distance = (Entity.GetAbsOrigin(myHero) - predPos):Length2D()
+
+	for i = 1, math.floor(distance / searchRadius) do
+		local checkVec = (predPos - Entity.GetAbsOrigin(myHero)):Normalized()
+		local checkPos = Entity.GetAbsOrigin(myHero) + checkVec:Scaled(i * searchRadius)
+		local unitsAround = NPCs.InRadius(checkPos, searchRadius, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_BOTH)
+		local check = false
+			for _, unit in ipairs(unitsAround) do
+				if unit and Entity.IsNPC(unit) and unit ~= target and unit ~= myHero and Entity.IsAlive(unit) and not Entity.IsDormant(unit) and not NPC.IsStructure(unit) and not NPC.IsBarracks(unit) and not NPC.IsWaitingToSpawn(unit) and NPC.GetUnitName(unit) ~= "npc_dota_neutral_caster" and NPC.GetUnitName(unit) ~= nil then
+					check = true
+					break
+				end
+			end
+
+		if check then
+			return false
+		end	
+
+	end
+
+	return true
+
+end
+
+function fooAllInOne.PudgeHookCanceller(myHero, target)
+
+	if not myHero then return false end
+	if not target then return false end
+
+	local hook = NPC.GetAbilityByIndex(myHero, 0)
+		if not hook then return false end
+			if Ability.GetLevel(hook) < 1 then return false end
+
+	local hookRange = Ability.GetCastRange(hook)
+
+	if fooAllInOne.PudgeHookTargetedPos == nil then return false end
+
+	if os.clock() > fooAllInOne.PudgeHookStartTimer + 0.3 then return false end
+	if os.clock() < fooAllInOne.PudgeHookStartTimer + 0.1 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) then return false end
+
+	local timePassed = math.min(os.clock() - fooAllInOne.PudgeHookStartTimer, 0.3)
+
+	local pred = (0.3 - timePassed) + (Entity.GetAbsOrigin(target):__sub(Entity.GetAbsOrigin(myHero)):Length2D() / 1450) + (NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) * 2)
+	local predPos = fooAllInOne.castPrediction(myHero, target, pred)
+	
+	if (predPos - Entity.GetAbsOrigin(myHero)):Length2D() > hookRange + 100 then return true end
+
+	local searchRadius = 120
+	local distance = (Entity.GetAbsOrigin(myHero) - predPos):Length2D()
+
+	local check = false
+		for i = 1, math.ceil(distance / searchRadius) do
+			local checkVec = (fooAllInOne.PudgeHookTargetedPos - Entity.GetAbsOrigin(myHero)):Normalized()
+			local checkPos = Entity.GetAbsOrigin(myHero) + checkVec:Scaled(i * searchRadius)
+			if (checkPos - predPos):Length2D() < searchRadius then
+				check = true
+				break
+			end
+		end
+
+	if not check then
+		return true
+	end
+
+	return false
+
+end
+
+function fooAllInOne.PudgeHookJukingChecker(myHero, target)
+
+	if not myHero then return false end
+	if not target then return false end
+
+	if not NPC.IsRunning(target) then return false end
+
+	local turning = Entity.IsTurning(target)
+
+	if NPC.IsRunning(target) then
+		if NPC.IsRunning(target) then
+			table.insert(fooAllInOne.rotationTable, turning)
+			if #fooAllInOne.rotationTable > Menu.GetValue(fooAllInOne.optionHeroPudgeHookJuke) then
+				table.remove(fooAllInOne.rotationTable, 1)
+			end
+		end
+	end
+
+	if #fooAllInOne.rotationTable < Menu.GetValue(fooAllInOne.optionHeroPudgeHookJuke) then 
+		return true
+	else
+		local check = false
+		for i = 1, #fooAllInOne.rotationTable do
+			if fooAllInOne.rotationTable[i] == true then
+				check = true
+				break
+			end
+		end
+
+		if check then
+			return true
+		end
+	end
+
+	return false
+ 
+end
+
+function fooAllInOne.PudgeHookGetTarget(myHero)
+
+	if not myHero then return end
+
+	local targetingRange = Menu.GetValue(fooAllInOne.optionHeroPudgeHookAcquiRange)
+	local mousePos = Input.GetWorldCursorPos()
+
+	
+	local enemyTable = Heroes.InRadius(mousePos, targetingRange, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY)
+		if Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookAllies) then
+			enemyTable = Heroes.InRadius(mousePos, targetingRange, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_BOTH)
+		end
+		if #enemyTable < 1 then return end
+
+	local nearestTarget = nil
+	local distance = 99999
+
+	for i, v in ipairs(enemyTable) do
+		if v and Entity.IsHero(v) and Entity.IsAlive(v) and v ~= myHero then
+			if fooAllInOne.targetChecker(v) ~= nil then
+				local enemyDist = (Entity.GetAbsOrigin(v) - mousePos):Length2D()
+				if enemyDist < distance then
+					nearestTarget = v
+					distance = enemyDist
+				end
+			end
+		end
+	end
+
+	return nearestTarget or nil
+
+end
+
+function fooAllInOne.PudgeHookTiming(myHero, target)
+
+	if not myHero then return 0 end
+	if not target then return 0 end
+
+	local invulnerabilityList = {
+		"modifier_eul_cyclone",
+		"modifier_obsidian_destroyer_astral_imprisonment_prison",
+		"modifier_shadow_demon_disruption",
+		"modifier_invoker_tornado"
+			}
+	
+	local searchMod
+	for _, modifier in ipairs(invulnerabilityList) do
+		if NPC.HasModifier(target, modifier) then
+			searchMod = NPC.GetModifier(target, modifier)
+			break
+		end
+	end
+
+	if not searchMod then return 0 end
+
+	local timing = 0
+	if searchMod then
+		local dieTime = Modifier.GetDieTime(searchMod)
+		timing = dieTime
+	end
+
+	return timing
+
+end
+
+function fooAllInOne.PudgeHookHitTracker(myHero, hook)
+
+	if not myHero then return end
+	if not hook then return end
+
+	if Ability.SecondsSinceLastUse(hook) == -1 and fooAllInOne.PudgeHookHit then
+		fooAllInOne.PudgeHookHit = false
+	end
+
+	if fooAllInOne.PudgeHookTarget == nil and fooAllInOne.PudgeHookHit then
+		fooAllInOne.PudgeHookHit = false
+	end
+
+	if fooAllInOne.PudgeHookTarget then
+		if NPC.HasModifier(fooAllInOne.PudgeHookTarget, "modifier_pudge_meat_hook") then
+			fooAllInOne.PudgeHookHit = true
+		end
+	end
+	
+	return
+
+end
+
+function fooAllInOne.PudgeHookForceStaffFun(myHero, myMana, target, hook)
+
+	if not myHero then return false end
+	if not target then return false end
+		if NPC.HasState(target, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then return false end
+
+	if not Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookStaff) then return false end
+	if not hook then return false end
+
+	if fooAllInOne.heroCanCastSpells(myHero, enemy) == false then return false end
+	if fooAllInOne.isHeroChannelling(myHero) == true then return false end 
+
+	if not NPC.IsEntityInRange(myHero, target, 750) then return false end
+	if fooAllInOne.PudgeHookJukingChecker(myHero, target) then return false end
+
+	local force = NPC.GetItem(myHero, "item_force_staff", true)
+		if not force then return false end
+		if not Ability.IsCastable(force, myMana) then return false end
+
+	local targetTurnTime90 = (0.03 * math.pi) / NPC.GetTurnRate(target) / 3.5
+	if NPC.GetTimeToFace(target, myHero) > targetTurnTime90 then return false end
+
+	local targetRotation = Entity.GetRotation(target):GetForward()
+	local targetForcedPos = Entity.GetAbsOrigin(target) + targetRotation:Normalized():Scaled(600)
+
+	if not fooAllInOne.PudgeHookCollisionCheckerPosition(myHero, targetForcedPos) then return false end
+	local hookRange = Ability.GetCastRange(hook)
+		if (Entity.GetAbsOrigin(myHero) - targetForcedPos):Length2D() > hookRange then return false end
+
+	return true
+
+end
+
+function fooAllInOne.PudgeHookCollisionCheckerPosition(myHero, pos)
+
+	if not myHero then return false end
+	if not pos then return false end
+
+	local searchRadius = 125
+	local distance = (Entity.GetAbsOrigin(myHero) - pos):Length2D()
+
+	for i = 1, math.floor(distance / searchRadius) do
+		local checkVec = (pos - Entity.GetAbsOrigin(myHero)):Normalized()
+		local checkPos = Entity.GetAbsOrigin(myHero) + checkVec:Scaled(i * searchRadius)
+		local unitsAround = NPCs.InRadius(checkPos, searchRadius, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_BOTH)
+		local check = false
+			for _, unit in ipairs(unitsAround) do
+				if unit and Entity.IsNPC(unit) and unit ~= target and unit ~= myHero and Entity.IsAlive(unit) and not Entity.IsDormant(unit) and not NPC.IsStructure(unit) and not NPC.IsBarracks(unit) and not NPC.IsWaitingToSpawn(unit) and NPC.GetUnitName(unit) ~= "npc_dota_neutral_caster" and NPC.GetUnitName(unit) ~= nil then
+					check = true
+					break
+				end
+			end
+
+		if check then
+			return false
+		end	
+
+	end
+
+	return true
+
+end
+			
+function fooAllInOne.PudgeHookTargetIndicatorDel(myHero)
+
+	if not myHero then return end
+
+	local curtime = GameRules.GetGameTime()
+
+	if not Menu.IsKeyDown(fooAllInOne.optionHeroPudgeHookKey) or fooAllInOne.PudgeHookTarget == nil then
+		if fooAllInOne.PudgecurrentParticle > 0 then
+			Particle.Destroy(fooAllInOne.PudgecurrentParticle)			
+			fooAllInOne.PudgecurrentParticle = 0
+		end
+	end
+
+	return
+
+end
+
+function fooAllInOne.PudgeHookTargetIndicator(myHero, target)
+
+	if not myHero then return end
+	if not Menu.IsEnabled(fooAllInOne.optionHeroPudgeHook) then return end
+
+	local curtime = GameRules.GetGameTime()
+		
+	if (not target or target ~= fooAllInOne.PudgecurrentParticleTarget) and fooAllInOne.PudgecurrentParticle > 0 then
+		Particle.Destroy(fooAllInOne.PudgecurrentParticle)			
+		fooAllInOne.PudgecurrentParticle = 0
+		fooAllInOne.PudgecurrentParticleTarget = target
+	else
+		if fooAllInOne.PudgecurrentParticle == 0 and target then
+			local Particle = Particle.Create("particles/ui_mouseactions/range_finder_tower_aoe.vpcf", Enum.ParticleAttachment.PATTACH_INVALID, target)	
+			fooAllInOne.PudgecurrentParticle = Particle
+			fooAllInOne.PudgecurrentParticleTarget = target			
+		end
+		if fooAllInOne.PudgecurrentParticle > 0 then
+			Particle.SetControlPoint(fooAllInOne.PudgecurrentParticle, 2, Entity.GetOrigin(myHero))
+			Particle.SetControlPoint(fooAllInOne.PudgecurrentParticle, 6, Vector(1, 0, 0))
+			Particle.SetControlPoint(fooAllInOne.PudgecurrentParticle, 7, Entity.GetOrigin(fooAllInOne.PudgecurrentParticleTarget))
+		end
 	end
 
 end
@@ -14086,9 +15055,9 @@ function fooAllInOne.ODKillsteal(myHero, myMana, myAttackRange, arcaneOrb, astra
 					local target = fooAllInOne.targetChecker(targets)
 					if target then
 						if not NPC.HasState(target, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and not NPC.IsLinkensProtected(target) and not NPC.HasModifier(target, "modifier_templar_assassin_refraction_absorb") then
-							local targetHP = Entity.GetHealth(target) + 4 * math.ceil(NPC.GetHealthRegen(target))
+							local targetHP = Entity.GetHealth(target) + 5 * math.ceil(NPC.GetHealthRegen(target))
 							local prisonDamage = Ability.GetLevelSpecialValueFor(astralPrison, "damage")
-							local prisonTrueDamage = (1 - NPC.GetMagicalArmorValue(target)) * (prisonDamage + prisonDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))
+							local prisonTrueDamage = (1 - NPC.GetMagicalArmorValue(target)) * (prisonDamage + prisonDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100)) - 5
 							if targetHP < prisonTrueDamage then
 								Ability.CastTarget(astralPrison, target)
 								break
@@ -15678,7 +16647,6 @@ end
 function fooAllInOne.ClinkzCombo(myHero, enemy)
 
 	if not Menu.IsEnabled(fooAllInOne.optionHeroClinkz) then return end
-	if not NPC.IsEntityInRange(myHero, enemy, 3000)	then return end
 
 	local strafe = NPC.GetAbilityByIndex(myHero, 0)
 	local searingArrows = NPC.GetAbilityByIndex(myHero, 1)
@@ -15690,45 +16658,68 @@ function fooAllInOne.ClinkzCombo(myHero, enemy)
 
 	fooAllInOne.itemUsage(myHero, enemy)
 
-	if Menu.IsKeyDown(fooAllInOne.optionHeroClinkzHarassKey) then
-		fooAllInOne.ClinkzAutoHarass(myHero, myMana, clinkzAttackRange, searingArrows)
-		Engine.ExecuteCommand("dota_range_display " .. clinkzAttackRange)
-	else
-		Engine.ExecuteCommand("dota_range_display 0")
+	if Menu.IsEnabled(fooAllInOne.optionHeroClinkzHarass) then
+		if Menu.IsKeyDown(fooAllInOne.optionHeroClinkzHarassKey) then
+			fooAllInOne.ClinkzAutoHarass(myHero, myMana, searingArrows)
+		end
 	end
 	
-	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 then
-		if NPC.IsEntityInRange(myHero, enemy, NPC.GetAttackRange(myHero)) then
-			if strafe and Ability.IsCastable(strafe, myMana) and fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
-				Ability.CastNoTarget(strafe)
-				return
+	if enemy then
+		if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 then
+			if NPC.IsEntityInRange(myHero, enemy, NPC.GetAttackRange(myHero)) then
+				if strafe and Ability.IsCastable(strafe, myMana) and fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
+					Ability.CastNoTarget(strafe)
+					return
+				end
 			end
+		fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 		end
-	fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 	end					
 end
 
-function fooAllInOne.ClinkzAutoHarass(myHero, myMana, clinkzAttackRange, searingArrows)
+
+
+function fooAllInOne.ClinkzAutoHarass(myHero, myMana, searingArrows)
 
 	if not myHero then return end
-	if not Menu.IsEnabled(fooAllInOne.optionHeroClinkzHarass) then return end
 
 	if not searingArrows then return end
 		if Ability.GetLevel(searingArrows) < 1 then return end
+		if not Ability.IsCastable(searingArrows, myMana) then return end
 
 	if fooAllInOne.heroCanCastSpells(myHero, enemy) == false then return end
 	if fooAllInOne.isHeroChannelling(myHero) == true then return end 
 	if fooAllInOne.IsHeroInvisible(myHero) == true then return end
 
-	for _, hero in ipairs(NPC.GetHeroesInRadius(myHero, clinkzAttackRange, Enum.TeamType.TEAM_ENEMY)) do
-		if hero and Entity.IsHero(hero) and not Entity.IsDormant(hero) and not NPC.IsIllusion(hero) then 
-			if Entity.IsAlive(hero) then
-        			Ability.CastTarget(searingArrows, hero)
-				break
-        			return
+	local harassTarget = nil
+		for _, hero in ipairs(NPC.GetHeroesInRadius(myHero, NPC.GetAttackRange(myHero), Enum.TeamType.TEAM_ENEMY)) do
+			if hero and Entity.IsHero(hero) and not Entity.IsDormant(hero) and not NPC.IsIllusion(hero) then 
+				if Entity.IsAlive(hero) and not NPC.HasState(hero, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+        				harassTarget = hero
+					break
+				end
+      			end			
+		end
+
+	local mousePos = Input.GetWorldCursorPos()
+	if harassTarget ~= nil then
+		if not fooAllInOne.lastHitBackswingChecker(myHero) then
+			Ability.CastTarget(searingArrows, harassTarget)
+			return
+		else
+			if not NPC.IsPositionInRange(myHero, mousePos, 50, 0) then
+				fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, mousePos)
+				return
 			end
-      		end		
+		end
+	else
+		if not NPC.IsPositionInRange(myHero, mousePos, 50, 0) then
+			fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_MOVE_TO_POSITION", nil, mousePos)
+			return
+		end
 	end
+
+	return
 
 end
 
@@ -23871,6 +24862,28 @@ function fooAllInOne.AutoNukeKillSteal(myHero)
 								end
 							end
 						end
+						if skillName == "winter_wyvern_splinter_blast" and targetMode == "special" then	
+							local skillDamage = Ability.GetDamage(NPC.GetAbility(myHero, skillName))
+							local skillTrueDamage = ((1 - NPC.GetMagicalArmorValue(stealEnemy)) * skillDamage) + (skillDamage * (Hero.GetIntellectTotal(myHero) / 14 / 100))
+							if Entity.GetHealth(stealEnemy) + NPC.GetHealthRegen(stealEnemy) < skillTrueDamage then
+								if NPC.IsEntityInRange(myHero, stealEnemy, 1600, 0) and not NPC.HasState(stealEnemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+									local target
+									for _, possibleTargets in ipairs(Heroes.InRadius(Entity.GetAbsOrigin(stealEnemy), 499, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY)) do
+										if possibleTargets and possibleTargets ~= stealEnemy and Entity.IsHero(possibleTargets) and Entity.IsAlive(possibleTargets) and not NPC.HasState(possibleTargets, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) and not NPC.IsLinkensProtected(possibleTargets) then
+											if NPC.IsEntityInRange(myHero, possibleTargets, 1199) then
+												target = possibleTargets
+												break
+											end
+										end
+									end
+									if target ~= nil then
+										Ability.CastTarget(NPC.GetAbility(myHero, skillName), target)
+										break
+										return
+									end
+								end
+							end
+						end
 					end
 				end
 				if skillType == "pure" and NPC.GetAbility(myHero, skillName) ~= nil and not Ability.IsUltimate(NPC.GetAbility(myHero, skillName)) and Ability.IsCastable(NPC.GetAbility(myHero, skillName), myMana) then
@@ -26040,4 +27053,3 @@ function fooAllInOne.KunkkaShipCombo(myHero, enemy)
 end
 
 return fooAllInOne
-			
