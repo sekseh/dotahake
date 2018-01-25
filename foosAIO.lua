@@ -1,12 +1,12 @@
 ﻿-- foosAIO.lua
--- Version: beta.0.98.10b
+-- Version: beta.0.98.10c
 -- Author: foo0oo
 -- Release Date: 2017/05/03
 -- Last Update: 2018/01/25
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.10b", "Release date: 2018/01/25", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.10c", "Release date: 2018/01/25", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -11228,15 +11228,32 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 			if NPC.HasModifier(enemy, "modifier_pudge_meat_hook") then
 				maxInitRange = 0
 			end
-		end	
+		end
+		if Q and Ability.SecondsSinceLastUse(Q) > -1 and Ability.SecondsSinceLastUse(Q) < 0.5 then
+			maxInitRange = 0
+		end
 
 	if fooAllInOne.PudgeRotComboActivation and not Menu.IsKeyDown(fooAllInOne.optionComboKey) then
 		if Ability.GetToggleState(W) then
-			if os.clock() > fooAllInOne.PudgeRotComboDeactivation then
-				Ability.Toggle(W)
-				fooAllInOne.PudgeRotComboActivation = false
-				fooAllInOne.PudgeRotComboDeactivation = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + 0.05
-				return
+			local checkEnemies = false
+				for i, v in ipairs(Entity.GetHeroesInRadius(myHero, 250, Enum.TeamType.TEAM_ENEMY)) do
+					if v and Entity.IsHero(v) and Entity.IsAlive(v) and not NPC.IsIllusion(v) then
+						checkEnemies = true
+						break
+					end
+				end
+
+				if Entity.GetHealth(myHero) / Entity.GetMaxHealth(myHero) < 0.2 then
+					checkEnemies = false
+				end
+
+			if not checkEnemies then		
+				if os.clock() > fooAllInOne.PudgeRotComboDeactivation then
+					Ability.Toggle(W)
+					fooAllInOne.PudgeRotComboActivation = false
+					fooAllInOne.PudgeRotComboDeactivation = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) + NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING) + 0.05
+					return
+				end
 			end
 		end
 	end
@@ -11281,6 +11298,7 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 						if not NPC.IsEntityInRange(myHero, enemy, Menu.GetValue(fooAllInOne.optionHeroPudgeBlinkMinRange)) then
 							if not NPC.HasModifier(myHero, "modifier_item_forcestaff_active") then
 								Ability.CastPosition(blink, (Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(75)))
+								fooAllInOne.lastTick = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING)
 								return
 							end
 						end
@@ -11291,6 +11309,7 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 						if not NPC.IsEntityInRange(myHero, enemy, Menu.GetValue(fooAllInOne.optionHeroPudgeBlinkMinRange)) then
 							if not NPC.HasModifier(myHero, "modifier_item_forcestaff_active") then
 								Ability.CastPosition(blink, (Entity.GetAbsOrigin(enemy) + (Entity.GetAbsOrigin(myHero) - Entity.GetAbsOrigin(enemy)):Normalized():Scaled(75)))
+								fooAllInOne.lastTick = os.clock() + NetChannel.GetAvgLatency(Enum.Flow.FLOW_INCOMING)
 								return
 							end
 						end
@@ -11319,25 +11338,27 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 					fooAllInOne.lastTick = 0
 					fooAllInOne.PudgeHookTargetedPos = nil
 					return
-				end		
+				end	
 
+				if W and Ability.IsReady(W) and NPC.IsEntityInRange(myHero, enemy, 245) and not Ability.GetToggleState(W) then
+					if os.clock() > fooAllInOne.PudgeHookRotDelayer then	
+						Ability.Toggle(W)
+						fooAllInOne.PudgeRotComboActivation = true
+						fooAllInOne.PudgeHookRotDelayer = os.clock() + 0.2
+						return
+					end
+				end
+	
 				if os.clock() > fooAllInOne.lastTick then
 
 					if ult and Ability.IsCastable(ult, myMana) then
 						if NPC.IsEntityInRange(myHero, enemy, Ability.GetCastRange(ult)) then
 							if not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_HEXED) and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_STUNNED) then
 								Ability.CastTarget(ult, enemy)
-								fooAllInOne.lastTick = os.clock() + 0.3
+								fooAllInOne.lastTick = os.clock() + 0.5
 								return
 							end
 						end	
-					end
-
-					if W and Ability.IsReady(W) and NPC.IsEntityInRange(myHero, enemy, 250) and not Ability.GetToggleState(W) then
-						Ability.Toggle(W)
-						fooAllInOne.PudgeRotComboActivation = true
-						fooAllInOne.lastTick = os.clock() + 0.2
-						return
 					end
 
 					local check = false
@@ -11352,7 +11373,10 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 							if force and Ability.SecondsSinceLastUse(force) > -1 and Ability.SecondsSinceLastUse(force) < 1 then
 								check = true
 							end
-						end	
+							if blink and Ability.SecondsSinceLastUse(blink) > -1 and Ability.SecondsSinceLastUse(blink) < 0.5 then
+								check = true
+							end
+						end
 
 					if Menu.IsEnabled(fooAllInOne.optionHeroPudgeHookCombo) and not check and not NPC.HasModifier(myHero, "modifier_item_forcestaff_active") then
 						if Q and Ability.IsCastable(Q, myMana) and NPC.IsEntityInRange(myHero, enemy, Menu.GetValue(fooAllInOne.optionHeroPudgeHookComboMaxRange)) and not NPC.IsChannellingAbility(myHero) then
@@ -11370,7 +11394,17 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 				end
 			end
 
-			if not NPC.HasModifier(enemy, "modifier_pudge_meat_hook") then
+			local attCheck = false
+				if ult and Ability.IsCastable(ult, myMana) then
+					if force and Ability.SecondsSinceLastUse(force) > -1 and Ability.SecondsSinceLastUse(force) < 1 then
+						check = true
+					end
+					if blink and Ability.SecondsSinceLastUse(blink) > -1 and Ability.SecondsSinceLastUse(blink) < 0.5 then
+						check = true
+					end
+				end
+
+			if not NPC.HasModifier(enemy, "modifier_pudge_meat_hook") and not attCheck then
 				fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
 				return
 			end
@@ -11384,6 +11418,8 @@ function fooAllInOne.PudgeCombo(myHero, enemy)
 	if Menu.IsEnabled(fooAllInOne.optionHeroPudgeSuicide) then
 		fooAllInOne.PudgeAutoSuicide(myHero, myMana, W)
 	end
+
+	return
 
 end
 
