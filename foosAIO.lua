@@ -1,12 +1,12 @@
 ﻿-- foosAIO.lua
--- Version: beta.0.98.10c
+-- Version: beta.0.98.10d
 -- Author: foo0oo
 -- Release Date: 2017/05/03
--- Last Update: 2018/01/25
+-- Last Update: 2018/01/29
 local fooAllInOne = {}
 -- Menu Items
 	-- general Menu
-fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.10c", "Release date: 2018/01/25", 0, 0, 0)
+fooAllInOne.versionNumber = Menu.AddOption({ "Utility","foos AllInOne" }, "0. Version Number: beta.0.98.10d", "Release date: 2018/01/29", 0, 0, 0)
 Menu.SetValueName(fooAllInOne.versionNumber, 0, '')
 
 fooAllInOne.optionEnable = Menu.AddOption({ "Utility","foos AllInOne" }, "1. Overall enabled {{overall}}", "Helpers helper")
@@ -5066,6 +5066,7 @@ function fooAllInOne.GetMoveSpeed(enemy)
 end
 
 function fooAllInOne.getBestPosition(unitsAround, radius)
+
 	if not unitsAround or #unitsAround < 1 then
 		return 
 	end
@@ -5076,31 +5077,64 @@ function fooAllInOne.getBestPosition(unitsAround, radius)
 		return Entity.GetAbsOrigin(unitsAround[1]) 
 	end
 
-	local maxCount = 1
-	local bestPosition = Entity.GetAbsOrigin(unitsAround[1])
-	for i = 1, (countEnemies - 1) do
-		for j = i + 1, countEnemies do
-			if unitsAround[i] and unitsAround[j] then
-				local pos1 = Entity.GetAbsOrigin(unitsAround[i])
-				local pos2 = Entity.GetAbsOrigin(unitsAround[j])
-				local mid = pos1:__add(pos2):Scaled(0.5)
+	return fooAllInOne.getMidPoint(unitsAround)
 
-				local heroesCount = 0
-				for k = 1, countEnemies do
-				--	if NPC.IsPositionInRange(unitsAround[k], mid, radius, 0) then
-					if (Entity.GetAbsOrigin(unitsAround[k]) - mid):Length2D() <= radius then
-						heroesCount = heroesCount + 1
-					end
-				end
+--	local maxCount = 1
+--	local bestPosition = Entity.GetAbsOrigin(unitsAround[1])
+--	for i = 1, (countEnemies - 1) do
+--		for j = i + 1, countEnemies do
+--			if unitsAround[i] and unitsAround[j] then
+--				local pos1 = Entity.GetAbsOrigin(unitsAround[i])
+--				local pos2 = Entity.GetAbsOrigin(unitsAround[j])
+--				local mid = pos1:__add(pos2):Scaled(0.5)
+--
+--				local heroesCount = 0
+--				for k = 1, countEnemies do
+--				--	if NPC.IsPositionInRange(unitsAround[k], mid, radius, 0) then
+--					if (Entity.GetAbsOrigin(unitsAround[k]) - mid):Length2D() <= radius then
+--						heroesCount = heroesCount + 1
+--					end
+--				end
+--
+--				if heroesCount > maxCount then
+--					maxCount = heroesCount
+--					bestPosition = mid
+--				end
+--			end
+--		end
+--	end
+--	return bestPosition
 
-				if heroesCount > maxCount then
-					maxCount = heroesCount
-					bestPosition = mid
-				end
+end
+
+function fooAllInOne.getMidPoint(entityList)
+
+	if not entityList then return end
+	if #entityList < 1 then return end
+
+	local pts = {}
+		for i, v in ipairs(entityList) do
+			if v and not Entity.IsDormant(v) then
+				local pos = Entity.GetAbsOrigin(v)
+				local posX = pos:GetX()
+				local posY = pos:GetY()
+				table.insert(pts, { x=posX, y=posY })
 			end
 		end
+	
+	local x, y, c = 0, 0, #pts
+
+		if (pts.numChildren and pts.numChildren > 0) then c = pts.numChildren end
+
+	for i = 1, c do
+
+		x = x + pts[i].x
+		y = y + pts[i].y
+
 	end
-	return bestPosition
+
+	return Vector(x/c, y/c, 0)
+
 end
 
 function fooAllInOne.GetMyFaction(myHero)
@@ -11060,9 +11094,25 @@ function fooAllInOne.axeCombo(myHero, enemy)
 	local hunger = NPC.GetAbilityByIndex(myHero, 1)
 	local culling = NPC.GetAbility(myHero, "axe_culling_blade")
 
-	local Blademail = NPC.GetItem(myHero, "item_blade_mail", true)
+	local blademail = NPC.GetItem(myHero, "item_blade_mail", true)
 	local blink = NPC.GetItem(myHero, "item_blink", true)
 	local myMana = NPC.GetMana(myHero)
+
+	local callRange = 300
+		if NPC.HasAbility(myHero, "special_bonus_unique_axe_2") then
+			if Ability.GetLevel(NPC.GetAbility(myHero, "special_bonus_unique_axe_2")) > 0 then
+				callRange = 400
+			end
+		end
+		if NPC.IsRunning(enemy) then
+			if not blink then
+				callRange = callRange - 100
+			else
+				if Ability.SecondsSinceLastUse(blink) > 0.75 then
+					callRange = callRange - 100
+				end
+			end	
+		end	
 
 	if Menu.IsEnabled(fooAllInOne.optionHeroAxeCulling) then
 		if culling and Ability.IsCastable(culling, myMana) and fooAllInOne.isHeroChannelling(myHero) == false and fooAllInOne.IsHeroInvisible(myHero) == false then
@@ -11093,44 +11143,59 @@ function fooAllInOne.axeCombo(myHero, enemy)
 	
 	fooAllInOne.itemUsage(myHero, enemy)
 	
-	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and cursorCheck and fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
-		if not NPC.IsEntityInRange(myHero, enemy, 260) then
-			if blink and Ability.IsReady(blink) then
-				if NPC.IsEntityInRange(myHero, enemy, 1150) then
-					if Menu.GetValue(fooAllInOne.optionHeroAxeJump) == 0 then
-						Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy))
-						return
-					else
-						local bestPos = fooAllInOne.getBestPosition(Heroes.InRadius(Entity.GetAbsOrigin(enemy), 580, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY), 290)
-						if bestPos ~= nil then
-							Ability.CastPosition(blink, bestPos)
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and cursorCheck then
+		if fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
+			if not NPC.IsEntityInRange(myHero, enemy, callRange) then
+				if blink and Ability.IsReady(blink) then
+					if NPC.IsEntityInRange(myHero, enemy, 1150) then
+						if Menu.GetValue(fooAllInOne.optionHeroAxeJump) == 0 then
+							Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy))
 							return
+						else
+							local bestPos = fooAllInOne.getBestPosition(Heroes.InRadius(Entity.GetAbsOrigin(enemy), callRange * 2, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY), callRange)
+							if bestPos ~= nil then
+								Ability.CastPosition(blink, bestPos)
+								return
+							end
 						end
 					end
 				end
 			end
-		else
-			if culling and Entity.GetHealth(enemy) + NPC.GetHealthRegen(enemy) < Ability.GetLevelSpecialValueFor(culling, "kill_threshold") and NPC.IsEntityInRange(myHero, enemy, 150) and Ability.IsCastable(culling, myMana) and not NPC.IsLinkensProtected(enemy) then 
-				Ability.CastTarget(culling, enemy)
-				fooAllInOne.lastTick = os.clock()
-				return 
-			end 
-			if call and Ability.IsCastable(call, myMana) then 
-				Ability.CastNoTarget(call)
-				fooAllInOne.lastTick = os.clock()
-				return
-			end
-			if fooAllInOne.SleepReady(0.4) and Blademail and NPC.HasModifier(enemy, "modifier_axe_berserkers_call") and Ability.IsCastable(Blademail, myMana) then 
-				Ability.CastNoTarget(Blademail)
-				return
-			end
-			if fooAllInOne.SleepReady(0.4) and hunger and NPC.HasModifier(enemy, "modifier_axe_berserkers_call") and Ability.IsCastable(hunger, myMana - 120) then 
-				Ability.CastTarget(hunger, enemy)
-				return
+
+			if os.clock() > fooAllInOne.lastTick then
+
+				if culling and Ability.IsCastable(culling, myMana) and NPC.IsEntityInRange(myHero, enemy, 150) then
+					if Entity.GetHealth(enemy) + NPC.GetHealthRegen(enemy) < Ability.GetLevelSpecialValueFor(culling, "kill_threshold") and not NPC.IsLinkensProtected(enemy) then 
+						Ability.CastTarget(culling, enemy)
+						fooAllInOne.lastTick = os.clock() + 0.3 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+						return 
+					end
+				end
+
+				if call and Ability.IsCastable(call, myMana) and NPC.IsEntityInRange(myHero, enemy, callRange) then 
+					Ability.CastNoTarget(call)
+					fooAllInOne.lastTick = os.clock() + 0.4 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+					return
+				end
+
+				if blademail and Ability.IsCastable(blademail, myMana) and NPC.HasModifier(enemy, "modifier_axe_berserkers_call") then 
+					Ability.CastNoTarget(blademail)
+					fooAllInOne.lastTick = os.clock() + 0.05 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+					return
+				end
+
+				if hunger and Ability.IsCastable(hunger, myMana - 120) and NPC.IsEntityInRange(myHero, enemy, Ability.GetCastRange(hunger)) and not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then 
+					Ability.CastTarget(hunger, enemy)
+					fooAllInOne.lastTick = os.clock() + 0.3 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+					return
+				end
 			end
 		end
+
 	fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+	return
 	end
+
 end
 
 function fooAllInOne.centaurCombo(myHero, enemy)
@@ -11141,7 +11206,7 @@ function fooAllInOne.centaurCombo(myHero, enemy)
 	local hoofStomp = NPC.GetAbilityByIndex(myHero, 0)
 	local doubleEdge = NPC.GetAbilityByIndex(myHero, 1)
 
-	local Blademail = NPC.GetItem(myHero, "item_blade_mail", true)
+	local blademail = NPC.GetItem(myHero, "item_blade_mail", true)
 	local blink = NPC.GetItem(myHero, "item_blink", true)
 	local myMana = NPC.GetMana(myHero)
 
@@ -11158,45 +11223,63 @@ function fooAllInOne.centaurCombo(myHero, enemy)
 	
 	fooAllInOne.itemUsage(myHero, enemy)
 
-	local stunRange = 250
+	local stunRange = 315
 		if NPC.IsRunning(enemy) then
-			stunRange = 125
+			if not blink then
+				stunRange = 175
+			else
+				if Ability.SecondsSinceLastUse(blink) > 0.75 then
+					stunRange = 175
+				end
+			end
 		end	
 	
-	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and cursorCheck and fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
-		if not NPC.IsEntityInRange(myHero, enemy, stunRange) then
-			if blink and Ability.IsReady(blink) then
-				if NPC.IsEntityInRange(myHero, enemy, 1150) then
-					if Menu.GetValue(fooAllInOne.optionHeroCentaurJump) == 0 then
-						Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy))
-						return
-					else
-						local bestPos = fooAllInOne.getBestPosition(Heroes.InRadius(Entity.GetAbsOrigin(enemy), 600, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY), 300)
-						if bestPos ~= nil then
-							Ability.CastPosition(blink, bestPos)
+	if Menu.IsKeyDown(fooAllInOne.optionComboKey) and Entity.GetHealth(enemy) > 0 and cursorCheck then
+		if fooAllInOne.heroCanCastSpells(myHero, enemy) == true then
+			if not NPC.IsEntityInRange(myHero, enemy, stunRange) then
+				if blink and Ability.IsReady(blink) then
+					if NPC.IsEntityInRange(myHero, enemy, 1150) then
+						if Menu.GetValue(fooAllInOne.optionHeroCentaurJump) == 0 then
+							Ability.CastPosition(blink, Entity.GetAbsOrigin(enemy))
 							return
+						else
+							local bestPos = fooAllInOne.getBestPosition(Heroes.InRadius(Entity.GetAbsOrigin(enemy), stunRange * 2, Entity.GetTeamNum(myHero), Enum.TeamType.TEAM_ENEMY), stunRange)
+							if bestPos ~= nil then
+								Ability.CastPosition(blink, bestPos)
+								return
+							end
 						end
 					end
 				end
 			end
-		else
-			if not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
-				if hoofStomp and Ability.IsCastable(hoofStomp, myMana) then 
-					Ability.CastNoTarget(hoofStomp)
-					fooAllInOne.lastTick = os.clock()
-					return
-				end
-				if fooAllInOne.SleepReady(0.5) and Blademail and NPC.HasModifier(enemy, "modifier_stunned") and Ability.IsCastable(Blademail, myMana) then 
-					Ability.CastNoTarget(Blademail)
-					return
-				end
-				if fooAllInOne.SleepReady(0.5) and doubleEdge and Ability.IsCastable(doubleEdge, myMana) then 
-					Ability.CastTarget(doubleEdge, enemy)
-					return
+
+			if os.clock() > fooAllInOne.lastTick then
+			
+				if not NPC.HasState(enemy, Enum.ModifierState.MODIFIER_STATE_MAGIC_IMMUNE) then
+
+					if hoofStomp and Ability.IsCastable(hoofStomp, myMana) and NPC.IsEntityInRange(myHero, enemy, stunRange) then 
+						Ability.CastNoTarget(hoofStomp)
+						fooAllInOne.lastTick = os.clock() + 0.5 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING) 
+						return
+					end
+
+					if blademail and Ability.IsCastable(blademail, myMana) and NPC.HasModifier(enemy, "modifier_stunned") then 
+						Ability.CastNoTarget(blademail)
+						fooAllInOne.lastTick = os.clock() + 0.05 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+						return
+					end
+
+					if doubleEdge and Ability.IsCastable(doubleEdge, myMana) and NPC.IsEntityInRange(myHero, enemy, 150) and not NPC.IsLinkensProtected(enemy) then 
+						Ability.CastTarget(doubleEdge, enemy)
+						fooAllInOne.lastTick = os.clock() + 0.5 + NetChannel.GetAvgLatency(Enum.Flow.FLOW_OUTGOING)
+						return
+					end
 				end
 			end
 		end
+
 	fooAllInOne.GenericMainAttack(myHero, "Enum.UnitOrder.DOTA_UNIT_ORDER_ATTACK_TARGET", enemy, nil)
+	return
 	end
 
 end
@@ -26679,7 +26762,7 @@ function fooAllInOne.TinkerFarmGetSaveSpot(myHero, target, blink)
 	local treeTargetPos = nil
 	if treeCount >= 4 then
 		if targetTree ~= nil then
-			local bestPos = fooAllInOne.getBestPosition(Trees.InRadius(Entity.GetAbsOrigin(targetTree), 499, true), 500)
+			local bestPos = fooAllInOne.getBestPosition(Trees.InRadius(Entity.GetAbsOrigin(targetTree), 400, true), 200)
 			if bestPos ~= nil and bestPos:__sub(targetPos):Length2D() < 1000 and bestPos:__sub(myPos):Length2D() < 1125 then
 				treeTargetPos = bestPos
 			end		
@@ -27194,3 +27277,4 @@ function fooAllInOne.KunkkaShipCombo(myHero, enemy)
 end
 
 return fooAllInOne
+			
